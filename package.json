@@ -1,0 +1,25 @@
+{
+  "name": "swayari-enterprises",
+  "version": "0.1.0",
+  "description": "SWAYARI ENTERPRISES - Décor & Gifting Catalogue and Order Management Application",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev public --d1 DB",
+    "build": "node scripts/generate-manifest.js",
+    "test": "node scripts/run-tests.js",
+    "migrate:local": "wrangler d1 migrations apply DB --local",
+    "migrate:prod": "wrangler d1 migrations apply DB --remote",
+    "seed:local": "wrangler d1 execute DB --local --file=./migrations/0002_demo_data.sql",
+    "backup:daily": "bash scripts/create-daily-backup.sh"
+  },
+  "dependencies": {
+    "jose": "^5.9.6"
+  },
+  "devDependencies": {
+    "wrangler": "^3.109.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWAYARI | Décor &amp; Gifting | Artisanal Art &amp; Heirloom Mementos</title>
+  <meta name="description" content="SWAYARI ENTERPRISES presents a luxury catalogue of handcrafted devotional art, silver-embossed framed plaques, brass décor, and bespoke festive gifting.">
+  <link rel="canonical" href="https://swayari-enterprises.pages.dev/">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/assets/brand/favicon.svg">
+
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta name="google-client-id" content="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/pages.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand-link" aria-label="SWAYARI Home">
+        <img src="/assets/brand/swayari-logo.svg" alt="SWAYARI Décor &amp; Gifting" class="brand-logo-img">
+      </a>
+
+      <nav class="main-nav" aria-label="Main Navigation">
+        <a href="/" class="nav-link active">Home</a>
+        <a href="/shop/" class="nav-link">Shop Catalogue</a>
+        <a href="/about/" class="nav-link">About SWAYARI</a>
+        <a href="/contact/" class="nav-link">Contact</a>
+        <a href="/admin/" id="header-admin-link" class="nav-link" style="display:none; color:var(--color-burgundy); font-weight:700;">Admin Panel</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="/cart/" class="action-btn" aria-label="View Cart and Order Requests" title="View Request Cart">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="cart-count-badge" style="display:none;">0</span>
+        </a>
+
+        <div id="header-auth-container">
+          <button id="header-signin-btn" class="btn btn-secondary btn-sm">Sign In</button>
+        </div>
+
+        <button class="action-btn mobile-menu-toggle" aria-label="Toggle Navigation Menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container hero-content">
+        <!-- SVG Lotus Crest -->
+        <svg class="hero-crest" viewBox="0 0 64 64">
+          <g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <path d="M32 10 C27 20 26 28 32 36 C38 28 37 20 32 10 Z" fill="currentColor" fill-opacity="0.3"/>
+            <path d="M27 28 C16 18 12 34 28 37"/>
+            <path d="M24 33 C9 27 8 42 26 40"/>
+            <path d="M37 28 C48 18 52 34 36 37"/>
+            <path d="M40 33 C55 27 56 42 38 40"/>
+            <polygon points="32,43 36,47 32,51 28,47" fill="currentColor"/>
+          </g>
+        </svg>
+
+        <p class="hero-subtitle">SWAYARI ENTERPRISES &bull; DÉCOR &amp; GIFTING</p>
+        <h1 class="hero-title">Heirloom Devotional Art &amp; Thoughtful Gifting</h1>
+        <p class="hero-tagline">Exquisite silver-foil framed reliefs, artisanal brassware, and bespoke celebrations curated with timeless Indian craftsmanship.</p>
+        
+        <div class="hero-actions">
+          <a href="/shop/" class="btn btn-gold">Explore Catalogue</a>
+          <a href="/contact/" class="btn btn-secondary" style="color:#FAF7F2; border-color:rgba(250,247,242,0.3);">Custom &amp; Bulk Gifting</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catalogue Highlights Section -->
+    <section class="container" style="padding: 4rem 1.5rem;">
+      <div class="section-header">
+        <span class="section-subtitle">Curated Collection</span>
+        <h2 class="section-title">Artisanal Masterpieces</h2>
+        <p class="section-lead">Each item is individually crafted, inspected, and packaged to bring sanctity, elegance, and distinction to your sacred space or festive celebrations.</p>
+      </div>
+
+      <!-- Categories row (rendered only if published products exist) -->
+      <div id="category-pills" style="display:flex; justify-content:center; gap:0.75rem; flex-wrap:wrap; margin-bottom:2.5rem;"></div>
+
+      <!-- Products Grid -->
+      <div id="home-product-grid" class="product-grid">
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <div class="empty-state-icon">❖</div>
+          <h3 class="empty-state-title">Inaugural Collection In Progress</h3>
+          <p class="empty-state-text">Our authentic handcrafted inventory is currently being catalogued. We invite you to view sample previews or reach out directly for personalised gifting orders.</p>
+          <button id="show-preview-btn" class="btn btn-outline-gold btn-sm">Preview Sample Catalogue</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Brand Introduction -->
+    <section class="brand-story-section">
+      <div class="container brand-story-grid">
+        <div>
+          <span class="section-subtitle">The SWAYARI Heritage</span>
+          <h2 style="font-size:2.2rem; margin-bottom:1.25rem;">Crafted with Reverence, Gifted with Grace</h2>
+          <p>At SWAYARI, we believe décor is not merely ornamentation—it is an enduring reflection of heritage, tradition, and sacred gratitude. Every embossed devotional relief, brass oil lamp, and celebratory memento in our collection is curated to honor time-honored Indian artisanal techniques.</p>
+          <p>Whether commemorating a housewarming, seeking an auspicious wedding memento, or honoring valued corporate relationships, SWAYARI offers bespoke customisation, dedicated telephone consultation, and respectful personal attention for every request.</p>
+          <div style="margin-top:2rem;">
+            <a href="/about/" class="btn btn-secondary">Learn Our Story</a>
+          </div>
+        </div>
+
+        <div class="brand-story-card">
+          <img src="/assets/brand/swayari_brand_card.jpeg" alt="SWAYARI Décor &amp; Gifting Artwork" class="brand-card-preview-img">
+        </div>
+      </div>
+    </section>
+
+    <!-- Corporate & Bulk Gifting Banner -->
+    <section class="container" style="margin-bottom: 5rem;">
+      <div style="background-color:var(--bg-surface); border:1px solid var(--color-gold-border); border-radius:var(--radius-md); padding:3rem 2rem; text-align:center; box-shadow:var(--shadow-sm);">
+        <span class="section-subtitle">Festive &amp; Corporate Gifting</span>
+        <h3 style="font-size:2rem; margin-bottom:1rem; color:var(--color-burgundy);">Bespoke Orders &amp; Institutional Inquiries</h3>
+        <p style="max-width:650px; margin:0 auto 2rem auto; color:var(--text-secondary);">We provide customised engraving, premium velvet presentation packaging, and tiered quotations for bulk festive gifting, cultural festivals, and corporate milestones.</p>
+        <a href="/contact/" class="btn btn-primary">Inquire for Bulk Orders</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div style="margin-bottom:1rem;">
+            <span style="font-family:var(--font-heading); font-size:1.5rem; color:var(--color-gold); font-weight:700; letter-spacing:0.12em;">SWAYARI</span>
+            <div style="font-size:0.65rem; color:#DDD2C4; letter-spacing:0.2em; text-transform:uppercase;">DÉCOR &amp; GIFTING</div>
+          </div>
+          <p style="color:#C4B6A6; font-size:0.88rem; line-height:1.6; margin-bottom:1.5rem;">
+            SWAYARI ENTERPRISES specialises in premium devotional art, silver-embossed framed plaques, and artisanal brass décor for discerning homes and momentous celebrations.
+          </p>
+          <div style="font-size:0.85rem; color:#DDD2C4;">
+            <strong>Email:</strong> swayarienterprises@gmail.com
+          </div>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Catalogue</h4>
+          <ul class="footer-links">
+            <li><a href="/shop/">All Products</a></li>
+            <li><a href="/shop/?category=silver-plated-art">Silver Embossed Art</a></li>
+            <li><a href="/shop/?category=brass-decor">Brass Décor &amp; Urulis</a></li>
+            <li><a href="/shop/?category=corporate-festive-gifting">Festive Gifting Sets</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about/">About Us</a></li>
+            <li><a href="/contact/">Contact &amp; Inquiries</a></li>
+            <li><a href="/cart/">Request Cart</a></li>
+            <li><a href="/account/orders">My Order Requests</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Policies</h4>
+          <ul class="footer-links">
+            <li><a href="/ordering-policy/">Ordering &amp; Delivery Policy</a></li>
+            <li><a href="/privacy/">Privacy Policy</a></li>
+          </ul>
+          <div style="margin-top:1.5rem; font-size:0.8rem; color:#A89B8D; line-height:1.4;">
+            Requests are verified manually. No online payments are collected on this website.
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 SWAYARI ENTERPRISES. All rights reserved.</div>
+        <div>Designed with reverence &bull; Powered by Cloudflare &amp; Google Identity</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <div class="modal-content">
+      <button id="auth-modal-close" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+      <div class="google-auth-card">
+        <svg class="lotus-header" viewBox="0 0 64 64">
+          <g stroke="#C5A059" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <path d="M32 10 C27 20 26 28 32 36 C38 28 37 20 32 10 Z" fill="#C5A059" fill-opacity="0.3"/>
+            <path d="M27 28 C16 18 12 34 28 37"/>
+            <path d="M37 28 C48 18 52 34 36 37"/>
+            <polygon points="32,43 36,47 32,51 28,47" fill="#C5A059"/>
+          </g>
+        </svg>
+        <h3 id="auth-modal-title" class="google-auth-title">Sign in to SWAYARI</h3>
+        <p class="google-auth-desc">Sign in with your Google account to save items to your request list, submit order requests, and track quotation updates.</p>
+
+        <!-- Google Identity Button Container -->
+        <div id="google-signin-btn-container" class="google-btn-container"></div>
+
+        <!-- Dev Mode Authentication Options (Displayed in development when client ID is pending) -->
+        <div id="dev-auth-options" style="margin-top:1.5rem; padding-top:1.25rem; border-top:1px dashed var(--border-subtle); display:none;">
+          <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.75rem;">DEVELOPMENT SHORTCUTS:</p>
+          <div style="display:flex; gap:0.5rem; justify-content:center;">
+            <button id="dev-login-customer-btn" class="btn btn-secondary btn-sm">Sign in as Customer</button>
+            <button id="dev-login-admin-btn" class="btn btn-gold btn-sm">Sign in as Admin</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { Auth } from '/js/auth.js';
+    import { Cart } from '/js/cart.js';
+
+    async function loadProducts(includeDemo = false) {
+      const container = document.getElementById('home-product-grid');
+      try {
+        const res = await API.getProducts(includeDemo ? { include_demo: '1' } : {});
+        if (res.products && res.products.length > 0) {
+          container.innerHTML = res.products.map(p => `
+            <div class="product-card">
+              ${p.isDemo ? '<span class="badge badge-demo product-tag">Sample Preview</span>' : ''}
+              <div class="product-card-img-wrapper">
+                <img src="${p.primaryImage}" alt="${p.name}" class="product-card-img" loading="lazy">
+              </div>
+              <div class="product-card-content">
+                <span class="product-category-meta">${p.categoryName || 'Décor'}</span>
+                <h3 class="product-card-title">
+                  <a href="/product/?slug=${p.slug}">${p.name}</a>
+                </h3>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem; flex:1;">
+                  ${p.material ? p.material + ' &bull; ' : ''}${p.dimensions || ''}
+                </p>
+                <div class="product-card-price-row">
+                  <div>
+                    ${p.indicativePrice ? `<div class="product-price">₹${p.indicativePrice.toLocaleString('en-IN')}</div><div class="product-price-disclaimer">Indicative • Excludes shipping</div>` : '<div class="product-price-request">Price on Request</div>'}
+                  </div>
+                  <button class="btn btn-secondary btn-sm add-cart-btn" data-product-id="${p.id}">
+                    Add to Request
+                  </button>
+                </div>
+              </div>
+            </div>
+          `).join('');
+
+          // Bind Add to Cart with Google Auth resume
+          container.querySelectorAll('.add-cart-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const prodId = btn.getAttribute('data-product-id');
+              const prod = res.products.find(x => x.id === prodId);
+              if (!prod) return;
+
+              if (Auth.isAuthenticated()) {
+                Cart.addItem(prod, 1);
+                Auth.showToast(`Added "${prod.name}" to your request list!`);
+              } else {
+                Auth.requireAuthForAction({
+                  type: 'add_to_cart',
+                  product: prod,
+                  quantity: 1
+                });
+              }
+            });
+          });
+        }
+      } catch (e) {
+        console.error('Failed to load products on homepage:', e);
+      }
+    }
+
+    loadProducts();
+
+    document.getElementById('show-preview-btn')?.addEventListener('click', () => {
+      loadProducts(true);
+    });
+  </script>
+</body>
+</html>

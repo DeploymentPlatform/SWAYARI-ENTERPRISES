@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details | SWAYARI Décor &amp; Gifting</title>
+  <meta name="description" content="View handcrafted specifications, dimensions, and submit an order inquiry for SWAYARI artisanal items.">
+  <link rel="icon" type="image/svg+xml" href="/assets/brand/favicon.svg">
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta name="google-client-id" content="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com">
+
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/pages.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand-link">
+        <img src="/assets/brand/swayari-logo.svg" alt="SWAYARI Décor &amp; Gifting" class="brand-logo-img">
+      </a>
+
+      <nav class="main-nav">
+        <a href="/">Home</a>
+        <a href="/shop/" class="nav-link active">Shop Catalogue</a>
+        <a href="/about/" class="nav-link">About SWAYARI</a>
+        <a href="/contact/" class="nav-link">Contact</a>
+        <a href="/admin/" id="header-admin-link" class="nav-link" style="display:none; color:var(--color-burgundy); font-weight:700;">Admin Panel</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="/cart/" class="action-btn" aria-label="View Request Cart">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="cart-count-badge" style="display:none;">0</span>
+        </a>
+
+        <div id="header-auth-container">
+          <button id="header-signin-btn" class="btn btn-secondary btn-sm">Sign In</button>
+        </div>
+
+        <button class="action-btn mobile-menu-toggle" aria-label="Toggle Menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="min-height:60vh; padding: 2rem 1.5rem 5rem 1.5rem;">
+    <!-- Breadcrumb -->
+    <nav style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;">
+      <a href="/">Home</a> &rsaquo; 
+      <a href="/shop/">Catalogue</a> &rsaquo; 
+      <span id="breadcrumb-product-name" style="color:var(--text-primary);">Product</span>
+    </nav>
+
+    <!-- Product Layout Container -->
+    <div id="product-detail-container">
+      <div style="text-align:center; padding:4rem; color:var(--text-muted);">
+        Loading product details...
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 SWAYARI ENTERPRISES. All rights reserved.</div>
+        <div>Order requests are confirmed manually via personal consultation.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <div class="modal-content">
+      <button id="auth-modal-close" class="modal-close-btn">&times;</button>
+      <div class="google-auth-card">
+        <h3 id="auth-modal-title" class="google-auth-title">Sign in to SWAYARI</h3>
+        <p class="google-auth-desc">Sign in with Google to add this item to your request list and submit an order request.</p>
+        <div id="google-signin-btn-container" class="google-btn-container"></div>
+        <div id="dev-auth-options" style="margin-top:1.5rem; padding-top:1.25rem; border-top:1px dashed var(--border-subtle); display:none;">
+          <div style="display:flex; gap:0.5rem; justify-content:center;">
+            <button id="dev-login-customer-btn" class="btn btn-secondary btn-sm">Sign in as Customer</button>
+            <button id="dev-login-admin-btn" class="btn btn-gold btn-sm">Sign in as Admin</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { Auth } from '/js/auth.js';
+    import { Cart } from '/js/cart.js';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug') || urlParams.get('id');
+
+    async function loadProduct() {
+      const container = document.getElementById('product-detail-container');
+      if (!slug) {
+        container.innerHTML = `
+          <div class="notice-box notice-warning">
+            No product identifier provided. Please select an item from our <a href="/shop/">Catalogue</a>.
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        const res = await API.getProductBySlug(slug);
+        const p = res.product;
+        document.title = `${p.name} | SWAYARI Décor & Gifting`;
+        document.getElementById('breadcrumb-product-name').textContent = p.name;
+
+        let selectedVariant = p.variants && p.variants.length > 0 ? p.variants[0] : null;
+        let quantity = p.minQuantity || 1;
+
+        container.innerHTML = `
+          <div class="product-detail-layout">
+            <!-- Left: Gallery -->
+            <div class="product-gallery">
+              <div class="product-main-image-wrap">
+                <img id="main-view-image" src="${p.primaryImage}" alt="${p.name}" class="product-main-image">
+              </div>
+              ${p.images && p.images.length > 1 ? `
+                <div class="product-thumbnails">
+                  ${p.images.map((img, idx) => `
+                    <button class="product-thumb-btn ${idx === 0 ? 'active' : ''}" data-img="${img}">
+                      <img src="${img}" alt="Thumbnail ${idx+1}" class="product-thumb-img">
+                    </button>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Right: Details & Order Request -->
+            <div>
+              <div class="product-meta-header">
+                ${p.isDemo ? '<div style="margin-bottom:0.5rem;"><span class="badge badge-demo">Sample Preview Entry</span></div>' : ''}
+                <div class="product-sku-badge">SKU: ${p.sku} &bull; ${p.categoryName || 'Décor &amp; Gifting'}</div>
+                <h1 class="product-page-title">${p.name}</h1>
+                <div class="product-page-price-box">
+                  ${p.indicativePrice ? `
+                    <span class="product-page-price">₹${p.indicativePrice.toLocaleString('en-IN')}</span>
+                    <span class="product-page-price-note">Indicative Estimate (Excludes unconfirmed shipping)</span>
+                  ` : `
+                    <span class="product-price-request" style="font-size:1.3rem;">Price on Request</span>
+                  `}
+                </div>
+              </div>
+
+              <p style="font-size:1rem; line-height:1.7; margin-bottom:1.5rem; color:var(--text-secondary);">
+                ${p.description}
+              </p>
+
+              <!-- Technical Specifications -->
+              <table class="spec-table">
+                <tbody>
+                  ${p.material ? `<tr><th>Material / Finish</th><td>${p.material}</td></tr>` : ''}
+                  ${p.dimensions ? `<tr><th>Dimensions</th><td>${p.dimensions}</td></tr>` : ''}
+                  <tr><th>Availability</th><td>${p.availabilityLabel || 'Available on Request'}</td></tr>
+                  <tr><th>Minimum Quantity</th><td>${p.minQuantity || 1} unit(s)</td></tr>
+                  ${p.customisationInfo ? `<tr><th>Customisation</th><td>${p.customisationInfo}</td></tr>` : ''}
+                </tbody>
+              </table>
+
+              <!-- Variants (if any) -->
+              ${p.hasVariants && p.variants && p.variants.length > 0 ? `
+                <div class="option-group">
+                  <label class="option-label">Select Option / Packaging:</label>
+                  <div class="variant-chips" id="variant-chips-container">
+                    ${p.variants.map((v, i) => `
+                      <button class="variant-chip-btn ${i === 0 ? 'active' : ''}" data-variant-id="${v.id}">
+                        ${v.name} ${v.indicative_price ? `(+₹${v.indicative_price})` : ''}
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- Quantity Selector -->
+              <div class="option-group" style="display:flex; align-items:center; gap:1.5rem;">
+                <div>
+                  <label class="option-label">Quantity:</label>
+                  <div class="qty-control">
+                    <button class="qty-btn" id="qty-decrease">-</button>
+                    <input type="number" id="qty-input" class="qty-input" value="${quantity}" min="${p.minQuantity || 1}" max="1000">
+                    <button class="qty-btn" id="qty-increase">+</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Custom Note per item -->
+              <div class="form-group">
+                <label for="item-note-input" class="form-label">Customisation / Dedication Note (Optional):</label>
+                <input type="text" id="item-note-input" class="form-input" placeholder="e.g., Inscribe family name or festive greeting plaque" maxlength="300">
+              </div>
+
+              <!-- Disclaimer Notice -->
+              <div class="notice-box notice-info">
+                <strong>Important Note:</strong> This is a product request list, not an instant checkout. Submitting a request does not require online payment. Our team will review availability, calculate actual courier shipping, discuss customisation, and provide a formal quotation.
+              </div>
+
+              <!-- Action Buttons -->
+              <div style="display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap;">
+                <button id="add-to-request-btn" class="btn btn-primary" style="flex:1;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                  <span>Add to Order Request</span>
+                </button>
+                <a href="/cart/" class="btn btn-secondary">View Cart</a>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Thumbnail switcher
+        container.querySelectorAll('.product-thumb-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            container.querySelectorAll('.product-thumb-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const imgPath = btn.getAttribute('data-img');
+            document.getElementById('main-view-image').src = imgPath;
+          });
+        });
+
+        // Variant selector
+        container.querySelectorAll('.variant-chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            container.querySelectorAll('.variant-chip-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const vId = btn.getAttribute('data-variant-id');
+            selectedVariant = p.variants.find(v => v.id === vId);
+          });
+        });
+
+        // Quantity controls
+        const qtyInput = document.getElementById('qty-input');
+        const minQty = p.minQuantity || 1;
+        document.getElementById('qty-decrease')?.addEventListener('click', () => {
+          let q = parseInt(qtyInput.value, 10) || minQty;
+          if (q > minQty) {
+            qtyInput.value = q - 1;
+            quantity = q - 1;
+          }
+        });
+        document.getElementById('qty-increase')?.addEventListener('click', () => {
+          let q = parseInt(qtyInput.value, 10) || minQty;
+          qtyInput.value = q + 1;
+          quantity = q + 1;
+        });
+        qtyInput?.addEventListener('change', () => {
+          let q = parseInt(qtyInput.value, 10) || minQty;
+          if (q < minQty) q = minQty;
+          qtyInput.value = q;
+          quantity = q;
+        });
+
+        // Add to Request Button with Google Sign-in flow
+        document.getElementById('add-to-request-btn')?.addEventListener('click', () => {
+          const note = document.getElementById('item-note-input')?.value.trim();
+
+          if (Auth.isAuthenticated()) {
+            Cart.addItem(p, quantity, selectedVariant, note);
+            Auth.showToast(`Added ${quantity} &times; "${p.name}" to request list!`);
+          } else {
+            // Unauthenticated: triggers sign in with Google; upon success, resumes exact add-to-cart action
+            Auth.requireAuthForAction({
+              type: 'add_to_cart',
+              product: p,
+              quantity: quantity,
+              variant: selectedVariant,
+              note: note
+            });
+          }
+        });
+
+      } catch (err) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3 class="empty-state-title">Item Unavailable</h3>
+            <p class="empty-state-text">${err.message}</p>
+            <a href="/shop/" class="btn btn-primary btn-sm">Back to Catalogue</a>
+          </div>
+        `;
+      }
+    }
+
+    loadProduct();
+  </script>
+</body>
+</html>

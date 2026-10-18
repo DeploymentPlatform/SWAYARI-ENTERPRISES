@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+.npm/
+
+# Cloudflare & Wrangler
+.wrangler/
+.mf/
+
+# Environment and secrets
+.env
+.dev.vars
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Build & Test outputs
+dist/
+coverage/
+scratch/
+*.log
+
+# Backups (local bundle exports kept outside repo)
+*.bundle
+*.tar.gz

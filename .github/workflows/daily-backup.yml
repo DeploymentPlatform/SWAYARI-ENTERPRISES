@@ -1,0 +1,42 @@
+name: Daily Code Snapshot (Asia/Kolkata)
+
+on:
+  schedule:
+    # 18:30 UTC daily equals 00:00 (Midnight) Asia/Kolkata IST
+    - cron: '30 18 * * *'
+  workflow_dispatch:
+
+# Minimum permissions: only write access to Git repository contents
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Compute Asia/Kolkata Date and Create Snapshot Branch
+        run: |
+          # Calculate current date in Asia/Kolkata (IST)
+          TZ="Asia/Kolkata" date
+          TODAY=$(TZ="Asia/Kolkata" date "+%Y-%m-%d")
+          BRANCH_NAME="backup/${TODAY}"
+          echo "Target snapshot branch: ${BRANCH_NAME}"
+
+          # Check if remote branch already exists to prevent accidental overwrite
+          if git ls-remote --heads origin "${BRANCH_NAME}" | grep -q "${BRANCH_NAME}"; then
+            echo "ℹ️  Snapshot branch '${BRANCH_NAME}' already exists on origin. Preserving existing snapshot."
+            exit 0
+          fi
+
+          # Create local branch from current main commit
+          git branch "${BRANCH_NAME}" HEAD
+
+          # Push snapshot branch
+          echo "Pushing new snapshot branch: ${BRANCH_NAME}"
+          git push origin "${BRANCH_NAME}"

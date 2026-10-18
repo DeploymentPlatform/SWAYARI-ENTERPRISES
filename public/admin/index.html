@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | SWAYARI ENTERPRISES</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/assets/brand/favicon.svg">
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta name="google-client-id" content="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com">
+
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <style>
+    .admin-pill {
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      transition: all var(--transition-fast);
+    }
+    .admin-pill.active {
+      background-color: var(--color-burgundy);
+      color: #FFFFFF;
+      border-color: var(--color-burgundy);
+    }
+    .drawer-section {
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .drawer-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+  </style>
+</head>
+<body style="background-color: #F8F6F2;">
+
+  <!-- Admin Bar -->
+  <header class="admin-header-bar">
+    <div class="container admin-title-row">
+      <div style="display:flex; align-items:center; gap:1.25rem;">
+        <span style="font-family:var(--font-heading); font-size:1.35rem; color:var(--color-gold); font-weight:700; letter-spacing:0.1em;">SWAYARI</span>
+        <span style="font-size:0.8rem; background:rgba(197,160,89,0.2); padding:0.2rem 0.6rem; border-radius:var(--radius-sm); border:1px solid var(--color-gold-border);">ADMIN CONTROL</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:1.5rem; font-size:0.88rem;">
+        <span id="admin-user-email" style="color:#DDD2C4;">Verifying...</span>
+        <a href="/" target="_blank" style="color:var(--color-gold); text-decoration:underline;">View Storefront &nearr;</a>
+        <button id="admin-logout-btn" class="btn btn-secondary btn-sm" style="color:#FAF7F2; border-color:rgba(255,255,255,0.25);">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Unauthorized Gate Screen (Hidden when authenticated) -->
+  <div id="admin-gate-screen" class="container container-narrow" style="padding: 5rem 1.5rem; text-align:center; display:none;">
+    <div style="background:var(--bg-surface); border:1px solid var(--color-gold-border); border-radius:var(--radius-md); padding:3.5rem 2.5rem; box-shadow:var(--shadow-md);">
+      <div style="width:64px; height:64px; border-radius:50%; background:var(--color-burgundy-soft); color:var(--color-burgundy); display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem auto; font-size:1.8rem;">
+        🔒
+      </div>
+      <h2 style="color:var(--color-burgundy); margin-bottom:0.75rem;">Administrator Authentication Required</h2>
+      <p style="color:var(--text-secondary); max-width:500px; margin:0 auto 2rem auto; font-size:0.95rem;">
+        Access to the SWAYARI order management and catalogue administration system is restricted to authorized personnel (swayarienterprises@gmail.com).
+      </p>
+
+      <div id="gate-google-container" style="display:flex; justify-content:center; margin-bottom:1.5rem;"></div>
+
+      <div id="gate-dev-box" style="margin-top:1.5rem; padding-top:1.25rem; border-top:1px dashed var(--border-subtle); display:none;">
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.5rem;">DEVELOPMENT TEST SHORTCUT:</p>
+        <button id="gate-dev-login-admin" class="btn btn-gold btn-sm">Log in as swayarienterprises@gmail.com</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authenticated Admin Workspace -->
+  <div id="admin-workspace" class="container" style="padding: 2rem 1.5rem 6rem 1.5rem; display:none;">
+    
+    <!-- Top Stats Cards -->
+    <div class="admin-stats-grid">
+      <div class="stat-card" style="border-left: 4px solid #1E40AF;">
+        <div class="stat-label">New Requests</div>
+        <div id="stat-new-requests" class="stat-value">0</div>
+      </div>
+      <div class="stat-card" style="border-left: 4px solid #92400E;">
+        <div class="stat-label">Contacted</div>
+        <div id="stat-contacted" class="stat-value">0</div>
+      </div>
+      <div class="stat-card" style="border-left: 4px solid #6B21A8;">
+        <div class="stat-label">Quoted</div>
+        <div id="stat-quoted" class="stat-value">0</div>
+      </div>
+      <div class="stat-card" style="border-left: 4px solid #065F46;">
+        <div class="stat-label">Confirmed</div>
+        <div id="stat-confirmed" class="stat-value">0</div>
+      </div>
+      <div class="stat-card" style="border-left: 4px solid var(--color-gold);">
+        <div class="stat-label">Total Requests</div>
+        <div id="stat-total-orders" class="stat-value">0</div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+      <button class="admin-tab-btn active" data-tab="orders-tab">Order Requests</button>
+      <button class="admin-tab-btn" data-tab="products-tab">Catalogue Products</button>
+      <button class="admin-tab-btn" data-tab="categories-tab">Categories</button>
+      <button class="admin-tab-btn" data-tab="assets-tab">Deployed Assets</button>
+    </div>
+
+    <!-- TAB 1: ORDER REQUESTS -->
+    <section id="orders-tab" class="admin-tab-content">
+      <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:1.25rem; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        
+        <!-- Status Filter Pills -->
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="admin-pill active" data-status="all">All</button>
+          <button class="admin-pill" data-status="new_request">New Requests</button>
+          <button class="admin-pill" data-status="contacted">Contacted</button>
+          <button class="admin-pill" data-status="quoted">Quoted</button>
+          <button class="admin-pill" data-status="confirmed">Confirmed</button>
+          <button class="admin-pill" data-status="dispatched">Dispatched</button>
+          <button class="admin-pill" data-status="completed">Completed</button>
+          <button class="admin-pill" data-status="cancelled">Cancelled</button>
+        </div>
+
+        <!-- Search Bar & Refresh -->
+        <div style="display:flex; gap:0.75rem; align-items:center;">
+          <input type="search" id="admin-search-orders" class="form-input" placeholder="Search orders, phone, city..." style="width:240px; padding:0.4rem 0.75rem; font-size:0.88rem;">
+          <button id="refresh-orders-btn" class="btn btn-secondary btn-sm" title="Refresh Orders">
+            ↻ Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Orders Data Table -->
+      <div id="admin-orders-table-wrap" style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Reference ID</th>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Telephone</th>
+              <th>Destination</th>
+              <th>Status</th>
+              <th>Items</th>
+              <th>Quotation Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="admin-orders-tbody">
+            <tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--text-muted);">Loading requests...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 2: PRODUCTS CATALOGUE -->
+    <section id="products-tab" class="admin-tab-content" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <h2 style="font-size:1.5rem;">Product Inventory</h2>
+        <button id="add-product-btn" class="btn btn-primary btn-sm">+ Add New Product</button>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>SKU</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Indicative Price</th>
+              <th>Min Qty</th>
+              <th>Status</th>
+              <th>Demo?</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-products-tbody">
+            <tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--text-muted);">Loading products...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 3: CATEGORIES -->
+    <section id="categories-tab" class="admin-tab-content" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <h2 style="font-size:1.5rem;">Categories</h2>
+        <button id="add-category-btn" class="btn btn-primary btn-sm">+ Add Category</button>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Slug</th>
+              <th>Description</th>
+              <th>Display Order</th>
+              <th>Products Linked</th>
+            </tr>
+          </thead>
+          <tbody id="admin-categories-tbody">
+            <tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">Loading categories...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 4: DEPLOYED ASSETS -->
+    <section id="assets-tab" class="admin-tab-content" style="display:none;">
+      <div style="margin-bottom:1.5rem;">
+        <h2 style="font-size:1.5rem; margin-bottom:0.5rem;">Deployed Static Images</h2>
+        <p style="color:var(--text-muted); font-size:0.9rem;">
+          These photos are tracked in Git under <code>public/assets/</code> and deployed to Cloudflare Pages. Admin products reference these image paths.
+        </p>
+      </div>
+
+      <div id="admin-assets-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:1.5rem;">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+  </div>
+
+  <!-- ORDER MANAGEMENT MODAL / DRAWER -->
+  <div id="manage-order-modal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width:860px;">
+      <button id="close-manage-order-modal" class="modal-close-btn">&times;</button>
+      <div id="manage-order-content">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCT CREATE / EDIT MODAL -->
+  <div id="product-modal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width:680px;">
+      <button id="close-product-modal" class="modal-close-btn">&times;</button>
+      <div id="product-modal-content">
+        <!-- Form injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module" src="/js/admin.js"></script>
+</body>
+</html>

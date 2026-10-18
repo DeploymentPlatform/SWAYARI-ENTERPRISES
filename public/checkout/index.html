@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Order Request | SWAYARI Décor &amp; Gifting</title>
+  <meta name="description" content="Submit your order request and delivery address to SWAYARI ENTERPRISES. No online payment required; our team will contact you directly to confirm.">
+  <link rel="icon" type="image/svg+xml" href="/assets/brand/favicon.svg">
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta name="google-client-id" content="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com">
+
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/pages.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand-link">
+        <img src="/assets/brand/swayari-logo.svg" alt="SWAYARI Décor &amp; Gifting" class="brand-logo-img">
+      </a>
+
+      <nav class="main-nav">
+        <a href="/">Home</a>
+        <a href="/shop/" class="nav-link">Shop Catalogue</a>
+        <a href="/about/" class="nav-link">About SWAYARI</a>
+        <a href="/contact/" class="nav-link">Contact</a>
+        <a href="/admin/" id="header-admin-link" class="nav-link" style="display:none; color:var(--color-burgundy); font-weight:700;">Admin Panel</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="/cart/" class="action-btn" aria-label="View Request Cart">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="cart-count-badge" style="display:none;">0</span>
+        </a>
+
+        <div id="header-auth-container">
+          <button id="header-signin-btn" class="btn btn-secondary btn-sm">Sign In</button>
+        </div>
+
+        <button class="action-btn mobile-menu-toggle" aria-label="Toggle Menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="min-height:70vh; padding: 3rem 1.5rem 5rem 1.5rem;">
+    <div style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem; margin-bottom: 2.5rem;">
+      <span class="section-subtitle">Final Step</span>
+      <h1 style="font-size:2.2rem; color:var(--color-burgundy);">Submit Order Request</h1>
+      <p style="color:var(--text-secondary);">Provide your contact and shipping destination. No payment is collected online.</p>
+    </div>
+
+    <div id="checkout-main-area">
+      <!-- Checked & rendered via JavaScript -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 SWAYARI ENTERPRISES. All rights reserved.</div>
+        <div>Customer Orders: swayarienterprises@gmail.com</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <div class="modal-content">
+      <button id="auth-modal-close" class="modal-close-btn">&times;</button>
+      <div class="google-auth-card">
+        <h3 id="auth-modal-title" class="google-auth-title">Sign in to SWAYARI</h3>
+        <p class="google-auth-desc">Please sign in with Google to associate your order request with your account.</p>
+        <div id="google-signin-btn-container" class="google-btn-container"></div>
+        <div id="dev-auth-options" style="margin-top:1.5rem; padding-top:1.25rem; border-top:1px dashed var(--border-subtle); display:none;">
+          <div style="display:flex; gap:0.5rem; justify-content:center;">
+            <button id="dev-login-customer-btn" class="btn btn-secondary btn-sm">Sign in as Customer</button>
+            <button id="dev-login-admin-btn" class="btn btn-gold btn-sm">Sign in as Admin</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { Auth } from '/js/auth.js';
+    import { Cart } from '/js/cart.js';
+
+    // Generate unique idempotency key for this session attempt
+    const idempotencyKey = 'req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10);
+
+    async function initCheckout() {
+      const container = document.getElementById('checkout-main-area');
+      const items = Cart.getItems();
+
+      if (!items || items.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3 class="empty-state-title">No Items in Request List</h3>
+            <p class="empty-state-text">Your request list is currently empty. Please select products from our catalogue.</p>
+            <a href="/shop/" class="btn btn-gold">Browse Catalogue</a>
+          </div>
+        `;
+        return;
+      }
+
+      if (!Auth.isAuthenticated()) {
+        container.innerHTML = `
+          <div class="empty-state" style="max-width:600px; margin:2rem auto;">
+            <div class="empty-state-icon">🔒</div>
+            <h3 class="empty-state-title">Sign In Required to Submit</h3>
+            <p class="empty-state-text">To ensure order authenticity and enable you to track status updates, please sign in with your Google account before submitting your order request.</p>
+            <button id="checkout-signin-btn" class="btn btn-primary">Sign in with Google</button>
+          </div>
+        `;
+        document.getElementById('checkout-signin-btn')?.addEventListener('click', () => {
+          Auth.openAuthModal();
+        });
+        return;
+      }
+
+      const user = Auth.user;
+      const { subtotal } = Cart.getIndicativeSubtotal();
+
+      container.innerHTML = `
+        <div class="cart-checkout-layout">
+          <!-- Form -->
+          <div>
+            <form id="order-request-form">
+              <h2 style="font-size:1.3rem; margin-bottom:1.5rem; color:var(--color-burgundy); border-bottom:1px solid var(--border-subtle); padding-bottom:0.75rem;">1. Contact Information</h2>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="form-group">
+                  <label class="form-label">Full Name <span class="required">*</span></label>
+                  <input type="text" id="cust-name" class="form-input" required value="${user.name || ''}" placeholder="Your Full Name">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email Address (Google Verified)</label>
+                  <input type="email" id="cust-email" class="form-input" disabled value="${user.email}" style="background-color:var(--bg-secondary); cursor:not-allowed;">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Contact Telephone Number <span class="required">*</span></label>
+                <input type="tel" id="cust-phone" class="form-input" required placeholder="10-digit mobile number for order discussion" pattern="[0-9+ -]{10,15}">
+                <div class="form-hint">Our team will call or WhatsApp this number to confirm availability, packing options, and delivery timeline.</div>
+              </div>
+
+              <h2 style="font-size:1.3rem; margin:2rem 0 1.5rem 0; color:var(--color-burgundy); border-bottom:1px solid var(--border-subtle); padding-bottom:0.75rem;">2. Delivery Destination</h2>
+
+              <div class="form-group">
+                <label class="form-label">Street Address &amp; House/Flat No. <span class="required">*</span></label>
+                <input type="text" id="cust-address" class="form-input" required placeholder="Apartment / Door No., Building, Street Name, Landmark">
+              </div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+                <div class="form-group">
+                  <label class="form-label">City / Town <span class="required">*</span></label>
+                  <input type="text" id="cust-city" class="form-input" required placeholder="e.g. Hyderabad">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">State <span class="required">*</span></label>
+                  <input type="text" id="cust-state" class="form-input" required placeholder="e.g. Telangana">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Pincode <span class="required">*</span></label>
+                  <input type="text" id="cust-pincode" class="form-input" required placeholder="e.g. 500034" pattern="[0-9]{6}">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">General Delivery or Customisation Notes (Optional)</label>
+                <textarea id="cust-notes" class="form-textarea" rows="3" placeholder="Provide any special instructions, preferred delivery dates, or occasion details..."></textarea>
+              </div>
+
+              <div class="notice-box notice-warning" style="margin-top:2rem;">
+                <strong>Submission Notice:</strong><br>
+                “Our team will contact you to confirm availability, final pricing, shipping charges and delivery details. Submitting this request does not confirm a purchase or reserve stock.”
+              </div>
+
+              <div style="margin-top:1.5rem;">
+                <button type="submit" id="submit-request-btn" class="btn btn-primary btn-block" style="font-size:1.05rem;">
+                  Submit Order Request
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Order Summary Sidebar -->
+          <div>
+            <div class="checkout-card" style="position:sticky; top:100px;">
+              <h3 style="font-size:1.25rem; margin-bottom:1rem; color:var(--color-burgundy); border-bottom:1px solid var(--border-subtle); padding-bottom:0.5rem;">Items in this Request</h3>
+              <div style="max-height:300px; overflow-y:auto; margin-bottom:1.25rem; padding-right:0.5rem;">
+                ${items.map(it => `
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; font-size:0.88rem; padding-bottom:0.5rem; border-bottom:1px dotted var(--border-subtle);">
+                    <div>
+                      <strong>${it.name}</strong> &times; ${it.quantity}
+                      ${it.variantName ? `<div style="font-size:0.75rem; color:var(--text-muted);">${it.variantName}</div>` : ''}
+                      ${it.customisationNote ? `<div style="font-size:0.72rem; color:var(--color-gold-dark); font-style:italic;">Note: ${it.customisationNote}</div>` : ''}
+                    </div>
+                    <div>
+                      ${it.indicativePrice ? '₹' + (it.indicativePrice * it.quantity).toLocaleString('en-IN') : 'On Request'}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+
+              <div style="border-top:1px solid var(--border-subtle); padding-top:0.75rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem; font-size:0.95rem;">
+                  <span>Indicative Subtotal:</span>
+                  <strong>${subtotal > 0 ? '₹' + subtotal.toLocaleString('en-IN') : 'To Be Quoted'}</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:var(--text-muted);">
+                  <span>Shipping &amp; Taxes:</span>
+                  <span>Calculated Manually</span>
+                </div>
+              </div>
+
+              <div style="margin-top:1.5rem; font-size:0.78rem; color:var(--text-muted); line-height:1.5;">
+                🔒 All requests are stored securely in SWAYARI's cloud database. An order reference will be generated upon submission.
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Handle Submission
+      document.getElementById('order-request-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submit-request-btn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting Request...';
+
+        const payload = {
+          idempotencyKey: idempotencyKey,
+          customerName: document.getElementById('cust-name').value.trim(),
+          customerPhone: document.getElementById('cust-phone').value.trim(),
+          deliveryAddress: document.getElementById('cust-address').value.trim(),
+          deliveryCity: document.getElementById('cust-city').value.trim(),
+          deliveryState: document.getElementById('cust-state').value.trim(),
+          deliveryPincode: document.getElementById('cust-pincode').value.trim(),
+          customerNotes: document.getElementById('cust-notes').value.trim(),
+          items: items.map(it => ({
+            productId: it.productId,
+            variantId: it.variantId,
+            quantity: it.quantity,
+            customisationNote: it.customisationNote
+          }))
+        };
+
+        try {
+          const res = await API.submitOrderRequest(payload);
+          if (res.success && res.orderId) {
+            // Clear cart only AFTER confirmed database save
+            Cart.clear();
+            window.location.href = `/order-confirmation/?id=${encodeURIComponent(res.orderId)}`;
+          } else {
+            throw new Error(res.error || 'Failed to record order request');
+          }
+        } catch (err) {
+          alert(`Submission Error: ${err.message}. Your request items have been preserved in your cart. Please review details and try again.`);
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Order Request';
+        }
+      });
+    }
+
+    window.addEventListener('load', initCheckout);
+    window.addEventListener('swayari:auth-changed', initCheckout);
+  </script>
+</body>
+</html>

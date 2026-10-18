@@ -174,3 +174,21 @@ export interface CartItem {
   selectedVariant?: string | null;
   customisationNote?: string;
 }
+
+export interface CampaignBanner {
+  id: string;
+  badge?: string | null;
+  headline: string;
+  emphasis?: string | null;
+  supporting?: string | null;
+  ctaText: string;
+  ctaHref: string;
+  desktopImage: string;
+  mobileImage: string;
+  alt?: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+

@@ -10,6 +10,9 @@ export async function onRequestGet(context) {
   }
 
   try {
+    const isProduction = env.ENVIRONMENT === 'production';
+    const demoFilter = (isProduction || !includeDemo) ? 'AND p.is_demo = 0' : '';
+
     const row = await env.DB.prepare(`
       SELECT p.id, p.sku, p.name, p.slug, p.description, p.category_id,
              p.images, p.material, p.dimensions, p.has_variants, p.variants_json,
@@ -18,7 +21,7 @@ export async function onRequestGet(context) {
              c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.slug = ? AND p.status = 'published' ${includeDemo ? '' : 'AND p.is_demo = 0'}
+      WHERE p.slug = ? AND p.status = 'published' ${demoFilter}
     `).bind(slug).first();
 
     if (!row) {

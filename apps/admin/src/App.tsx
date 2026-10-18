@@ -6,6 +6,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { OrdersPage } from './pages/OrdersPage';
 import { ProductsPage } from './pages/ProductsPage';
 import { CategoriesPage } from './pages/CategoriesPage';
+import { BannersPage } from './pages/BannersPage';
 import { AssetsPage } from './pages/AssetsPage';
 import { Loader2 } from 'lucide-react';
 import { Wordmark } from './components/ui';
@@ -50,6 +51,8 @@ const AdminContent: React.FC = () => {
         return <ProductsPage />;
       case 'categories':
         return <CategoriesPage />;
+      case 'banners':
+        return <BannersPage />;
       case 'assets':
         return <AssetsPage />;
       default:

@@ -1,64 +1,135 @@
 import React from 'react';
 import { Link } from '../lib/router';
-import { LotusMark, Wordmark } from './ui';
-
-const COLUMNS = [
-  {
-    title: 'Shop',
-    links: [
-      { to: '/shop', label: 'The collection' },
-      { to: '/cart', label: 'Your bag' },
-      { to: '/orders', label: 'Your requests' }
-    ]
-  },
-  {
-    title: 'Help',
-    links: [
-      { to: '/ordering-policy', label: 'How ordering works' },
-      { to: '/contact', label: 'Contact us' },
-      { to: '/privacy-policy', label: 'Privacy policy' }
-    ]
-  }
-];
+import { Mail, Phone, MapPin, ShieldCheck } from 'lucide-react';
 
 export const Footer: React.FC = () => (
-  <footer className="bg-burgundy-deep text-ivory">
-    <div className="container-content grid grid-cols-2 gap-x-6 gap-y-10 py-14 md:grid-cols-12 md:gap-12 md:py-20">
-      <div className="col-span-2 md:col-span-5">
-        <Wordmark tone="light" size="sm" />
-        <p className="mt-6 max-w-sm text-[0.9375rem] leading-relaxed text-ivory/80">
-          Décor and gifting for homes and special occasions. Send a request for the pieces you like — our team
-          will contact you to confirm availability, final pricing and delivery. No online payment is taken.
-        </p>
-      </div>
+  <footer className="bg-[#35121C] text-[#F7F4EF] border-t border-[#B49155]/30">
+    <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
+        
+        {/* Brand & Mission */}
+        <div className="md:col-span-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full border border-[#B49155]/40 bg-[#FAF7F2] p-1 flex items-center justify-center">
+              <img src="/assets/brand/swayari-logo.svg" alt="" className="w-full h-full object-contain" />
+            </div>
+            <div>
+              <span className="font-wordmark text-[1.375rem] font-bold tracking-wider text-white">
+                SWAYARI
+              </span>
+              <p className="text-[10px] tracking-[0.2em] text-[#B49155] uppercase font-medium">
+                Décor &amp; Gifting
+              </p>
+            </div>
+          </div>
 
-      {COLUMNS.map(col => (
-        <nav key={col.title} aria-label={col.title} className="md:col-span-2">
-          <h2 className="font-sans text-label uppercase text-gold-light">{col.title}</h2>
-          <ul className="mt-5 space-y-3 text-[0.9375rem]">
-            {col.links.map(link => (
-              <li key={link.to}>
-                <Link to={link.to} className="text-ivory/85 transition-colors hover:text-ivory">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+          <p className="mt-4 text-[13px] text-[#F7F4EF]/85 leading-relaxed max-w-sm">
+            Curators of fine Indian artisanal devotional art, solid bell-metal brassware, temple deepams, and bespoke celebration gifting.
+          </p>
+
+          <div className="mt-5 p-3.5 rounded-xl bg-white/5 border border-white/10 text-[11.5px] text-[#F7F4EF]/80 leading-relaxed">
+            <strong className="text-[#D8C29D] font-semibold block mb-0.5">Order Request Policy:</strong>
+            Submitting an order request does not take online payments or reserve stock. Our team phones you directly to confirm availability, dimensions, packaging, and final pricing.
+          </div>
+        </div>
+
+        {/* Collections */}
+        <div className="md:col-span-3">
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#B49155]">
+            Collections
+          </h2>
+          <ul className="mt-4 space-y-2.5 text-[13px]">
+            <li>
+              <Link to="/shop?category=devotional-frames" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Devotional Frames
+              </Link>
+            </li>
+            <li>
+              <Link to="/shop?category=decorative-lamps" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Decorative Brass Lamps
+              </Link>
+            </li>
+            <li>
+              <Link to="/shop?category=home-accents" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Home Accents &amp; Sculptures
+              </Link>
+            </li>
+            <li>
+              <Link to="/shop?category=festive-decor" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Festive Urulis &amp; Pooja Décor
+              </Link>
+            </li>
+            <li>
+              <Link to="/shop?category=gift-sets" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Curated Gift Sets
+              </Link>
+            </li>
           </ul>
-        </nav>
-      ))}
+        </div>
 
-      <div className="col-span-2 md:col-span-3">
-        <h2 className="font-sans text-label uppercase text-gold-light">Write to us</h2>
-        <a href="mailto:swayarienterprises@gmail.com" className="mt-5 inline-block break-all text-[0.9375rem] text-ivory/85 underline decoration-ivory/30 underline-offset-4 hover:text-ivory">
-          swayarienterprises@gmail.com
-        </a>
+        {/* Quick Links & Policies */}
+        <div className="md:col-span-2">
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#B49155]">
+            Customer Care
+          </h2>
+          <ul className="mt-4 space-y-2.5 text-[13px]">
+            <li>
+              <Link to="/account/orders" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                My Order Requests
+              </Link>
+            </li>
+            <li>
+              <Link to="/ordering-policy" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                How Ordering Works
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Our Story &amp; Heritage
+              </Link>
+            </li>
+            <li>
+              <Link to="/privacy-policy" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/contact" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Contact &amp; Assistance
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Business Contact */}
+        <div className="md:col-span-3">
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#B49155]">
+            SWAYARI ENTERPRISES
+          </h2>
+          <div className="mt-4 space-y-3 text-[13px] text-[#F7F4EF]/85">
+            <div className="flex items-start gap-2.5">
+              <Mail className="w-4 h-4 text-[#B49155] flex-shrink-0 mt-0.5" />
+              <a href="mailto:swayarienterprises@gmail.com" className="hover:text-white underline underline-offset-2 break-all">
+                swayarienterprises@gmail.com
+              </a>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <Phone className="w-4 h-4 text-[#B49155] flex-shrink-0 mt-0.5" />
+              <span>Personal Consultation via Call / WhatsApp</span>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <ShieldCheck className="w-4 h-4 text-[#B49155] flex-shrink-0 mt-0.5" />
+              <span>Insured Transit &amp; Dedicated Multi-Layer Fragile Packaging</span>
+            </div>
+          </div>
+        </div>
+
       </div>
-    </div>
 
-    <div className="border-t border-ivory/10">
-      <div className="container-content flex flex-col items-center justify-between gap-3 py-6 text-[0.8125rem] text-ivory/65 sm:flex-row">
-        <p>© {new Date().getFullYear()} SWAYARI ENTERPRISES</p>
-        <LotusMark className="h-4 w-7 text-gold-light/70" />
+      {/* Copyright Strip */}
+      <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#F7F4EF]/60 gap-3">
+        <p>&copy; {new Date().getFullYear()} SWAYARI ENTERPRISES. All rights reserved.</p>
+        <p>Bespoke Catalogue &amp; Order Request Application</p>
       </div>
     </div>
   </footer>

@@ -1,317 +1,503 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, Search, ShoppingBag, User as UserIcon, X, LogOut, Package } from 'lucide-react';
+import { 
+  Menu, Search, ShoppingBag, User as UserIcon, X, LogOut, Package, 
+  ChevronRight, Phone, Sparkles, Check, ArrowRight
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { Link, useRouter } from '../lib/router';
-import { Wordmark, useDialogBehaviour } from './ui';
+import { useProducts } from '../lib/products';
+import { formatPrice } from '@swayari/shared';
 
-const NAV = [
-  { to: '/shop', label: 'Shop' },
-  { to: '/about', label: 'Our Story' },
-  { to: '/contact', label: 'Contact' }
+const CATEGORIES = [
+  { slug: 'all', label: 'All Pieces', href: '/shop' },
+  { slug: 'devotional-frames', label: 'Devotional Frames', href: '/shop?category=devotional-frames' },
+  { slug: 'decorative-lamps', label: 'Decorative Lamps', href: '/shop?category=decorative-lamps' },
+  { slug: 'home-accents', label: 'Home Accents', href: '/shop?category=home-accents' },
+  { slug: 'festive-decor', label: 'Festive Décor', href: '/shop?category=festive-decor' },
+  { slug: 'gift-sets', label: 'Gift Sets', href: '/shop?category=gift-sets' },
+  { slug: 'about', label: 'Our Story', href: '/about' },
+  { slug: 'contact', label: 'Contact', href: '/contact' }
 ];
 
-const IconButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
-  ({ className = '', children, ...rest }, ref) => (
-    <button
-      ref={ref}
-      type="button"
-      className={`relative inline-flex h-11 w-11 items-center justify-center text-ink transition-colors hover:text-burgundy ${className}`}
-      {...rest}
-    >
-      {children}
-    </button>
-  )
-);
-
 export const Header: React.FC = () => {
-  const { path } = useRouter();
+  const { path, navigate } = useRouter();
+  const { user, logout, initiateGoogleSignIn } = useAuth();
+  const signOut = () => logout();
+  const requestSignIn = () => initiateGoogleSignIn();
   const { itemCount, openDrawer } = useCart();
+  const { products } = useProducts();
+
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
 
-  useEffect(() => setMenuOpen(false), [path]);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const accountRef = useRef<HTMLDivElement>(null);
 
-  const isActive = (to: string) => path === to || (to === '/shop' && (path.startsWith('/product/') || path === '/search'));
+  // Close menus on navigation
+  useEffect(() => {
+    setMenuOpen(false);
+    setAccountMenuOpen(false);
+    setIsSearchFocused(false);
+  }, [path]);
+
+  // Click outside to close search dropdown & account dropdown
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setIsSearchFocused(false);
+      }
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+        setAccountMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filter search suggestions as user types
+  useEffect(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      setSuggestions([]);
+      return;
+    }
+    const filtered = products
+      .filter(p => 
+        p.name.toLowerCase().includes(q) || 
+        (p.categoryName && p.categoryName.toLowerCase().includes(q)) ||
+        (p.material && p.material.toLowerCase().includes(q)) ||
+        (p.description && p.description.toLowerCase().includes(q))
+      )
+      .slice(0, 5);
+    setSuggestions(filtered);
+  }, [searchQuery, products]);
+
+  function handleSearchSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    setIsSearchFocused(false);
+    if (q) {
+      navigate(`/shop?search=${encodeURIComponent(q)}`);
+    } else {
+      navigate('/shop');
+    }
+  }
+
+  function handleSuggestionClick(slug: string) {
+    setIsSearchFocused(false);
+    setSearchQuery('');
+    navigate(`/product/${slug}`);
+  }
+
+  const currentCategory = new URLSearchParams(window.location.search).get('category');
+  const isShopActive = path === '/shop' || path.startsWith('/product/');
 
   return (
     <>
-      <div className="bg-burgundy-deep text-ivory">
-        <p className="container-content py-2 text-center text-[0.8125rem] tracking-wide text-ivory/90">
-          <span className="hidden sm:inline">Order requests are confirmed personally by our team — no online payment is taken.</span>
-          <span className="sm:hidden">Requests confirmed personally · No online payment</span>
-        </p>
-      </div>
-
-      <header className="sticky top-0 z-40 border-b border-stone-deep bg-ivory/95 backdrop-blur supports-[backdrop-filter]:bg-ivory/90">
-        <div className="container-content grid h-[76px] grid-cols-[1fr_auto_1fr] items-center md:h-[88px]">
-          {/* Left: mobile menu / desktop nav */}
-          <div className="flex items-center">
-            <IconButton className="-ml-2.5 lg:hidden" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}>
-              <Menu className="h-6 w-6" strokeWidth={1.5} aria-hidden />
-            </IconButton>
-            <nav aria-label="Main" className="hidden lg:block">
-              <ul className="flex items-center gap-9">
-                {NAV.map(item => (
-                  <li key={item.to}>
-                    <Link
-                      to={item.to}
-                      aria-current={isActive(item.to) ? 'page' : undefined}
-                      className={`relative py-2 text-[0.8125rem] font-medium uppercase tracking-[0.14em] transition-colors hover:text-burgundy ${
-                        isActive(item.to) ? 'text-burgundy after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:bg-burgundy' : 'text-ink'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+      {/* 1. Top Notice Strip */}
+      <aside aria-label="Order request model notice" className="bg-[#571C2A] text-[#F7F4EF] text-[12px] font-medium py-1.5 px-4 tracking-wide shadow-inner">
+        <div className="max-w-[1360px] mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#B49155]/20 text-[#B49155] text-[10px]">✨</span>
+            <span>
+              <strong className="font-semibold text-white">Design Preview Store:</strong> Sample prices &amp; pieces for layout evaluation.
+            </span>
           </div>
-
-          {/* Centre: wordmark */}
-          <Link to="/" aria-label="SWAYARI — Décor & Gifting, home" className="px-2">
-            <Wordmark />
-          </Link>
-
-          {/* Right: utilities */}
-          <div className="flex items-center justify-end gap-0.5 sm:gap-1.5">
-            <IconButton aria-label="Search the collection" onClick={() => setSearchOpen(true)} className="hidden sm:inline-flex">
-              <Search className="h-[21px] w-[21px]" strokeWidth={1.5} aria-hidden />
-            </IconButton>
-            <AccountMenu />
-            <IconButton aria-label={`Open your bag, ${itemCount} ${itemCount === 1 ? 'item' : 'items'}`} onClick={openDrawer} className="-mr-2.5">
-              <ShoppingBag className="h-[22px] w-[22px]" strokeWidth={1.5} aria-hidden />
-              {itemCount > 0 && (
-                <span className="absolute right-1 top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-burgundy px-1 text-[0.6875rem] font-semibold leading-none text-ivory">
-                  {itemCount > 99 ? '99+' : itemCount}
-                </span>
-              )}
-            </IconButton>
+          <div className="hidden md:flex items-center gap-6 text-[11px] text-[#F7F4EF]/85">
+            <span>No upfront online payment · Personal phone consultation</span>
+            <Link to="/contact" className="hover:text-white underline underline-offset-2 transition-colors">
+              Call / WhatsApp Us
+            </Link>
           </div>
         </div>
-      </header>
+      </aside>
 
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} onSearch={() => { setMenuOpen(false); setSearchOpen(true); }} isActive={isActive} />
-      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
-    </>
-  );
-};
-
-/* ------------------------------------------------------------------ Account */
-
-const AccountMenu: React.FC = () => {
-  const { user, initiateGoogleSignIn, logout } = useAuth();
-  const { navigate } = useRouter();
-  const [open, setOpen] = useState(false);
-  const wrapRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (e: MouseEvent) => {
-      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
-    document.addEventListener('mousedown', onDoc);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDoc);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
-  if (!user) {
-    return (
-      <IconButton aria-label="Sign in to your account" onClick={() => initiateGoogleSignIn(undefined, 'account')}>
-        <UserIcon className="h-[21px] w-[21px]" strokeWidth={1.5} aria-hidden />
-      </IconButton>
-    );
-  }
-
-  return (
-    <div className="relative" ref={wrapRef}>
-      <IconButton aria-label={`Account menu for ${user.name}`} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(v => !v)}>
-        {user.picture ? (
-          <img src={user.picture} alt="" className="h-7 w-7 rounded-full border border-stone-deep" referrerPolicy="no-referrer" />
-        ) : (
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-burgundy text-xs font-semibold text-ivory">
-            {user.name.charAt(0).toUpperCase()}
-          </span>
-        )}
-      </IconButton>
-      {open && (
-        <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-64 border border-stone-deep bg-white py-2 shadow-card">
-          <div className="border-b border-stone-deep px-4 pb-3 pt-1">
-            <p className="truncate font-medium">{user.name}</p>
-            <p className="truncate text-sm text-ink-soft">{user.email}</p>
-          </div>
-          <button
-            role="menuitem"
-            type="button"
-            className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-stone"
-            onClick={() => {
-              setOpen(false);
-              navigate('/orders');
-            }}
-          >
-            <Package className="h-4 w-4 text-ink-soft" aria-hidden /> Your requests
-          </button>
-          <button
-            role="menuitem"
-            type="button"
-            className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-stone"
-            onClick={() => {
-              setOpen(false);
-              logout();
-            }}
-          >
-            <LogOut className="h-4 w-4 text-ink-soft" aria-hidden /> Sign out
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-/* ------------------------------------------------------------------ Mobile menu */
-
-const MobileMenu: React.FC<{ open: boolean; onClose: () => void; onSearch: () => void; isActive: (to: string) => boolean }> = ({
-  open,
-  onClose,
-  onSearch,
-  isActive
-}) => {
-  const ref = useDialogBehaviour(open, onClose);
-  const { user, initiateGoogleSignIn } = useAuth();
-  return (
-    <AnimatePresence>
-      {open && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <motion.div className="absolute inset-0 bg-umber/50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
-          <motion.div
-            ref={ref}
-            role="dialog"
-            tabIndex={-1}
-            aria-modal="true"
-            aria-label="Menu"
-            className="outline-none absolute inset-y-0 left-0 flex w-[min(88vw,380px)] flex-col bg-ivory shadow-drawer"
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ type: 'tween', duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <div className="flex h-[76px] items-center justify-between border-b border-stone-deep px-4">
-              <Wordmark size="sm" />
-              <button type="button" onClick={onClose} className="inline-flex h-11 w-11 items-center justify-center" aria-label="Close menu">
-                <X className="h-6 w-6" strokeWidth={1.5} aria-hidden />
+      {/* 2. Main Shopping Header */}
+      <header className="sticky top-0 z-40 bg-[#FFFFFF] border-b border-[#E7DFD5] shadow-soft">
+        <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Top Row: Brand, Search, Utilities */}
+          <div className="flex items-center justify-between h-[68px] md:h-[76px] gap-4 md:gap-8">
+            
+            {/* Left: Mobile hamburger + SWAYARI Logo */}
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setMenuOpen(true)}
+                className="lg:hidden p-2 -ml-2 text-[#292421] hover:text-[#571C2A] transition-colors"
+                aria-label="Open navigation menu"
+                aria-expanded={menuOpen}
+              >
+                <Menu className="w-6 h-6" strokeWidth={1.75} />
               </button>
+
+              <Link to="/" className="flex items-center gap-2.5 group py-1" aria-label="SWAYARI Home">
+                <div className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-[#B49155]/40 bg-[#FAF7F2] p-1.5 flex items-center justify-center transition-transform group-hover:scale-105 duration-300">
+                  <img src="/assets/brand/swayari-logo.svg" alt="" className="w-full h-full object-contain" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-wordmark text-[1.375rem] md:text-[1.625rem] font-bold tracking-[0.12em] text-[#571C2A] leading-none group-hover:text-[#441420] transition-colors">
+                    SWAYARI
+                  </span>
+                  <span className="text-[10px] md:text-[11px] tracking-[0.22em] text-[#B49155] uppercase font-sans font-medium mt-0.5">
+                    Décor &amp; Gifting
+                  </span>
+                </div>
+              </Link>
             </div>
-            <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-6 py-6">
-              <ul className="space-y-1">
-                {NAV.map(item => (
-                  <li key={item.to}>
-                    <Link
-                      to={item.to}
-                      onClick={onClose}
-                      aria-current={isActive(item.to) ? 'page' : undefined}
-                      className={`block border-b border-stone-deep py-4 font-display text-[1.75rem] leading-tight ${isActive(item.to) ? 'text-burgundy' : 'text-ink'}`}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8 space-y-1 text-base">
-                <button type="button" onClick={onSearch} className="flex w-full items-center gap-3 py-3 text-left">
-                  <Search className="h-5 w-5 text-ink-soft" strokeWidth={1.5} aria-hidden /> Search
-                </button>
+
+            {/* Center: Prominent Tanishq/Amazon-style Search Bar (Desktop) */}
+            <div ref={searchContainerRef} className="hidden md:block flex-1 max-w-[560px] relative">
+              <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+                <div className="absolute left-3.5 text-[#7A6E66] pointer-events-none">
+                  <Search className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  placeholder="Search décor, gifts and more"
+                  className="w-full h-[42px] pl-10 pr-10 rounded-full border border-[#E7DFD5] bg-[#FAF7F2] text-[#292421] text-[14px] placeholder-[#7A6E66] focus:outline-none focus:border-[#571C2A] focus:bg-[#FFFFFF] focus:ring-1 focus:ring-[#571C2A] transition-all shadow-inner"
+                  autoComplete="off"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => { setSearchQuery(''); setSuggestions([]); }}
+                    className="absolute right-3.5 text-[#7A6E66] hover:text-[#292421] p-1"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </form>
+
+              {/* Live Search Suggestions Dropdown */}
+              <AnimatePresence>
+                {isSearchFocused && searchQuery.trim().length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-[#E7DFD5] shadow-modal overflow-hidden z-50 divide-y divide-[#F4EFEA]"
+                  >
+                    {suggestions.length > 0 ? (
+                      <div className="py-2">
+                        <div className="px-4 py-1.5 text-[11px] font-semibold text-[#7A6E66] uppercase tracking-wider">
+                          Suggested Pieces
+                        </div>
+                        {suggestions.map((p) => {
+                          const thumb = p.images?.[0] || '/assets/demo/sample_product_1.jpeg';
+                          return (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => handleSuggestionClick(p.slug)}
+                              className="w-full px-4 py-2.5 flex items-center gap-3.5 hover:bg-[#FAF7F2] text-left transition-colors group"
+                            >
+                              <img src={thumb} alt="" className="w-11 h-11 rounded-lg object-cover bg-[#F4EFEA] border border-[#E7DFD5]/60 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[13px] font-medium text-[#292421] group-hover:text-[#571C2A] truncate">
+                                  {p.name}
+                                </p>
+                                <div className="flex items-center gap-2 text-[11px] text-[#7A6E66] mt-0.5">
+                                  <span>{p.categoryName || 'Décor'}</span>
+                                  {p.indicativePrice && (
+                                    <>
+                                      <span>•</span>
+                                      <span className="font-semibold text-[#571C2A]">{formatPrice(p.indicativePrice)}</span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                              <ChevronRight className="w-4 h-4 text-[#7A6E66] opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </button>
+                          );
+                        })}
+                        <div className="p-2 bg-[#FAF7F2] border-t border-[#E7DFD5]/60">
+                          <button
+                            type="button"
+                            onClick={handleSearchSubmit}
+                            className="w-full text-center py-1.5 text-[12px] font-medium text-[#571C2A] hover:underline flex items-center justify-center gap-1.5"
+                          >
+                            <span>See all results for "{searchQuery}"</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-6 text-center text-[13px] text-[#544A44]">
+                        No matching pieces found for "{searchQuery}".
+                        <div className="mt-2">
+                          <button
+                            type="button"
+                            onClick={handleSearchSubmit}
+                            className="text-[#571C2A] font-semibold hover:underline"
+                          >
+                            Browse All Pieces in Catalogue
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Right: Account & Cart Buttons */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              
+              {/* Account / My Requests */}
+              <div ref={accountRef} className="relative">
                 {user ? (
-                  <Link to="/orders" onClick={onClose} className="flex items-center gap-3 py-3">
-                    <Package className="h-5 w-5 text-ink-soft" strokeWidth={1.5} aria-hidden /> Your requests
-                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] transition-colors border border-transparent hover:border-[#E7DFD5]"
+                    aria-label="Customer account menu"
+                  >
+                    {user.picture ? (
+                      <img src={user.picture} alt="" className="w-7 h-7 rounded-full object-cover border border-[#B49155]/40" />
+                    ) : (
+                      <div className="w-7 h-7 rounded-full bg-[#571C2A] text-white text-[12px] font-semibold flex items-center justify-center">
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <span className="hidden sm:inline-block text-[13px] font-medium text-[#292421] max-w-[100px] truncate">
+                      {user.name.split(' ')[0]}
+                    </span>
+                  </button>
                 ) : (
                   <button
                     type="button"
-                    onClick={() => {
-                      onClose();
-                      initiateGoogleSignIn(undefined, 'account');
-                    }}
-                    className="flex w-full items-center gap-3 py-3 text-left"
+                    onClick={requestSignIn}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#292421] hover:text-[#571C2A] transition-colors border border-transparent hover:border-[#E7DFD5]"
                   >
-                    <UserIcon className="h-5 w-5 text-ink-soft" strokeWidth={1.5} aria-hidden /> Sign in
+                    <UserIcon className="w-5 h-5 text-[#544A44]" />
+                    <span className="hidden sm:inline-block text-[13px] font-medium">Sign In</span>
+                  </button>
+                )}
+
+                {/* Account Dropdown */}
+                <AnimatePresence>
+                  {accountMenuOpen && user && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      className="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-[#E7DFD5] shadow-modal py-2 z-50 text-[13px]"
+                    >
+                      <div className="px-4 py-2 border-b border-[#F4EFEA]">
+                        <p className="font-semibold text-[#292421] truncate">{user.name}</p>
+                        <p className="text-[11px] text-[#7A6E66] truncate">{user.email}</p>
+                      </div>
+                      <Link
+                        to="/account/orders"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-[#292421] hover:bg-[#FAF7F2] transition-colors"
+                      >
+                        <Package className="w-4 h-4 text-[#571C2A]" />
+                        <span>My Order Requests</span>
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={signOut}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[#B42318] hover:bg-[#FAF7F2] text-left transition-colors border-t border-[#F4EFEA]"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Sign Out</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Cart / Bag Button */}
+              <button
+                type="button"
+                onClick={openDrawer}
+                className="relative flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-[#FAF7F2] hover:bg-[#F4EFEA] border border-[#E7DFD5] transition-all hover:border-[#B49155]/60 group"
+                aria-label={`Shopping bag with ${itemCount} items`}
+              >
+                <div className="relative">
+                  <ShoppingBag className="w-5 h-5 text-[#571C2A] group-hover:scale-105 transition-transform" strokeWidth={1.8} />
+                  {itemCount > 0 && (
+                    <span className="absolute -top-1.5 -right-2 bg-[#571C2A] text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center animate-pulse">
+                      {itemCount}
+                    </span>
+                  )}
+                </div>
+                <span className="text-[13px] font-semibold text-[#292421] hidden sm:inline-block">
+                  Cart
+                </span>
+              </button>
+
+            </div>
+
+          </div>
+
+          {/* Mobile Search Row (Full Width) */}
+          <div className="md:hidden pb-3">
+            <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+              <Search className="w-4 h-4 absolute left-3.5 text-[#7A6E66]" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search décor, gifts and more"
+                className="w-full h-[38px] pl-10 pr-9 rounded-full border border-[#E7DFD5] bg-[#FAF7F2] text-[13px] placeholder-[#7A6E66] focus:outline-none focus:border-[#571C2A] focus:bg-white"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 text-[#7A6E66] p-1"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </form>
+          </div>
+
+        </div>
+
+        {/* 3. Bottom Category Navigation Strip (Tanishq/Amazon Style) */}
+        <nav aria-label="Category navigation" className="bg-[#FAF7F2] border-t border-[#E7DFD5] overflow-x-auto scrollbar-none">
+          <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
+            <ul className="flex items-center gap-1 sm:gap-2 md:gap-4 py-2 min-w-max">
+              {CATEGORIES.map((cat) => {
+                const isSelected = 
+                  cat.slug === 'all' 
+                    ? isShopActive && !currentCategory
+                    : currentCategory === cat.slug;
+
+                return (
+                  <li key={cat.slug}>
+                    <Link
+                      to={cat.href}
+                      className={`inline-flex items-center px-3 py-1.5 rounded-full text-[12.5px] md:text-[13px] font-medium tracking-wide transition-all ${
+                        isSelected
+                          ? 'bg-[#571C2A] text-white shadow-sm'
+                          : 'text-[#544A44] hover:text-[#571C2A] hover:bg-white'
+                      }`}
+                    >
+                      {cat.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </nav>
+      </header>
+
+      {/* 4. Mobile Menu Drawer */}
+      <AnimatePresence>
+        {menuOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMenuOpen(false)}
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="absolute top-0 bottom-0 left-0 w-[82vw] max-w-[340px] bg-white border-r border-[#E7DFD5] shadow-2xl flex flex-col"
+            >
+              {/* Drawer Header */}
+              <div className="p-5 border-b border-[#E7DFD5] flex items-center justify-between bg-[#FAF7F2]">
+                <div className="flex items-center gap-2">
+                  <img src="/assets/brand/swayari-logo.svg" alt="" className="w-8 h-8 object-contain" />
+                  <span className="font-wordmark font-bold text-[1.25rem] text-[#571C2A] tracking-wider">SWAYARI</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen(false)}
+                  className="p-1.5 text-[#544A44] hover:text-[#292421]"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Drawer Links */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-1">
+                <p className="px-3 py-1.5 text-[11px] font-bold text-[#7A6E66] uppercase tracking-widest">
+                  Categories
+                </p>
+                {CATEGORIES.map((cat) => (
+                  <Link
+                    key={cat.slug}
+                    to={cat.href}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-lg text-[14px] font-medium text-[#292421] hover:bg-[#FAF7F2] transition-colors"
+                  >
+                    <span>{cat.label}</span>
+                    <ChevronRight className="w-4 h-4 text-[#7A6E66]" />
+                  </Link>
+                ))}
+
+                <div className="pt-4 border-t border-[#E7DFD5] mt-4 space-y-1">
+                  <p className="px-3 py-1.5 text-[11px] font-bold text-[#7A6E66] uppercase tracking-widest">
+                    Customer Care
+                  </p>
+                  <Link
+                    to="/ordering-policy"
+                    className="block px-3 py-2 text-[13px] text-[#544A44] hover:text-[#571C2A]"
+                  >
+                    How Ordering Works
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className="block px-3 py-2 text-[13px] text-[#544A44] hover:text-[#571C2A]"
+                  >
+                    Contact &amp; Customization
+                  </Link>
+                </div>
+              </div>
+
+              {/* Drawer Footer */}
+              <div className="p-4 border-t border-[#E7DFD5] bg-[#FAF7F2]">
+                {user ? (
+                  <div className="flex items-center justify-between">
+                    <div className="truncate">
+                      <p className="text-[13px] font-semibold text-[#292421]">{user.name}</p>
+                      <p className="text-[11px] text-[#7A6E66] truncate">{user.email}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={signOut}
+                      className="p-2 text-[#B42318] hover:bg-white rounded-lg transition-colors"
+                      title="Sign Out"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => { setMenuOpen(false); requestSignIn(); }}
+                    className="w-full py-2.5 rounded-lg bg-[#571C2A] text-white text-[13px] font-semibold hover:bg-[#441420] transition-colors shadow-sm flex items-center justify-center gap-2"
+                  >
+                    <UserIcon className="w-4 h-4" />
+                    <span>Sign In with Google</span>
                   </button>
                 )}
               </div>
-            </nav>
-            <p className="border-t border-stone-deep px-6 py-5 text-sm text-ink-soft">
-              Questions? <a className="link-underline" href="mailto:swayarienterprises@gmail.com">swayarienterprises@gmail.com</a>
-            </p>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
-  );
-};
-
-/* ------------------------------------------------------------------ Search */
-
-const SearchDialog: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
-  const ref = useDialogBehaviour(open, onClose);
-  const { navigate } = useRouter();
-  const [query, setQuery] = useState('');
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    const q = query.trim();
-    if (!q) return;
-    onClose();
-    navigate(`/search?q=${encodeURIComponent(q)}`);
-  }
-
-  return (
-    <AnimatePresence>
-      {open && (
-        <div className="fixed inset-0 z-50">
-          <motion.div className="absolute inset-0 bg-umber/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
-          <motion.div
-            ref={ref}
-            role="dialog"
-            tabIndex={-1}
-            aria-modal="true"
-            aria-label="Search the collection"
-            className="outline-none absolute inset-x-0 top-0 bg-ivory shadow-dialog"
-            initial={{ y: -24, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -24, opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <form onSubmit={submit} className="container-content flex items-center gap-3 py-6 md:py-9" role="search">
-              <Search className="h-6 w-6 flex-shrink-0 text-ink-soft" strokeWidth={1.5} aria-hidden />
-              <label htmlFor="site-search" className="sr-only">
-                Search the collection
-              </label>
-              <input
-                id="site-search"
-                data-autofocus
-                type="search"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Search the collection"
-                className="w-full bg-transparent font-display text-2xl text-ink placeholder:text-ink-faint focus:outline-none md:text-4xl"
-                autoComplete="off"
-                enterKeyHint="search"
-              />
-              <button type="submit" className="btn-primary hidden sm:inline-flex" disabled={!query.trim()}>
-                Search
-              </button>
-              <button type="button" onClick={onClose} className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center" aria-label="Close search">
-                <X className="h-6 w-6" strokeWidth={1.5} aria-hidden />
-              </button>
-            </form>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };

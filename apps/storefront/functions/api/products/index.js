@@ -21,8 +21,9 @@ export async function onRequestGet(context) {
     `;
     const params = [];
 
+    const isProduction = env.ENVIRONMENT === 'production';
     // Strictly exclude demo items unless explicitly asked for in preview mode
-    if (!includeDemo) {
+    if (isProduction || !includeDemo) {
       query += ' AND p.is_demo = 0';
     }
 

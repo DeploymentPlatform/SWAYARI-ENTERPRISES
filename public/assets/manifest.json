@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-18T15:49:17.788Z",
-  "totalAssets": 73,
+  "generatedAt": "2026-10-18T17:05:49.098Z",
+  "totalAssets": 139,
   "assets": [
     {
       "id": "brand_favicon_svg",
@@ -28,6 +28,96 @@
       "label": "SWAYARI brand card (reference artwork)",
       "sizeBytes": 162991,
       "updatedAt": "2026-10-18T13:55:07.212Z"
+    },
+    {
+      "id": "categories_cat-decorative-lamps_jpg",
+      "filename": "cat-decorative-lamps.jpg",
+      "path": "/assets/categories/cat-decorative-lamps.jpg",
+      "category": "categories",
+      "label": "cat decorative lamps",
+      "sizeBytes": 31063,
+      "updatedAt": "2026-10-18T16:51:25.799Z"
+    },
+    {
+      "id": "categories_cat-decorative-lamps_webp",
+      "filename": "cat-decorative-lamps.webp",
+      "path": "/assets/categories/cat-decorative-lamps.webp",
+      "category": "categories",
+      "label": "cat decorative lamps",
+      "sizeBytes": 31798,
+      "updatedAt": "2026-10-18T16:51:25.805Z"
+    },
+    {
+      "id": "categories_cat-devotional-frames_jpg",
+      "filename": "cat-devotional-frames.jpg",
+      "path": "/assets/categories/cat-devotional-frames.jpg",
+      "category": "categories",
+      "label": "cat devotional frames",
+      "sizeBytes": 15955,
+      "updatedAt": "2026-10-18T16:51:25.787Z"
+    },
+    {
+      "id": "categories_cat-devotional-frames_webp",
+      "filename": "cat-devotional-frames.webp",
+      "path": "/assets/categories/cat-devotional-frames.webp",
+      "category": "categories",
+      "label": "cat devotional frames",
+      "sizeBytes": 12988,
+      "updatedAt": "2026-10-18T16:51:25.791Z"
+    },
+    {
+      "id": "categories_cat-festive-decor_jpg",
+      "filename": "cat-festive-decor.jpg",
+      "path": "/assets/categories/cat-festive-decor.jpg",
+      "category": "categories",
+      "label": "cat festive decor",
+      "sizeBytes": 20474,
+      "updatedAt": "2026-10-18T16:51:25.818Z"
+    },
+    {
+      "id": "categories_cat-festive-decor_webp",
+      "filename": "cat-festive-decor.webp",
+      "path": "/assets/categories/cat-festive-decor.webp",
+      "category": "categories",
+      "label": "cat festive decor",
+      "sizeBytes": 18336,
+      "updatedAt": "2026-10-18T16:51:25.823Z"
+    },
+    {
+      "id": "categories_cat-gift-sets_jpg",
+      "filename": "cat-gift-sets.jpg",
+      "path": "/assets/categories/cat-gift-sets.jpg",
+      "category": "categories",
+      "label": "cat gift sets",
+      "sizeBytes": 14230,
+      "updatedAt": "2026-10-18T16:51:25.828Z"
+    },
+    {
+      "id": "categories_cat-gift-sets_webp",
+      "filename": "cat-gift-sets.webp",
+      "path": "/assets/categories/cat-gift-sets.webp",
+      "category": "categories",
+      "label": "cat gift sets",
+      "sizeBytes": 11380,
+      "updatedAt": "2026-10-18T16:51:25.831Z"
+    },
+    {
+      "id": "categories_cat-home-accents_jpg",
+      "filename": "cat-home-accents.jpg",
+      "path": "/assets/categories/cat-home-accents.jpg",
+      "category": "categories",
+      "label": "cat home accents",
+      "sizeBytes": 13018,
+      "updatedAt": "2026-10-18T16:51:25.809Z"
+    },
+    {
+      "id": "categories_cat-home-accents_webp",
+      "filename": "cat-home-accents.webp",
+      "path": "/assets/categories/cat-home-accents.webp",
+      "category": "categories",
+      "label": "cat home accents",
+      "sizeBytes": 10704,
+      "updatedAt": "2026-10-18T16:51:25.813Z"
     },
     {
       "id": "demo_sample_product_1_jpeg",
@@ -226,6 +316,150 @@
       "label": "hero festive lamps mobile (licensed stock — styling inspiration)",
       "sizeBytes": 45236,
       "updatedAt": "2026-10-18T15:12:50.617Z"
+    },
+    {
+      "id": "editorial_hero-slide-1-moments-desktop_jpg",
+      "filename": "hero-slide-1-moments-desktop.jpg",
+      "path": "/assets/editorial/hero-slide-1-moments-desktop.jpg",
+      "category": "editorial",
+      "label": "hero slide 1 moments desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 67871,
+      "updatedAt": "2026-10-18T16:51:25.534Z"
+    },
+    {
+      "id": "editorial_hero-slide-1-moments-desktop_webp",
+      "filename": "hero-slide-1-moments-desktop.webp",
+      "path": "/assets/editorial/hero-slide-1-moments-desktop.webp",
+      "category": "editorial",
+      "label": "hero slide 1 moments desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 38482,
+      "updatedAt": "2026-10-18T16:51:25.563Z"
+    },
+    {
+      "id": "editorial_hero-slide-1-moments-mobile_jpg",
+      "filename": "hero-slide-1-moments-mobile.jpg",
+      "path": "/assets/editorial/hero-slide-1-moments-mobile.jpg",
+      "category": "editorial",
+      "label": "hero slide 1 moments mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 36032,
+      "updatedAt": "2026-10-18T16:51:25.570Z"
+    },
+    {
+      "id": "editorial_hero-slide-1-moments-mobile_webp",
+      "filename": "hero-slide-1-moments-mobile.webp",
+      "path": "/assets/editorial/hero-slide-1-moments-mobile.webp",
+      "category": "editorial",
+      "label": "hero slide 1 moments mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 25066,
+      "updatedAt": "2026-10-18T16:51:25.582Z"
+    },
+    {
+      "id": "editorial_hero-slide-2-devotional-desktop_jpg",
+      "filename": "hero-slide-2-devotional-desktop.jpg",
+      "path": "/assets/editorial/hero-slide-2-devotional-desktop.jpg",
+      "category": "editorial",
+      "label": "hero slide 2 devotional desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 88526,
+      "updatedAt": "2026-10-18T16:51:25.592Z"
+    },
+    {
+      "id": "editorial_hero-slide-2-devotional-desktop_webp",
+      "filename": "hero-slide-2-devotional-desktop.webp",
+      "path": "/assets/editorial/hero-slide-2-devotional-desktop.webp",
+      "category": "editorial",
+      "label": "hero slide 2 devotional desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 56328,
+      "updatedAt": "2026-10-18T16:51:25.622Z"
+    },
+    {
+      "id": "editorial_hero-slide-2-devotional-mobile_jpg",
+      "filename": "hero-slide-2-devotional-mobile.jpg",
+      "path": "/assets/editorial/hero-slide-2-devotional-mobile.jpg",
+      "category": "editorial",
+      "label": "hero slide 2 devotional mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 46158,
+      "updatedAt": "2026-10-18T16:51:25.634Z"
+    },
+    {
+      "id": "editorial_hero-slide-2-devotional-mobile_webp",
+      "filename": "hero-slide-2-devotional-mobile.webp",
+      "path": "/assets/editorial/hero-slide-2-devotional-mobile.webp",
+      "category": "editorial",
+      "label": "hero slide 2 devotional mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 34800,
+      "updatedAt": "2026-10-18T16:51:25.648Z"
+    },
+    {
+      "id": "editorial_hero-slide-3-decor-desktop_jpg",
+      "filename": "hero-slide-3-decor-desktop.jpg",
+      "path": "/assets/editorial/hero-slide-3-decor-desktop.jpg",
+      "category": "editorial",
+      "label": "hero slide 3 decor desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 156498,
+      "updatedAt": "2026-10-18T16:51:25.659Z"
+    },
+    {
+      "id": "editorial_hero-slide-3-decor-desktop_webp",
+      "filename": "hero-slide-3-decor-desktop.webp",
+      "path": "/assets/editorial/hero-slide-3-decor-desktop.webp",
+      "category": "editorial",
+      "label": "hero slide 3 decor desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 121002,
+      "updatedAt": "2026-10-18T16:51:25.698Z"
+    },
+    {
+      "id": "editorial_hero-slide-3-decor-mobile_jpg",
+      "filename": "hero-slide-3-decor-mobile.jpg",
+      "path": "/assets/editorial/hero-slide-3-decor-mobile.jpg",
+      "category": "editorial",
+      "label": "hero slide 3 decor mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 93900,
+      "updatedAt": "2026-10-18T16:51:25.706Z"
+    },
+    {
+      "id": "editorial_hero-slide-3-decor-mobile_webp",
+      "filename": "hero-slide-3-decor-mobile.webp",
+      "path": "/assets/editorial/hero-slide-3-decor-mobile.webp",
+      "category": "editorial",
+      "label": "hero slide 3 decor mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 94214,
+      "updatedAt": "2026-10-18T16:51:25.725Z"
+    },
+    {
+      "id": "editorial_hero-slide-4-gifting-desktop_jpg",
+      "filename": "hero-slide-4-gifting-desktop.jpg",
+      "path": "/assets/editorial/hero-slide-4-gifting-desktop.jpg",
+      "category": "editorial",
+      "label": "hero slide 4 gifting desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 56369,
+      "updatedAt": "2026-10-18T16:51:25.733Z"
+    },
+    {
+      "id": "editorial_hero-slide-4-gifting-desktop_webp",
+      "filename": "hero-slide-4-gifting-desktop.webp",
+      "path": "/assets/editorial/hero-slide-4-gifting-desktop.webp",
+      "category": "editorial",
+      "label": "hero slide 4 gifting desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 28926,
+      "updatedAt": "2026-10-18T16:51:25.759Z"
+    },
+    {
+      "id": "editorial_hero-slide-4-gifting-mobile_jpg",
+      "filename": "hero-slide-4-gifting-mobile.jpg",
+      "path": "/assets/editorial/hero-slide-4-gifting-mobile.jpg",
+      "category": "editorial",
+      "label": "hero slide 4 gifting mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 39977,
+      "updatedAt": "2026-10-18T16:51:25.765Z"
+    },
+    {
+      "id": "editorial_hero-slide-4-gifting-mobile_webp",
+      "filename": "hero-slide-4-gifting-mobile.webp",
+      "path": "/assets/editorial/hero-slide-4-gifting-mobile.webp",
+      "category": "editorial",
+      "label": "hero slide 4 gifting mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 27864,
+      "updatedAt": "2026-10-18T16:51:25.778Z"
     },
     {
       "id": "editorial_marigold-garlands-600_jpg",
@@ -442,6 +676,366 @@
       "label": "bala krishna frame photo",
       "sizeBytes": 162388,
       "updatedAt": "2026-10-18T15:11:58.452Z"
+    },
+    {
+      "id": "products_demo-accent-ceremonial-bell-800_jpg",
+      "filename": "demo-accent-ceremonial-bell-800.jpg",
+      "path": "/assets/products/demo-accent-ceremonial-bell-800.jpg",
+      "category": "products",
+      "label": "demo accent ceremonial bell",
+      "sizeBytes": 215374,
+      "updatedAt": "2026-10-18T16:51:18.655Z"
+    },
+    {
+      "id": "products_demo-accent-ceremonial-bell-800_webp",
+      "filename": "demo-accent-ceremonial-bell-800.webp",
+      "path": "/assets/products/demo-accent-ceremonial-bell-800.webp",
+      "category": "products",
+      "label": "demo accent ceremonial bell",
+      "sizeBytes": 196018,
+      "updatedAt": "2026-10-18T16:51:18.710Z"
+    },
+    {
+      "id": "products_demo-accent-ganesh-idol-800_jpg",
+      "filename": "demo-accent-ganesh-idol-800.jpg",
+      "path": "/assets/products/demo-accent-ganesh-idol-800.jpg",
+      "category": "products",
+      "label": "demo accent ganesh idol",
+      "sizeBytes": 137723,
+      "updatedAt": "2026-10-18T16:51:17.850Z"
+    },
+    {
+      "id": "products_demo-accent-ganesh-idol-800_webp",
+      "filename": "demo-accent-ganesh-idol-800.webp",
+      "path": "/assets/products/demo-accent-ganesh-idol-800.webp",
+      "category": "products",
+      "label": "demo accent ganesh idol",
+      "sizeBytes": 110326,
+      "updatedAt": "2026-10-18T16:51:17.897Z"
+    },
+    {
+      "id": "products_demo-accent-ganesha-statue-800_jpg",
+      "filename": "demo-accent-ganesha-statue-800.jpg",
+      "path": "/assets/products/demo-accent-ganesha-statue-800.jpg",
+      "category": "products",
+      "label": "demo accent ganesha statue",
+      "sizeBytes": 196626,
+      "updatedAt": "2026-10-18T16:51:17.077Z"
+    },
+    {
+      "id": "products_demo-accent-ganesha-statue-800_webp",
+      "filename": "demo-accent-ganesha-statue-800.webp",
+      "path": "/assets/products/demo-accent-ganesha-statue-800.webp",
+      "category": "products",
+      "label": "demo accent ganesha statue",
+      "sizeBytes": 175838,
+      "updatedAt": "2026-10-18T16:51:17.126Z"
+    },
+    {
+      "id": "products_demo-accent-krishna-flute-800_jpg",
+      "filename": "demo-accent-krishna-flute-800.jpg",
+      "path": "/assets/products/demo-accent-krishna-flute-800.jpg",
+      "category": "products",
+      "label": "demo accent krishna flute",
+      "sizeBytes": 75084,
+      "updatedAt": "2026-10-18T16:51:15.993Z"
+    },
+    {
+      "id": "products_demo-accent-krishna-flute-800_webp",
+      "filename": "demo-accent-krishna-flute-800.webp",
+      "path": "/assets/products/demo-accent-krishna-flute-800.webp",
+      "category": "products",
+      "label": "demo accent krishna flute",
+      "sizeBytes": 61828,
+      "updatedAt": "2026-10-18T16:51:16.033Z"
+    },
+    {
+      "id": "products_demo-decor-brass-stand-800_jpg",
+      "filename": "demo-decor-brass-stand-800.jpg",
+      "path": "/assets/products/demo-decor-brass-stand-800.jpg",
+      "category": "products",
+      "label": "demo decor brass stand",
+      "sizeBytes": 65624,
+      "updatedAt": "2026-10-18T16:51:21.732Z"
+    },
+    {
+      "id": "products_demo-decor-brass-stand-800_webp",
+      "filename": "demo-decor-brass-stand-800.webp",
+      "path": "/assets/products/demo-decor-brass-stand-800.webp",
+      "category": "products",
+      "label": "demo decor brass stand",
+      "sizeBytes": 46024,
+      "updatedAt": "2026-10-18T16:51:21.778Z"
+    },
+    {
+      "id": "products_demo-decor-floral-uruli-800_jpg",
+      "filename": "demo-decor-floral-uruli-800.jpg",
+      "path": "/assets/products/demo-decor-floral-uruli-800.jpg",
+      "category": "products",
+      "label": "demo decor floral uruli",
+      "sizeBytes": 102900,
+      "updatedAt": "2026-10-18T16:51:19.982Z"
+    },
+    {
+      "id": "products_demo-decor-floral-uruli-800_webp",
+      "filename": "demo-decor-floral-uruli-800.webp",
+      "path": "/assets/products/demo-decor-floral-uruli-800.webp",
+      "category": "products",
+      "label": "demo decor floral uruli",
+      "sizeBytes": 82184,
+      "updatedAt": "2026-10-18T16:51:20.019Z"
+    },
+    {
+      "id": "products_demo-decor-marigold-diya-800_jpg",
+      "filename": "demo-decor-marigold-diya-800.jpg",
+      "path": "/assets/products/demo-decor-marigold-diya-800.jpg",
+      "category": "products",
+      "label": "demo decor marigold diya",
+      "sizeBytes": 59464,
+      "updatedAt": "2026-10-18T16:51:22.418Z"
+    },
+    {
+      "id": "products_demo-decor-marigold-diya-800_webp",
+      "filename": "demo-decor-marigold-diya-800.webp",
+      "path": "/assets/products/demo-decor-marigold-diya-800.webp",
+      "category": "products",
+      "label": "demo decor marigold diya",
+      "sizeBytes": 37584,
+      "updatedAt": "2026-10-18T16:51:22.461Z"
+    },
+    {
+      "id": "products_demo-decor-pooja-arrangement-800_jpg",
+      "filename": "demo-decor-pooja-arrangement-800.jpg",
+      "path": "/assets/products/demo-decor-pooja-arrangement-800.jpg",
+      "category": "products",
+      "label": "demo decor pooja arrangement",
+      "sizeBytes": 135855,
+      "updatedAt": "2026-10-18T16:51:20.914Z"
+    },
+    {
+      "id": "products_demo-decor-pooja-arrangement-800_webp",
+      "filename": "demo-decor-pooja-arrangement-800.webp",
+      "path": "/assets/products/demo-decor-pooja-arrangement-800.webp",
+      "category": "products",
+      "label": "demo decor pooja arrangement",
+      "sizeBytes": 120500,
+      "updatedAt": "2026-10-18T16:51:20.965Z"
+    },
+    {
+      "id": "products_demo-frame-baroque-floral-800_jpg",
+      "filename": "demo-frame-baroque-floral-800.jpg",
+      "path": "/assets/products/demo-frame-baroque-floral-800.jpg",
+      "category": "products",
+      "label": "demo frame baroque floral",
+      "sizeBytes": 112997,
+      "updatedAt": "2026-10-18T16:51:11.255Z"
+    },
+    {
+      "id": "products_demo-frame-baroque-floral-800_webp",
+      "filename": "demo-frame-baroque-floral-800.webp",
+      "path": "/assets/products/demo-frame-baroque-floral-800.webp",
+      "category": "products",
+      "label": "demo frame baroque floral",
+      "sizeBytes": 86844,
+      "updatedAt": "2026-10-18T16:51:11.291Z"
+    },
+    {
+      "id": "products_demo-frame-sanctum-gold-800_jpg",
+      "filename": "demo-frame-sanctum-gold-800.jpg",
+      "path": "/assets/products/demo-frame-sanctum-gold-800.jpg",
+      "category": "products",
+      "label": "demo frame sanctum gold",
+      "sizeBytes": 104687,
+      "updatedAt": "2026-10-18T16:51:10.491Z"
+    },
+    {
+      "id": "products_demo-frame-sanctum-gold-800_webp",
+      "filename": "demo-frame-sanctum-gold-800.webp",
+      "path": "/assets/products/demo-frame-sanctum-gold-800.webp",
+      "category": "products",
+      "label": "demo frame sanctum gold",
+      "sizeBytes": 69642,
+      "updatedAt": "2026-10-18T16:51:10.584Z"
+    },
+    {
+      "id": "products_demo-frame-temple-collection-800_jpg",
+      "filename": "demo-frame-temple-collection-800.jpg",
+      "path": "/assets/products/demo-frame-temple-collection-800.jpg",
+      "category": "products",
+      "label": "demo frame temple collection",
+      "sizeBytes": 140041,
+      "updatedAt": "2026-10-18T16:51:11.900Z"
+    },
+    {
+      "id": "products_demo-frame-temple-collection-800_webp",
+      "filename": "demo-frame-temple-collection-800.webp",
+      "path": "/assets/products/demo-frame-temple-collection-800.webp",
+      "category": "products",
+      "label": "demo frame temple collection",
+      "sizeBytes": 117390,
+      "updatedAt": "2026-10-18T16:51:11.945Z"
+    },
+    {
+      "id": "products_demo-frame-vintage-altar-800_jpg",
+      "filename": "demo-frame-vintage-altar-800.jpg",
+      "path": "/assets/products/demo-frame-vintage-altar-800.jpg",
+      "category": "products",
+      "label": "demo frame vintage altar",
+      "sizeBytes": 84793,
+      "updatedAt": "2026-10-18T16:51:12.500Z"
+    },
+    {
+      "id": "products_demo-frame-vintage-altar-800_webp",
+      "filename": "demo-frame-vintage-altar-800.webp",
+      "path": "/assets/products/demo-frame-vintage-altar-800.webp",
+      "category": "products",
+      "label": "demo frame vintage altar",
+      "sizeBytes": 46988,
+      "updatedAt": "2026-10-18T16:51:12.537Z"
+    },
+    {
+      "id": "products_demo-gift-festive-twin-diya-800_jpg",
+      "filename": "demo-gift-festive-twin-diya-800.jpg",
+      "path": "/assets/products/demo-gift-festive-twin-diya-800.jpg",
+      "category": "products",
+      "label": "demo gift festive twin diya",
+      "sizeBytes": 177114,
+      "updatedAt": "2026-10-18T16:51:25.471Z"
+    },
+    {
+      "id": "products_demo-gift-festive-twin-diya-800_webp",
+      "filename": "demo-gift-festive-twin-diya-800.webp",
+      "path": "/assets/products/demo-gift-festive-twin-diya-800.webp",
+      "category": "products",
+      "label": "demo gift festive twin diya",
+      "sizeBytes": 153144,
+      "updatedAt": "2026-10-18T16:51:25.525Z"
+    },
+    {
+      "id": "products_demo-gift-luxury-botanical-800_jpg",
+      "filename": "demo-gift-luxury-botanical-800.jpg",
+      "path": "/assets/products/demo-gift-luxury-botanical-800.jpg",
+      "category": "products",
+      "label": "demo gift luxury botanical",
+      "sizeBytes": 141207,
+      "updatedAt": "2026-10-18T16:51:24.565Z"
+    },
+    {
+      "id": "products_demo-gift-luxury-botanical-800_webp",
+      "filename": "demo-gift-luxury-botanical-800.webp",
+      "path": "/assets/products/demo-gift-luxury-botanical-800.webp",
+      "category": "products",
+      "label": "demo gift luxury botanical",
+      "sizeBytes": 120898,
+      "updatedAt": "2026-10-18T16:51:24.611Z"
+    },
+    {
+      "id": "products_demo-gift-sweets-presentation-800_jpg",
+      "filename": "demo-gift-sweets-presentation-800.jpg",
+      "path": "/assets/products/demo-gift-sweets-presentation-800.jpg",
+      "category": "products",
+      "label": "demo gift sweets presentation",
+      "sizeBytes": 99093,
+      "updatedAt": "2026-10-18T16:51:23.845Z"
+    },
+    {
+      "id": "products_demo-gift-sweets-presentation-800_webp",
+      "filename": "demo-gift-sweets-presentation-800.webp",
+      "path": "/assets/products/demo-gift-sweets-presentation-800.webp",
+      "category": "products",
+      "label": "demo gift sweets presentation",
+      "sizeBytes": 58426,
+      "updatedAt": "2026-10-18T16:51:23.882Z"
+    },
+    {
+      "id": "products_demo-gift-traditional-hamper-800_jpg",
+      "filename": "demo-gift-traditional-hamper-800.jpg",
+      "path": "/assets/products/demo-gift-traditional-hamper-800.jpg",
+      "category": "products",
+      "label": "demo gift traditional hamper",
+      "sizeBytes": 93907,
+      "updatedAt": "2026-10-18T16:51:23.093Z"
+    },
+    {
+      "id": "products_demo-gift-traditional-hamper-800_webp",
+      "filename": "demo-gift-traditional-hamper-800.webp",
+      "path": "/assets/products/demo-gift-traditional-hamper-800.webp",
+      "category": "products",
+      "label": "demo gift traditional hamper",
+      "sizeBytes": 73262,
+      "updatedAt": "2026-10-18T16:51:23.139Z"
+    },
+    {
+      "id": "products_demo-lamp-ceremonial-diya-800_jpg",
+      "filename": "demo-lamp-ceremonial-diya-800.jpg",
+      "path": "/assets/products/demo-lamp-ceremonial-diya-800.jpg",
+      "category": "products",
+      "label": "demo lamp ceremonial diya",
+      "sizeBytes": 130913,
+      "updatedAt": "2026-10-18T16:51:13.869Z"
+    },
+    {
+      "id": "products_demo-lamp-ceremonial-diya-800_webp",
+      "filename": "demo-lamp-ceremonial-diya-800.webp",
+      "path": "/assets/products/demo-lamp-ceremonial-diya-800.webp",
+      "category": "products",
+      "label": "demo lamp ceremonial diya",
+      "sizeBytes": 94516,
+      "updatedAt": "2026-10-18T16:51:13.912Z"
+    },
+    {
+      "id": "products_demo-lamp-sacred-flame-800_jpg",
+      "filename": "demo-lamp-sacred-flame-800.jpg",
+      "path": "/assets/products/demo-lamp-sacred-flame-800.jpg",
+      "category": "products",
+      "label": "demo lamp sacred flame",
+      "sizeBytes": 106119,
+      "updatedAt": "2026-10-18T16:51:14.521Z"
+    },
+    {
+      "id": "products_demo-lamp-sacred-flame-800_webp",
+      "filename": "demo-lamp-sacred-flame-800.webp",
+      "path": "/assets/products/demo-lamp-sacred-flame-800.webp",
+      "category": "products",
+      "label": "demo lamp sacred flame",
+      "sizeBytes": 73532,
+      "updatedAt": "2026-10-18T16:51:14.568Z"
+    },
+    {
+      "id": "products_demo-lamp-serene-glow-800_jpg",
+      "filename": "demo-lamp-serene-glow-800.jpg",
+      "path": "/assets/products/demo-lamp-serene-glow-800.jpg",
+      "category": "products",
+      "label": "demo lamp serene glow",
+      "sizeBytes": 193846,
+      "updatedAt": "2026-10-18T16:51:15.227Z"
+    },
+    {
+      "id": "products_demo-lamp-serene-glow-800_webp",
+      "filename": "demo-lamp-serene-glow-800.webp",
+      "path": "/assets/products/demo-lamp-serene-glow-800.webp",
+      "category": "products",
+      "label": "demo lamp serene glow",
+      "sizeBytes": 178842,
+      "updatedAt": "2026-10-18T16:51:15.283Z"
+    },
+    {
+      "id": "products_demo-lamp-traditional-pillar-800_jpg",
+      "filename": "demo-lamp-traditional-pillar-800.jpg",
+      "path": "/assets/products/demo-lamp-traditional-pillar-800.jpg",
+      "category": "products",
+      "label": "demo lamp traditional pillar",
+      "sizeBytes": 211105,
+      "updatedAt": "2026-10-18T16:51:13.244Z"
+    },
+    {
+      "id": "products_demo-lamp-traditional-pillar-800_webp",
+      "filename": "demo-lamp-traditional-pillar-800.webp",
+      "path": "/assets/products/demo-lamp-traditional-pillar-800.webp",
+      "category": "products",
+      "label": "demo lamp traditional pillar",
+      "sizeBytes": 187234,
+      "updatedAt": "2026-10-18T16:51:13.300Z"
     },
     {
       "id": "products_hanuman-frame-600_jpg",

@@ -31,5 +31,9 @@ scratch/
 # Portal asset copies are generated from public/assets by scripts/sync-assets.js
 apps/*/public/assets/products/
 apps/*/public/assets/editorial/
+apps/*/public/assets/categories/
 apps/admin/public/assets/demo/
-apps/admin/public/assets/manifest.json
+apps/*/public/assets/manifest.json
+
+# Temporary downloader cache
+.cache_img/

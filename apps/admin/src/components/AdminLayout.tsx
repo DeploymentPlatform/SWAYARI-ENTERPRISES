@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Inbox, Package, Layers, Image as ImageIcon, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Inbox, Package, Layers, Sliders, Image as ImageIcon, LogOut, Menu, X } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { Wordmark } from './ui';
 
@@ -14,6 +14,7 @@ const NAV = [
   { id: 'orders', label: 'Order requests', icon: Inbox },
   { id: 'products', label: 'Products', icon: Package },
   { id: 'categories', label: 'Categories', icon: Layers },
+  { id: 'banners', label: 'Campaign banners', icon: Sliders },
   { id: 'assets', label: 'Photo library', icon: ImageIcon }
 ];
 

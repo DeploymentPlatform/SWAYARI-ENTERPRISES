@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] - 2026-10-18
+
+### Changed
+- Storefront redesigned around a photography-led editorial direction (`docs/DESIGN_DIRECTION.md`):
+  new header wordmark, wide editorial hero with mobile composition, inventory-adaptive collection,
+  occasion tiles, brand story, ordering steps, and redesigned shop, search, product, bag, request
+  form, confirmation and request history.
+- Staff portal refined into a neutral operations interface with an order drawer, staff-only notes
+  panel, structured product editor and real counts only.
+- Copy rewritten to remove unconfirmed claims (artisans, casting, purity, origin, bespoke).
+- Root `wrangler.toml` no longer declares a Pages output; handoff guide uses per-app root directories.
+
+### Added
+- Licensed editorial photography with source record (`docs/ASSET_SOURCES.md`).
+- `scripts/prepare-product-photo.py` and prepared product images; `scripts/sync-assets.js`.
+- Migration `0004_preview_catalogue.sql` (honest sample entries, `is_demo = 1`).
+- `/api/auth/config` on both portals; `/dev-login` local-only page.
+- Tests 18–25 (now 25 total).
+
+### Fixed / Security
+- Dev login now deny-by-default (requires `ENVIRONMENT=development`).
+- Orders reject archived/draft products and samples outside development; idempotency keys scoped per customer.
+- Editing a sample product no longer publishes it as live inventory or erases variants.
+- Sample product URLs hidden without the preview flag; category counts exclude samples.
+- Customer order history fields; Google sign-in stylesheet allowed by CSP; Google button now
+  renders reliably after the async script loads.
+
+Implementation commit: `1bd5ce7`.
+
+---
+
 ## [0.2.0] - 2026-10-18
 
 ### Added

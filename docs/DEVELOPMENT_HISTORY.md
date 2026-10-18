@@ -131,3 +131,100 @@ The owner rejected the previous single-origin architecture and layout as too bas
 2. Review visual previews with the owner.
 3. Merge `feature/swayari-premium-portals` into `main` after owner visual sign-off.
 
+
+---
+
+## Milestone 3: Editorial Storefront Redesign, Staff Portal Refinement & Portal Hardening
+
+- **Date & Time (Asia/Kolkata):** `2026-10-18T21:20:00+05:30`
+- **Working Branch:** `feature/swayari-editorial-redesign` (from `feature/swayari-premium-portals` @ `da7c7c6`)
+- **Completed Implementation Commit:** `1bd5ce7060f452835eb58a5b5a71988f702b3aa7`
+- **Commit Summary:** `feat(redesign): photography-led storefront, refined staff portal and portal hardening`
+
+### 1. Context & Motivation
+The owner rejected the Milestone 2 storefront: grass-background product photo as the hero, the same
+photo repeated, a single narrow card in an empty grid, the square logo artwork reused as content,
+pale empty panels, badge clutter, exaggerated and unsupported claims, a weak header wordmark and a
+development sign-in strip visible to customers. The brief asked for a photography-led, honest
+direction — “Warm Indian homes, thoughtful gifting and beautifully presented devotional décor” —
+using licensed editorial imagery, prepared real product photographs, and a calmer staff portal,
+without changing the working architecture.
+
+### 2. What Changed
+1. **Visual direction** — `docs/DESIGN_DIRECTION.md`; tokens in `packages/ui` (ivory/stone,
+   ink, burgundy, restrained gold, umber hero panel; Cinzel wordmark, Cormorant Garamond display,
+   Jost text). `docs/DESIGN_SYSTEM.md` rewritten to match.
+2. **Storefront (`apps/storefront/src`)** — rebuilt header (live-text wordmark, Shop / Our Story /
+   Contact, search, account, bag, mobile menu); wide editorial hero with a separate mobile crop;
+   `ProductCollection` that adapts to the real item count; occasion tiles linking to enquiries;
+   brand story; “How ordering works”; footer. Shop/search, product detail, bag drawer, full bag,
+   request form (inline validation + focused error summary), confirmation and request history
+   redesigned. Sign-in dialog renders Google’s own button using the storefront client ID from
+   `/api/auth/config`; the intended add is resumed exactly once via sessionStorage. Contact form
+   now honestly composes an email (no backend existed; it previously showed a fake success).
+   Copy rewritten to remove unsupported claims.
+3. **Imagery** — eight licensed Pexels photographs (`public/assets/editorial`, recorded in
+   `docs/ASSET_SOURCES.md`); `scripts/prepare-product-photo.py` produces perspective-true cutouts
+   of the four supplied framed pieces on a neutral surface (originals untouched, max 960px to avoid
+   overstating quality). `scripts/sync-assets.js` copies canonical `public/assets` into each portal.
+4. **Staff portal (`apps/admin/src`)** — branded split login, sidebar, overview with real counts
+   only (preview samples counted separately), order list with status chips/search/thumbnails,
+   order drawer separating customer data, read-only original request, customer-visible quotations
+   and an amber “Staff only” notes panel; structured product editor drawer with an explicit sample flag.
+5. **Hardening (server)**
+   - Dev login is deny-by-default: only when `ENVIRONMENT === 'development'` (previously allowed
+     whenever the variable was anything other than `production`, including unset).
+   - Order submission rejects unpublished/archived products and preview samples outside
+     development; idempotency keys are honoured only for the customer who created the order (409 otherwise).
+   - Admin product update preserves `is_demo` and variants when the client omits them (editing a
+     sample previously turned it into live inventory and erased variants).
+   - Product-by-slug hides samples unless `include_demo=1`; category counts exclude samples.
+   - Customer order list returns camelCase fields (history page previously showed blank dates/cities).
+   - Admin orders list honours `limit` and returns a thumbnail; admin asset list reads the
+     deployed manifest instead of a hard-coded, mislabelled list.
+   - CSP allows `https://accounts.google.com/gsi/style` (Google button styles were blocked).
+   - `/api/auth/config` per portal exposes only that portal’s OAuth client ID.
+6. **Deployment wiring** — root `wrangler.toml` no longer declares `pages_build_output_dir`;
+   `docs/BROWSER_SETUP_HANDOFF.md` corrected: each Pages project must use `apps/storefront` or
+   `apps/admin` as its root directory (Pages has no separate functions-directory setting, so the
+   documented root `/` would have deployed the legacy root `functions/` including admin handlers).
+   Dev scripts run from each app folder against the shared local D1 state.
+
+### 3. Database / Migrations
+- `migrations/0004_preview_catalogue.sql`: renames the demo category label “Silver Plated Art” →
+  “Devotional Frames”; neutralises demo category descriptions; rewrites `SWY-DEMO-001` with honest
+  copy and the prepared images (material/dimensions/variants/customisation cleared); adds
+  `SWY-DEMO-002…004` for the other supplied photographs. All rows remain `is_demo = 1`.
+  Applied locally (`npm run d1:migrate:local`): ✅. **Not applied remotely.**
+
+### 4. Checks & Results (actually run)
+- `npm run build` — manifest 73 assets; storefront JS 462 kB (≈141 kB gzip); admin JS 280 kB. ✅
+- `npm test` — **25 passed, 0 failed** (8 new tests covering the hardening items and storefront
+  bundle/function separation).
+- `npx tsc --noEmit -p tsconfig.json` — 0 errors.
+- Local servers: storefront `wrangler pages dev` on :8790, admin on :8791 (the previous agent’s
+  servers were still running on :8788/:8789 and were left untouched).
+- Visual verification with headless Chrome (puppeteer-core) at 1440, 768 and 390 px: homepage
+  (first screen and full page), single- and two-item collection layouts, production state with no
+  live inventory, shop, search (results and empty), product (desktop/mobile), sign-in dialog,
+  bag drawer, full bag, request form validation, submission → confirmation → history, mobile
+  menu, search dialog, Our Story, Contact, policy, 404, and all admin screens. No horizontal
+  overflow and no script errors (other than Google reporting the local placeholder client ID).
+  Curated before/after set: `docs/screenshots/2026-10-18-editorial-redesign/`.
+- End-to-end flow verified: signed-out “Add to bag” → sign-in dialog → local test sign-in →
+  item added once and drawer opened → request saved → reference shown → visible in history and
+  in the staff portal.
+
+### 5. Deployment Status
+- Nothing deployed; no Cloudflare or Google settings changed. No paid services enabled.
+- Real Google sign-in not exercised (local `.dev.vars` contains a placeholder client ID).
+
+### 6. Open Issues & Next Steps
+1. Owner review of the redesign; merge to `main` only after sign-off.
+2. Configure both Pages projects with the corrected root directories, `SKIP_DEPENDENCY_INSTALL=1`,
+   `GOOGLE_STOREFRONT_CLIENT_ID` / `GOOGLE_ADMIN_CLIENT_ID`, then apply migration 0004 remotely.
+3. Owner to decide whether to delete the legacy single-origin files (root `functions/` and root
+   `public/*.html|js|css`); removal was not performed.
+4. Confirm real product details (sizes, materials, prices) and publish real inventory; better
+   product photographs on a plain background would allow larger gallery images.
+5. Optional: reduce storefront JS by lazy-loading Motion; consider a contact-form backend.

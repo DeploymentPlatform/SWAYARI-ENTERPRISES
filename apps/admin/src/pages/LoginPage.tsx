@@ -1,110 +1,94 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Lock } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
-import { ShieldCheck, AlertCircle, Lock, ArrowRight } from 'lucide-react';
+import { ErrorBanner, Wordmark } from '../components/ui';
 
 export const LoginPage: React.FC = () => {
-  const { handleGoogleCallback, authError, clearAuthError, devLoginAdmin } = useAdminAuth();
-  const googleBtnRef = useRef<HTMLDivElement>(null);
+  const { handleGoogleCallback, authError, config, devLoginAdmin } = useAdminAuth();
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const [gisState, setGisState] = useState<'idle' | 'loading' | 'ready' | 'unavailable'>('idle');
 
+  // Wait for the async Google Identity Services script, then render Google's button with the
+  // admin portal's own OAuth client (separate from the storefront client).
   useEffect(() => {
-    // Render Google Sign-in button if GIS is available
-    if (window.google?.accounts?.id && googleBtnRef.current) {
-      window.google.accounts.id.initialize({
-        client_id: '1097223362145-admin.apps.googleusercontent.com', // Verified server-side
-        callback: (response: any) => {
-          if (response.credential) {
-            handleGoogleCallback(response.credential);
-          }
-        },
-        auto_select: false
-      });
-
-      window.google.accounts.id.renderButton(googleBtnRef.current, {
-        theme: 'filled_black',
-        size: 'large',
-        text: 'signin_with',
-        shape: 'rectangular',
-        width: 320
-      });
-    }
-  }, []);
-
-  const isLocalDev = window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1');
+    if (!config.googleClientId) return;
+    let cancelled = false;
+    let tries = 0;
+    setGisState('loading');
+    const attempt = () => {
+      if (cancelled) return;
+      if (window.google?.accounts?.id && buttonRef.current) {
+        window.google.accounts.id.initialize({
+          client_id: config.googleClientId,
+          callback: (response: { credential?: string }) => response.credential && handleGoogleCallback(response.credential),
+          auto_select: false,
+          ux_mode: 'popup'
+        });
+        buttonRef.current.innerHTML = '';
+        window.google.accounts.id.renderButton(buttonRef.current, { theme: 'outline', size: 'large', text: 'signin_with', width: 320 });
+        setGisState('ready');
+        return;
+      }
+      if (++tries > 50) return setGisState('unavailable');
+      window.setTimeout(attempt, 100);
+    };
+    attempt();
+    return () => {
+      cancelled = true;
+    };
+  }, [config.googleClientId]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-ivory p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl border border-ivory-border shadow-card p-8 sm:p-10 space-y-8">
-        
-        {/* Brand Header */}
-        <div className="text-center space-y-4">
-          <img
-            src="/assets/brand/swayari-logo.svg"
-            alt="SWAYARI — Décor & Gifting"
-            className="h-12 w-auto mx-auto object-contain"
-          />
-          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-burgundy-light text-burgundy text-xs font-semibold tracking-wide">
-            <Lock className="w-3.5 h-3.5" />
-            <span>Staff Operations &amp; Order Portal</span>
-          </div>
-          <p className="text-xs text-charcoal-muted font-light leading-relaxed">
-            Restricted to authorized SWAYARI administrators and studio personnel. Please authenticate with your official Google account.
-          </p>
+    <div className="grid min-h-screen lg:grid-cols-[1fr_520px]">
+      <div className="relative hidden flex-col justify-between bg-burgundy-deep p-12 text-ivory lg:flex">
+        <Wordmark tone="light" />
+        <div className="max-w-md">
+          <p className="font-display text-[2.75rem] leading-[1.05]">Order requests, catalogue and customer follow-up in one place.</p>
+          <p className="mt-5 text-ivory/70">Staff portal for SWAYARI — Décor &amp; Gifting. Separate from the customer website.</p>
         </div>
+        <p className="text-sm text-ivory/50">© {new Date().getFullYear()} SWAYARI ENTERPRISES</p>
+      </div>
 
-        {/* Access Denied Warning if unauthorized email attempted */}
-        {authError && (
-          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 space-y-2">
-            <div className="flex items-center space-x-2 font-semibold">
-              <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
-              <span>Authorization Access Denied</span>
+      <div className="flex items-center justify-center bg-white px-6 py-16">
+        <div className="w-full max-w-sm">
+          <div className="lg:hidden">
+            <Wordmark />
+          </div>
+          <div className="mt-10 flex items-center gap-2 text-sm font-medium text-burgundy lg:mt-0">
+            <Lock className="h-4 w-4" aria-hidden /> Restricted access
+          </div>
+          <h1 className="mt-3 font-display text-[2.25rem] font-semibold leading-tight">Staff sign-in</h1>
+          <p className="mt-2 text-ink-soft">Sign in with an authorised SWAYARI Google account. Customer accounts cannot access this portal.</p>
+
+          {authError && (
+            <div className="mt-6">
+              <ErrorBanner message={authError} />
             </div>
-            <p className="font-light leading-relaxed">
-              {authError}
-            </p>
-            <p className="text-[11px] text-red-600 font-light">
-              Only verified identities listed in the backend staff allowlist (<span className="font-mono">swayarienterprises@gmail.com</span>) can access the admin dashboard.
-            </p>
-          </div>
-        )}
+          )}
 
-        {/* Google Sign-In Area */}
-        <div className="space-y-4">
-          <div className="flex justify-center" ref={googleBtnRef}>
-            <div className="text-xs text-charcoal-light py-2">
-              Loading Google Sign-in...
+          <div className="mt-8 min-h-[44px]">
+            {config.googleClientId ? (
+              <>
+                <div ref={buttonRef} />
+                {gisState === 'loading' && <p className="text-sm text-ink-soft">Loading Google sign-in…</p>}
+                {gisState === 'unavailable' && <p className="text-sm text-red-800">Google sign-in could not load. Check your connection and reload.</p>}
+              </>
+            ) : (
+              <p className="rounded-md border border-stone-deep bg-stone px-4 py-3 text-sm text-ink-soft">
+                Google sign-in is not configured for this deployment (GOOGLE_ADMIN_CLIENT_ID).
+              </p>
+            )}
+          </div>
+
+          {config.devLoginAvailable && (
+            <div className="mt-10 border-t border-dashed border-stone-shade pt-6">
+              <p className="text-[0.8125rem] text-ink-soft">Local development only — disabled in production.</p>
+              <button type="button" onClick={() => devLoginAdmin()} className="adm-btn-secondary mt-3 w-full">
+                Sign in as local test administrator
+              </button>
             </div>
-          </div>
-
-          <div className="text-center">
-            <span className="text-[11px] text-charcoal-light">
-              Required Account: <span className="font-medium text-charcoal">swayarienterprises@gmail.com</span>
-            </span>
-          </div>
+          )}
         </div>
-
-        {/* Local Dev Login Shortcut (Dev mode only) */}
-        {isLocalDev && (
-          <div className="pt-4 border-t border-ivory-border text-center space-y-2">
-            <p className="text-[11px] text-amber-800 font-medium">Local Development Mode</p>
-            <button
-              onClick={() => devLoginAdmin()}
-              className="w-full py-2.5 px-4 rounded-lg bg-burgundy text-white text-xs font-medium hover:bg-burgundy-hover transition-colors shadow-sm flex items-center justify-center space-x-1.5"
-            >
-              <span>Quick Login as Studio Admin (Local Test)</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        )}
-
-        {/* Security Footnote */}
-        <div className="text-center pt-2 border-t border-ivory-border/60 text-[10px] text-charcoal-light space-y-1">
-          <p className="flex items-center justify-center space-x-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-gold" />
-            <span>Host-Only Scoped Session Security • Protected Portal</span>
-          </p>
-          <p>© {new Date().getFullYear()} SWAYARI ENTERPRISES</p>
-        </div>
-
       </div>
     </div>
   );

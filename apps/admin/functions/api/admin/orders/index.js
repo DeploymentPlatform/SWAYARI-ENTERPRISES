@@ -12,13 +12,15 @@ export async function onRequestGet(context) {
 
   const status = url.searchParams.get('status');
   const search = url.searchParams.get('search');
+  const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') || '100', 10) || 100));
 
   try {
     let query = `
       SELECT o.id, o.customer_id, o.customer_name, o.customer_email,
              o.customer_phone, o.delivery_city, o.delivery_state,
              o.status, o.initial_indicative_subtotal, o.created_at, o.updated_at,
-             COUNT(i.id) as item_count
+             COUNT(i.id) as item_count,
+             (SELECT snapshot_image_url FROM order_items fi WHERE fi.order_id = o.id LIMIT 1) as first_image
       FROM orders o
       LEFT JOIN order_items i ON o.id = i.order_id
       WHERE 1=1
@@ -36,7 +38,7 @@ export async function onRequestGet(context) {
       params.push(term, term, term, term, term);
     }
 
-    query += ' GROUP BY o.id ORDER BY o.created_at DESC LIMIT 100';
+    query += ` GROUP BY o.id ORDER BY o.created_at DESC LIMIT ${limit}`;
 
     const stmt = env.DB.prepare(query);
     const bound = params.length > 0 ? stmt.bind(...params) : stmt;
@@ -52,6 +54,7 @@ export async function onRequestGet(context) {
       status: row.status,
       indicativeSubtotal: row.initial_indicative_subtotal,
       itemCount: Number(row.item_count || 0),
+      firstImage: row.first_image || null,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     }));

@@ -136,11 +136,24 @@ SWAYARI-ENTERPRISES/
 ├── migrations/                     # Canonical D1 SQL migrations
 │   ├── 0001_initial_schema.sql     # Core tables (users, orders, products, etc.)
 │   ├── 0002_demo_data.sql          # Sample products (tagged is_demo = 1)
-│   └── 0003_session_scope.sql      # Multi-portal session scope column
-├── public/assets/                  # Git-tracked high-resolution photography & logos
+│   ├── 0003_session_scope.sql      # Multi-portal session scope column
+│   └── 0004_preview_catalogue.sql  # Honest sample entries for the four supplied product photos (is_demo = 1)
+├── public/assets/                  # CANONICAL Git-tracked assets: brand/, products/, demo/ (originals), editorial/ (licensed stock)
+│                                   #   copied into apps/*/public/assets by scripts/sync-assets.js at build time
+│                                   #   (editorial/ goes to the storefront only)
 ├── scripts/                        # Manifest generator, test suite, backup automation
 └── docs/                           # System architecture, design system, handoff
 ```
+
+---
+
+### Legacy single-origin files
+
+`functions/` and the HTML/JS/CSS pages under `public/` at the repository root are the Milestone 1
+single-origin application (it includes admin handlers next to customer ones). They are not part of
+either portal's deployment once each Cloudflare Pages project uses its app folder as the root
+directory, and the root `wrangler.toml` no longer declares a Pages output. They are kept only until
+the owner approves removing them (see Milestone 3 open issues).
 
 ---
 
@@ -154,8 +167,9 @@ SWAYARI-ENTERPRISES/
    - Admin authentication binds directly to Google's verified `sub` and checks against the server allowlist (`swayarienterprises@gmail.com`).
    - Browser cannot supply roles or elevation flags.
 3. **Audience Validation (Google ID Token):**
-   - Storefront validates against `STOREFRONT_GOOGLE_CLIENT_ID`.
-   - Admin portal validates against `ADMIN_GOOGLE_CLIENT_ID`.
+   - Storefront validates against `GOOGLE_STOREFRONT_CLIENT_ID`.
+   - Admin portal validates against `GOOGLE_ADMIN_CLIENT_ID`.
+   - Each portal publishes only its own client ID to the browser via `GET /api/auth/config`.
    - A customer token cannot authenticate against the admin endpoint.
 4. **Customer Data Isolation:**
    - Storefront endpoint `/api/orders/:id` strictly checks `order.customer_id === session.user.id`. Customer B cannot view Customer A's records.

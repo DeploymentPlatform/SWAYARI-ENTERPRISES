@@ -35,17 +35,21 @@ export async function onRequestGet(context) {
       }
     });
 
+    // Live inventory only; preview samples (is_demo = 1) are counted separately.
     const productsResult = await env.DB.prepare(`
       SELECT status, COUNT(*) as count
       FROM products
+      WHERE is_demo = 0
       GROUP BY status
     `).all();
+    const samplesRow = await env.DB.prepare('SELECT COUNT(*) as count FROM products WHERE is_demo = 1').first();
 
     const productsCount = {
       total: 0,
       published: 0,
       draft: 0,
-      archived: 0
+      archived: 0,
+      samples: Number(samplesRow?.count || 0)
     };
 
     (productsResult.results || []).forEach(r => {

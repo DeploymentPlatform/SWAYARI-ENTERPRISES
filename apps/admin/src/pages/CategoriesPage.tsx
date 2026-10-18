@@ -1,158 +1,135 @@
-import React, { useState, useEffect } from 'react';
-import { Category } from '@swayari/shared';
-import { Layers, Plus, Loader2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Plus } from 'lucide-react';
+import { ErrorBanner, PageHeader } from '../components/ui';
+
+interface CategoryRow {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  productCount: number;
+}
 
 export const CategoriesPage: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isCreating, setIsCreating] = useState(false);
+  const [categories, setCategories] = useState<CategoryRow[]>([]);
+  const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [creating, setCreating] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [displayOrder, setDisplayOrder] = useState(0);
+  const [displayOrder, setDisplayOrder] = useState('0');
+  const [formError, setFormError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  async function fetchCategories() {
-    setLoading(true);
+  async function load() {
+    setState('loading');
     try {
       const res = await fetch('/api/admin/categories');
-      if (res.ok) {
-        const data = await res.json();
-        setCategories(data.categories || []);
-      }
-    } catch (err) {
-      console.error('Failed to load categories:', err);
-    } finally {
-      setLoading(false);
+      if (!res.ok) throw new Error();
+      setCategories((await res.json()).categories || []);
+      setState('ready');
+    } catch {
+      setState('error');
     }
   }
 
-  async function handleCreateCategory(e: React.FormEvent) {
-    e.preventDefault();
-    if (!name.trim()) return;
+  useEffect(() => {
+    load();
+  }, []);
 
-    try {
-      const res = await fetch('/api/admin/categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), description: description.trim(), displayOrder })
-      });
-      if (res.ok) {
-        setName('');
-        setDescription('');
-        setDisplayOrder(0);
-        setIsCreating(false);
-        fetchCategories();
-      }
-    } catch (err) {
-      console.error('Failed to create category:', err);
+  async function create(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) return setFormError('Please enter a category name.');
+    setFormError(null);
+    const res = await fetch('/api/admin/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name.trim(), description: description.trim(), displayOrder: Number(displayOrder) || 0 })
+    }).catch(() => null);
+    if (!res?.ok) {
+      const data = res ? await res.json().catch(() => ({})) : {};
+      return setFormError(data.error || 'The category was not saved.');
     }
+    setName('');
+    setDescription('');
+    setDisplayOrder('0');
+    setCreating(false);
+    load();
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-ivory-border shadow-subtle">
-        <div>
-          <h1 className="font-serif text-2xl font-bold text-charcoal">Category Taxonomy</h1>
-          <p className="text-xs text-charcoal-muted mt-0.5">
-            Organize products into curated devotional collections and occasions.
-          </p>
-        </div>
+    <div className="max-w-4xl space-y-6">
+      <PageHeader
+        title="Categories"
+        description="Groups shown as filters on the customer website. Categories without published products are hidden there automatically."
+        actions={
+          !creating && (
+            <button type="button" className="adm-btn-primary" onClick={() => setCreating(true)}>
+              <Plus className="h-4 w-4" aria-hidden /> New category
+            </button>
+          )
+        }
+      />
 
-        {!isCreating && (
-          <button
-            onClick={() => setIsCreating(true)}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-burgundy hover:bg-burgundy-hover text-white text-xs font-semibold shadow-sm transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            <span>New Category</span>
-          </button>
-        )}
-      </div>
-
-      {/* Create Category Inline Card */}
-      {isCreating && (
-        <form onSubmit={handleCreateCategory} className="bg-white p-5 rounded-2xl border border-burgundy/30 shadow-subtle space-y-4 text-xs">
-          <h3 className="font-semibold text-charcoal">Add New Category</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="font-medium text-charcoal block mb-1">Category Name *</label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="E.g. Sacred Pooja Urulis"
-                className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light"
-              />
-            </div>
-            <div>
-              <label className="font-medium text-charcoal block mb-1">Display Order</label>
-              <input
-                type="number"
-                value={displayOrder}
-                onChange={e => setDisplayOrder(Number(e.target.value) || 0)}
-                className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light"
-              />
-            </div>
+      {creating && (
+        <form onSubmit={create} className="adm-card space-y-4 p-5">
+          {formError && <ErrorBanner message={formError} />}
+          <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
+            <label>
+              <span className="adm-label">Name</span>
+              <input className="adm-input" value={name} onChange={e => setName(e.target.value)} autoFocus />
+            </label>
+            <label>
+              <span className="adm-label">Order</span>
+              <input type="number" className="adm-input" value={displayOrder} onChange={e => setDisplayOrder(e.target.value)} />
+            </label>
           </div>
-          <div>
-            <label className="font-medium text-charcoal block mb-1">Description (Optional)</label>
-            <input
-              type="text"
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder="Short collection description..."
-              className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light"
-            />
-          </div>
-          <div className="flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={() => setIsCreating(false)}
-              className="px-4 py-2 rounded-lg border border-ivory-border text-charcoal hover:bg-ivory"
-            >
+          <label className="block">
+            <span className="adm-label">Description (optional)</span>
+            <input className="adm-input" value={description} onChange={e => setDescription(e.target.value)} />
+          </label>
+          <div className="flex justify-end gap-2">
+            <button type="button" className="adm-btn-quiet" onClick={() => setCreating(false)}>
               Cancel
             </button>
-            <button
-              type="submit"
-              className="px-5 py-2 rounded-lg bg-burgundy text-white font-medium hover:bg-burgundy-hover"
-            >
-              Save Category
+            <button type="submit" className="adm-btn-primary">
+              Save category
             </button>
           </div>
         </form>
       )}
 
-      {/* Categories List */}
-      <div className="bg-white rounded-2xl border border-ivory-border shadow-subtle overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-xs text-charcoal-muted animate-pulse">
-            Loading categories...
-          </div>
+      {state === 'error' && <ErrorBanner message="Could not load categories." onRetry={load} />}
+
+      <div className="adm-card overflow-hidden">
+        {state === 'loading' ? (
+          <p className="px-5 py-10 text-center text-sm text-ink-soft">Loading…</p>
         ) : categories.length === 0 ? (
-          <div className="p-12 text-center text-xs text-charcoal-muted">
-            No categories defined yet.
-          </div>
+          <p className="px-5 py-10 text-center text-sm text-ink-soft">No categories yet.</p>
         ) : (
-          <div className="divide-y divide-ivory-border/60">
-            {categories.map(c => (
-              <div key={c.id} className="p-4 sm:p-5 flex items-center justify-between hover:bg-ivory-light/50 text-xs">
-                <div className="space-y-0.5">
-                  <h4 className="font-semibold text-charcoal text-sm">{c.name}</h4>
-                  <p className="text-charcoal-light font-mono text-[11px]">slug: {c.slug}</p>
-                  {c.description && <p className="text-charcoal-muted font-light">{c.description}</p>}
-                </div>
-                <div className="text-right">
-                  <span className="px-3 py-1 rounded-full bg-ivory-muted text-charcoal font-semibold text-[11px]">
-                    {c.productCount || 0} Products
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+          <table className="adm-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Web address</th>
+                <th className="text-right">Products</th>
+                <th className="text-right">Order</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map(c => (
+                <tr key={c.id}>
+                  <td>
+                    <p className="font-medium">{c.name}</p>
+                    {c.description && <p className="text-[0.8125rem] text-ink-soft">{c.description}</p>}
+                  </td>
+                  <td className="font-mono text-[0.8125rem] text-ink-soft">/shop?category={c.slug}</td>
+                  <td className="text-right tabular-nums">{c.productCount}</td>
+                  <td className="text-right tabular-nums text-ink-soft">{c.displayOrder}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

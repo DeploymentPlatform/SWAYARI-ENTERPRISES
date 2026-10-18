@@ -1,217 +1,166 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Plus, Search } from 'lucide-react';
 import { Product, formatPrice } from '@swayari/shared';
-import { Plus, Search, Edit3, Archive, Package, Eye } from 'lucide-react';
 import { ProductEditorModal } from '../components/ProductEditorModal';
+import { ErrorBanner, PageHeader, StatusBadge, Thumb } from '../components/ui';
 
 export const ProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [editorProductId, setEditorProductId] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [status, setStatus] = useState('all');
+  const [query, setQuery] = useState('');
+  const [applied, setApplied] = useState('');
+  const [editor, setEditor] = useState<{ id: string | null } | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [statusFilter]);
-
-  async function fetchProducts() {
-    setLoading(true);
+  async function load() {
+    setState('loading');
+    const params = new URLSearchParams();
+    if (status !== 'all') params.set('status', status);
+    if (applied) params.set('search', applied);
     try {
-      let url = '/api/admin/products';
-      const params = [];
-      if (statusFilter !== 'all') {
-        params.push(`status=${encodeURIComponent(statusFilter)}`);
-      }
-      if (searchQuery.trim()) {
-        params.push(`search=${encodeURIComponent(searchQuery.trim())}`);
-      }
-      if (params.length > 0) {
-        url += '?' + params.join('&');
-      }
-
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        setProducts(data.products || []);
-      }
-    } catch (err) {
-      console.error('Failed to load admin products:', err);
-    } finally {
-      setLoading(false);
+      const res = await fetch(`/api/admin/products${params.toString() ? `?${params}` : ''}`);
+      if (!res.ok) throw new Error();
+      setProducts((await res.json()).products || []);
+      setState('ready');
+    } catch {
+      setState('error');
     }
   }
 
-  async function handleArchiveProduct(id: string) {
-    if (!confirm('Are you sure you want to archive this product? It will be hidden from the storefront, while preserving all past order requests.')) {
-      return;
-    }
-    try {
-      const res = await fetch(`/api/admin/products/${encodeURIComponent(id)}`, {
-        method: 'DELETE'
-      });
-      if (res.ok) {
-        fetchProducts();
-      }
-    } catch (err) {
-      console.error('Failed to archive product:', err);
-    }
+  useEffect(() => {
+    load();
+  }, [status, applied]);
+
+  async function archive(p: Product) {
+    if (!window.confirm(`Archive “${p.name}”? It will be hidden from the customer website. Past requests keep their copy of it.`)) return;
+    const res = await fetch(`/api/admin/products/${encodeURIComponent(p.id)}`, { method: 'DELETE' }).catch(() => null);
+    setNotice(res?.ok ? `“${p.name}” archived.` : 'Could not archive the product. Please try again.');
+    load();
   }
 
   return (
     <div className="space-y-6">
-      {/* Title & Actions Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-ivory-border shadow-subtle">
-        <div>
-          <h1 className="font-serif text-2xl font-bold text-charcoal">Catalogue &amp; Inventory Management</h1>
-          <p className="text-xs text-charcoal-muted mt-0.5">
-            Configure confirmed materials, indicative pricing, and select high-res photos from deployed assets.
-          </p>
-        </div>
+      <PageHeader
+        title="Products"
+        description="What customers can request. Only confirmed details should be entered; sample items stay hidden from the public website."
+        actions={
+          <button type="button" className="adm-btn-primary" onClick={() => setEditor({ id: null })}>
+            <Plus className="h-4 w-4" aria-hidden /> New product
+          </button>
+        }
+      />
 
-        <button
-          onClick={() => {
-            setEditorProductId(null);
-            setIsModalOpen(true);
-          }}
-          className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-burgundy hover:bg-burgundy-hover text-white text-xs font-semibold shadow-sm transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>New Product</span>
-        </button>
-      </div>
-
-      {/* Filters & Search Row */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        {/* Status Pills */}
-        <div className="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto pb-1">
-          {['all', 'published', 'draft', 'archived'].map(st => (
-            <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
-              className={`px-4 py-2 rounded-full text-xs font-medium capitalize transition-colors ${
-                statusFilter === st
-                  ? 'bg-burgundy text-white font-semibold shadow-sm'
-                  : 'bg-white text-charcoal hover:bg-ivory border border-ivory-border'
-              }`}
-            >
-              {st}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex gap-2" role="group" aria-label="Filter by status">
+          {['all', 'published', 'draft', 'archived'].map(s => (
+            <button key={s} type="button" aria-pressed={status === s} onClick={() => setStatus(s)} className={status === s ? 'adm-chip-on' : 'adm-chip-off'}>
+              {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
           ))}
         </div>
-
-        {/* Search */}
-        <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 text-charcoal-light absolute left-3 top-1/2 -translate-y-1/2" />
+        <form
+          role="search"
+          className="relative w-full lg:w-72"
+          onSubmit={e => {
+            e.preventDefault();
+            setApplied(query.trim());
+          }}
+        >
+          <label htmlFor="product-search" className="sr-only">
+            Search products
+          </label>
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" aria-hidden />
           <input
-            type="text"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && fetchProducts()}
-            placeholder="Search SKU or title..."
-            className="w-full pl-9 pr-4 py-2 text-xs bg-white rounded-lg border border-ivory-border focus:border-burgundy focus:outline-none"
+            id="product-search"
+            type="search"
+            className="adm-input pl-9"
+            placeholder="Name or SKU"
+            value={query}
+            onChange={e => {
+              setQuery(e.target.value);
+              if (!e.target.value) setApplied('');
+            }}
           />
-        </div>
+        </form>
       </div>
 
-      {/* Products Table */}
-      <div className="bg-white rounded-2xl border border-ivory-border shadow-subtle overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center text-xs text-charcoal-muted animate-pulse">
-            Loading products...
-          </div>
+      {notice && (
+        <p role="status" className="rounded-md border border-stone-deep bg-white px-4 py-2.5 text-sm">
+          {notice}
+        </p>
+      )}
+      {state === 'error' && <ErrorBanner message="Could not load products." onRetry={load} />}
+
+      <div className="adm-card overflow-hidden">
+        {state === 'loading' ? (
+          <p className="px-5 py-12 text-center text-sm text-ink-soft">Loading products…</p>
         ) : products.length === 0 ? (
-          <div className="p-16 text-center text-xs text-charcoal-muted space-y-2">
-            <Package className="w-10 h-10 mx-auto text-charcoal-light stroke-[1.5]" />
-            <p className="font-semibold text-charcoal text-sm">No products found</p>
-            <p className="font-light">Click "New Product" above to publish your first piece.</p>
+          <div className="px-5 py-14 text-center">
+            <p className="font-medium">No products here yet</p>
+            <p className="mt-1 text-sm text-ink-soft">Add a product with its real photographs and confirmed details.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-ivory/60 text-charcoal-muted uppercase tracking-wider text-[10px] border-b border-ivory-border">
+            <table className="adm-table">
+              <thead>
                 <tr>
-                  <th className="py-3 px-4 font-semibold">Photo</th>
-                  <th className="py-3 px-4 font-semibold">SKU</th>
-                  <th className="py-3 px-4 font-semibold">Product Name</th>
-                  <th className="py-3 px-4 font-semibold">Category</th>
-                  <th className="py-3 px-4 font-semibold">Indicative Price</th>
-                  <th className="py-3 px-4 font-semibold">Status</th>
-                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                  <th>Product</th>
+                  <th>SKU</th>
+                  <th>Category</th>
+                  <th className="text-right">Price</th>
+                  <th>Status</th>
+                  <th>
+                    <span className="sr-only">Actions</span>
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ivory-border/60">
-                {products.map(p => {
-                  const firstImg = p.images && p.images.length > 0 ? p.images[0] : '/assets/demo/sample_product_1.jpeg';
-                  return (
-                    <tr key={p.id} className="hover:bg-ivory-light/60 transition-colors">
-                      <td className="py-3 px-4">
-                        <img
-                          src={firstImg}
-                          alt={p.name}
-                          className="w-10 h-12 object-cover rounded bg-ivory-muted border border-ivory-border"
-                        />
-                      </td>
-                      <td className="py-3 px-4 font-mono font-bold text-burgundy">{p.sku}</td>
-                      <td className="py-3 px-4">
-                        <p className="font-semibold text-charcoal line-clamp-1">{p.name}</p>
-                        {p.isDemo && (
-                          <span className="text-[10px] font-bold text-amber-700 uppercase">Preview Model</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 text-charcoal-muted">{p.categoryName || '—'}</td>
-                      <td className="py-3 px-4 font-serif font-semibold text-charcoal">
-                        {formatPrice(p.indicativePrice)}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium capitalize ${
-                            p.status === 'published'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : p.status === 'draft'
-                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                              : 'bg-gray-100 text-gray-700 border border-gray-200'
-                          }`}
-                        >
-                          {p.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-right space-x-2">
-                        <button
-                          onClick={() => {
-                            setEditorProductId(p.id);
-                            setIsModalOpen(true);
-                          }}
-                          className="p-1.5 rounded hover:bg-ivory text-charcoal hover:text-burgundy"
-                          title="Edit product"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                        {p.status !== 'archived' && (
-                          <button
-                            onClick={() => handleArchiveProduct(p.id)}
-                            className="p-1.5 rounded hover:bg-red-50 text-charcoal-light hover:text-red-700"
-                            title="Archive product"
-                          >
-                            <Archive className="w-4 h-4" />
+              <tbody>
+                {products.map(p => (
+                  <tr key={p.id} className="hover:bg-[#FAF8F5]">
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <Thumb src={p.images?.[0]} size="md" />
+                        <div className="min-w-0">
+                          <button type="button" className="text-left font-medium hover:text-burgundy hover:underline" onClick={() => setEditor({ id: p.id })}>
+                            {p.name}
                           </button>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
+                          {p.isDemo && <p className="text-[0.8125rem] text-amber-800">Sample — hidden from the public website</p>}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="font-mono text-[0.8125rem] text-ink-soft">{p.sku}</td>
+                    <td className="text-ink-soft">{p.categoryName || '—'}</td>
+                    <td className="whitespace-nowrap text-right tabular-nums">{p.indicativePrice === null ? 'On request' : formatPrice(p.indicativePrice)}</td>
+                    <td>
+                      <StatusBadge status={p.status} />
+                    </td>
+                    <td className="whitespace-nowrap text-right">
+                      <button type="button" className="adm-btn-quiet h-8 px-2.5" onClick={() => setEditor({ id: p.id })}>
+                        Edit
+                      </button>
+                      {p.status !== 'archived' && (
+                        <button type="button" className="adm-btn-quiet h-8 px-2.5 hover:text-red-800" onClick={() => archive(p)}>
+                          Archive
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         )}
       </div>
 
-      {/* Product Editor Modal */}
-      {isModalOpen && (
+      {editor && (
         <ProductEditorModal
-          productId={editorProductId}
-          onClose={() => setIsModalOpen(false)}
-          onSaved={() => fetchProducts()}
+          productId={editor.id}
+          onClose={() => setEditor(null)}
+          onSaved={name => {
+            setNotice(`“${name}” saved.`);
+            load();
+          }}
         />
       )}
     </div>

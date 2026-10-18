@@ -1,11 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { CartItem } from '@swayari/shared';
 import { useAuth } from './AuthContext';
 
 interface CartContextType {
   items: CartItem[];
   itemCount: number;
+  /** Sum of known indicative prices; null when no item has a price. */
   subtotal: number | null;
+  hasUnpricedItems: boolean;
   addItem: (item: CartItem) => void;
   removeItem: (productId: string, variant?: string | null) => void;
   updateQuantity: (productId: string, variant: string | null | undefined, quantity: number) => void;
@@ -13,89 +15,72 @@ interface CartContextType {
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
+  lastAddedName: string | null;
 }
 
+const STORAGE_KEY = 'swayari_cart';
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
+const sameLine = (a: CartItem, productId: string, variant?: string | null) =>
+  a.productId === productId && (a.selectedVariant || null) === (variant || null);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, consumePendingAddToCart } = useAuth();
   const [items, setItems] = useState<CartItem[]>(() => {
     try {
-      const saved = localStorage.getItem('swayari_cart');
-      return saved ? JSON.parse(saved) : [];
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
   });
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [lastAddedName, setLastAddedName] = useState<string | null>(null);
 
-  // Sync to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('swayari_cart', JSON.stringify(items));
-    } catch (e) {
-      console.warn('Could not save cart to localStorage', e);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      /* storage unavailable — bag still works for this visit */
     }
   }, [items]);
 
-  // Handle post-login add-to-cart resumption (EXACTLY ONCE)
+  // Resume the add the visitor intended before signing in — exactly once.
   useEffect(() => {
-    if (user) {
-      const pending = consumePendingAddToCart();
-      if (pending) {
-        addItem(pending);
-        setIsDrawerOpen(true);
-      }
-    }
+    if (!user) return;
+    const pending = consumePendingAddToCart();
+    if (pending) addItem(pending);
   }, [user]);
 
   function addItem(newItem: CartItem) {
     setItems(prev => {
-      const existingIndex = prev.findIndex(
-        it => it.productId === newItem.productId && it.selectedVariant === newItem.selectedVariant
-      );
-      if (existingIndex > -1) {
-        const updated = [...prev];
-        updated[existingIndex].quantity += newItem.quantity;
-        return updated;
-      }
-      return [...prev, newItem];
+      const index = prev.findIndex(it => sameLine(it, newItem.productId, newItem.selectedVariant));
+      if (index === -1) return [...prev, newItem];
+      return prev.map((it, i) => (i === index ? { ...it, quantity: it.quantity + newItem.quantity } : it));
     });
+    setLastAddedName(newItem.name);
     setIsDrawerOpen(true);
   }
 
   function removeItem(productId: string, variant?: string | null) {
-    setItems(prev => prev.filter(it => !(it.productId === productId && it.selectedVariant === variant)));
+    setItems(prev => prev.filter(it => !sameLine(it, productId, variant)));
   }
 
   function updateQuantity(productId: string, variant: string | null | undefined, quantity: number) {
-    if (quantity <= 0) {
-      removeItem(productId, variant);
-      return;
-    }
     setItems(prev =>
       prev.map(it => {
-        if (it.productId === productId && it.selectedVariant === variant) {
-          return { ...it, quantity };
-        }
-        return it;
+        if (!sameLine(it, productId, variant)) return it;
+        const min = it.minQuantity || 1;
+        return { ...it, quantity: Math.max(min, Math.min(999, Math.round(quantity))) };
       })
     );
   }
 
-  function clearCart() {
-    setItems([]);
-  }
-
   const itemCount = items.reduce((sum, it) => sum + it.quantity, 0);
-
-  // Compute indicative subtotal; if any item is "Price on request" (null), subtotal is informative
-  const subtotal = items.reduce((sum, it) => {
-    if (it.indicativePrice !== null && it.indicativePrice !== undefined) {
-      return (sum || 0) + it.indicativePrice * it.quantity;
-    }
-    return sum;
-  }, 0 as number | null);
+  const priced = items.filter(it => it.indicativePrice !== null && it.indicativePrice !== undefined);
+  const subtotal = priced.length ? priced.reduce((sum, it) => sum + (it.indicativePrice as number) * it.quantity, 0) : null;
+  const hasUnpricedItems = priced.length !== items.length;
 
   return (
     <CartContext.Provider
@@ -103,13 +88,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         items,
         itemCount,
         subtotal,
+        hasUnpricedItems,
         addItem,
         removeItem,
         updateQuantity,
-        clearCart,
+        clearCart: () => setItems([]),
         isDrawerOpen,
         openDrawer: () => setIsDrawerOpen(true),
-        closeDrawer: () => setIsDrawerOpen(false)
+        closeDrawer: () => setIsDrawerOpen(false),
+        lastAddedName
       }}
     >
       {children}
@@ -119,8 +106,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export function useCart() {
   const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
+  if (!context) throw new Error('useCart must be used within a CartProvider');
   return context;
 }

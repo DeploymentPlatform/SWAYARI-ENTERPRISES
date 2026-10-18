@@ -77,7 +77,7 @@ SWAYARI-ENTERPRISES/
 │   ├── export-git-bundle.sh       # Offline git bundle disaster recovery exporter
 │   ├── generate-manifest.js       # Auto-generator for deployed photo manifest
 │   ├── d1-mock.js                 # In-memory D1 test runner via node:sqlite
-│   └── run-tests.js               # Comprehensive 16-point automated test suite
+│   └── run-tests.js               # Automated test suite (25 tests)
 ├── docs/                          # In-depth architectural & operational docs
 ├── package.json
 └── wrangler.toml                  # Cloudflare Pages & D1 database configuration
@@ -96,22 +96,42 @@ SWAYARI-ENTERPRISES/
 npm install
 ```
 
-### 2. Generate Asset Manifest
+### 2. Build both portals
 ```bash
 npm run build
 ```
+Regenerates `public/assets/manifest.json`, copies the Git-tracked assets into each portal
+(`scripts/sync-assets.js`) and builds `apps/storefront/dist` and `apps/admin/dist`.
 
-### 3. Run Automated Test Suite
+### 3. Run the automated test suite
 ```bash
 npm test
 ```
-Executes all 16 unit, security, data isolation, and transactional tests using the in-memory D1 test adapter.
+Runs 25 security, data-isolation, ordering and portal-separation tests against an in-memory D1 database.
 
-### 4. Local Development Server
+### 4. Local development
 ```bash
-npm run dev
+npm run d1:migrate:local   # once, and after adding migrations
+npm run dev:storefront     # customer website  → http://localhost:8788
+npm run dev:admin          # staff portal      → http://localhost:8789
 ```
-Starts the local development server at `http://localhost:8788`.
+Both share the local D1 database in `.wrangler/state` and run with `ENVIRONMENT=development`.
+
+- **Preview catalogue:** the public site lists only real inventory. Sample items supplied for review
+  are shown on localhost automatically, or anywhere with `?preview=1` (`?preview=0` hides them).
+  `?count=1` (preview only) limits the samples to check the single-product layout.
+- **Local test sign-in:** customer — open the sign-in dialog and choose *Local development sign-in*
+  (route `/dev-login`); staff — button on the staff login page. Both are refused by the server
+  unless `ENVIRONMENT` is exactly `development`.
+
+### 5. Adding product photographs
+Photograph the piece flat on a plain contrasting background, then:
+```bash
+python3 scripts/prepare-product-photo.py <photo.jpg> public/assets/products <product-slug>
+npm run build
+```
+The script corrects perspective and places the unaltered product on a neutral surface
+(see `docs/ASSET_SOURCES.md`). Attach the result to a product in the staff portal.
 
 ---
 

@@ -27,3 +27,9 @@ scratch/
 # Backups (local bundle exports kept outside repo)
 *.bundle
 *.tar.gz
+
+# Portal asset copies are generated from public/assets by scripts/sync-assets.js
+apps/*/public/assets/products/
+apps/*/public/assets/editorial/
+apps/admin/public/assets/demo/
+apps/admin/public/assets/manifest.json

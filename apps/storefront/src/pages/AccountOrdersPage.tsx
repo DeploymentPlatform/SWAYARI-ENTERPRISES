@@ -1,275 +1,251 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { formatDate, formatPrice, getStatusMeta } from '@swayari/shared';
 import { useAuth } from '../context/AuthContext';
-import { Order, formatPrice, formatDate, getStatusMeta } from '@swayari/shared';
-import { Package, ArrowRight, Clock, FileText, ChevronDown, ChevronUp } from 'lucide-react';
+import { productImageSources } from '../lib/media';
+import { usePageMeta } from '../lib/meta';
+import { EmptyState, LoadError, PageIntro } from '../components/States';
+import { Picture, PriceText } from '../components/ui';
 
-interface AccountOrdersPageProps {
-  navigate: (path: string) => void;
+interface OrderSummary {
+  id: string;
+  status: string;
+  deliveryCity: string;
+  deliveryState: string;
+  indicativeSubtotal: number | null;
+  itemCount: number;
+  firstImage: string | null;
+  quotationCount: number;
+  createdAt: string;
 }
 
-export const AccountOrdersPage: React.FC<AccountOrdersPageProps> = ({ navigate }) => {
-  const { user, initiateGoogleSignIn } = useAuth();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
-  const [expandedDetails, setExpandedDetails] = useState<Record<string, Order>>({});
+interface Quotation {
+  id: string;
+  revisionNumber: number;
+  items: { productName: string; quantity: number; agreedUnitPrice: number }[];
+  itemsSubtotal: number;
+  shippingCharge: number;
+  taxAmount: number;
+  totalQuotedAmount: number;
+  notes: string | null;
+  createdAt: string;
+}
+
+interface OrderDetail {
+  id: string;
+  deliveryAddress: string;
+  deliveryCity: string;
+  deliveryState: string;
+  deliveryPincode: string;
+  customerNotes: string | null;
+  items: { id: string; name: string; quantity: number; variant: string | null; indicativePrice: number | null; imageUrl: string | null; customisationNote: string | null }[];
+  quotations: Quotation[];
+}
+
+const STATUS_TONE: Record<string, string> = {
+  new_request: 'bg-stone text-ink',
+  contacted: 'bg-amber-50 text-amber-900',
+  quoted: 'bg-burgundy-soft text-burgundy-deep',
+  confirmed: 'bg-emerald-50 text-emerald-900',
+  dispatched: 'bg-emerald-50 text-emerald-900',
+  completed: 'bg-emerald-50 text-emerald-900',
+  cancelled: 'bg-red-50 text-red-900'
+};
+
+const StatusPill: React.FC<{ status: string }> = ({ status }) => (
+  <span className={`inline-flex px-2.5 py-1 text-[0.75rem] font-medium uppercase tracking-[0.1em] ${STATUS_TONE[status] || 'bg-stone text-ink'}`}>
+    {status === 'new_request' ? 'Received' : getStatusMeta(status).label}
+  </span>
+);
+
+export const AccountOrdersPage: React.FC = () => {
+  const { user, isLoading, initiateGoogleSignIn } = useAuth();
+  const [orders, setOrders] = useState<OrderSummary[]>([]);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [attempt, setAttempt] = useState(0);
+  const [open, setOpen] = useState<string | null>(null);
+  const [details, setDetails] = useState<Record<string, OrderDetail | 'error'>>({});
+  usePageMeta('Your requests', undefined, { noindex: true });
 
   useEffect(() => {
-    if (user) {
-      fetchOrders();
-    } else {
-      setLoading(false);
-    }
-  }, [user]);
-
-  async function fetchOrders() {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/orders/my');
-      if (res.ok) {
-        const data = await res.json();
+    if (!user) return;
+    setStatus('loading');
+    fetch('/api/orders/my')
+      .then(res => (res.ok ? res.json() : Promise.reject()))
+      .then(data => {
         setOrders(data.orders || []);
-      }
-    } catch (err) {
-      console.error('Failed to load customer orders:', err);
-    } finally {
-      setLoading(false);
+        setStatus('ready');
+      })
+      .catch(() => setStatus('error'));
+  }, [user, attempt]);
+
+  async function toggle(id: string) {
+    setOpen(cur => (cur === id ? null : id));
+    if (details[id] && details[id] !== 'error') return;
+    try {
+      const res = await fetch(`/api/orders/${encodeURIComponent(id)}`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setDetails(d => ({ ...d, [id]: data.order }));
+    } catch {
+      setDetails(d => ({ ...d, [id]: 'error' }));
     }
   }
 
-  async function toggleOrder(orderId: string) {
-    if (expandedOrderId === orderId) {
-      setExpandedOrderId(null);
-      return;
-    }
-
-    setExpandedOrderId(orderId);
-    if (!expandedDetails[orderId]) {
-      try {
-        const res = await fetch(`/api/orders/${encodeURIComponent(orderId)}`);
-        if (res.ok) {
-          const data = await res.json();
-          setExpandedDetails(prev => ({ ...prev, [orderId]: data.order }));
-        }
-      } catch (err) {
-        console.error('Failed to load order details:', err);
-      }
-    }
-  }
+  if (isLoading) return <div className="container-content py-24 text-center text-ink-soft">Checking your account…</div>;
 
   if (!user) {
     return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center space-y-4">
-        <Package className="w-12 h-12 text-gold mx-auto stroke-[1.5]" />
-        <h2 className="font-serif text-2xl font-bold text-charcoal">Sign In to View Your Requests</h2>
-        <p className="text-xs text-charcoal-muted font-light leading-relaxed">
-          Sign in with your verified Google account to view your past enquiries, studio quotation revisions, and dispatch statuses.
-        </p>
-        <button
-          onClick={() => initiateGoogleSignIn()}
-          className="w-full py-3.5 rounded-md bg-burgundy text-white text-xs font-semibold hover:bg-burgundy-hover shadow-sm"
-        >
-          Sign In with Google
-        </button>
+      <div className="container-content">
+        <EmptyState
+          title="Sign in to see your requests"
+          body={<p>View the requests you have sent and any updates from our team.</p>}
+          secondary={
+            <button type="button" className="btn-primary" onClick={() => initiateGoogleSignIn(undefined, 'orders')}>
+              Sign in with Google
+            </button>
+          }
+        />
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <div className="mb-8 pb-4 border-b border-ivory-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-medium text-charcoal">
-            My Order Requests
-          </h1>
-          <p className="text-xs sm:text-sm text-charcoal-muted mt-1 font-light">
-            Account: {user.name} ({user.email})
-          </p>
-        </div>
-        <button
-          onClick={() => navigate('/shop')}
-          className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-white border border-ivory-border text-xs text-charcoal hover:bg-ivory transition-colors"
-        >
-          <span>Explore New Pieces</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </button>
-      </div>
+    <div className="container-content max-w-5xl pb-20 md:pb-28">
+      <PageIntro eyebrow="Your account" title="Your requests">
+        Signed in as {user.email}
+      </PageIntro>
 
-      {loading ? (
-        <div className="space-y-4 animate-pulse">
-          {[1, 2, 3].map(n => (
-            <div key={n} className="h-28 bg-white rounded-xl border border-ivory-border p-4" />
-          ))}
-        </div>
-      ) : orders.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-ivory-border p-12 text-center max-w-lg mx-auto shadow-subtle space-y-4">
-          <Package className="w-12 h-12 text-charcoal-light mx-auto stroke-[1.5]" />
-          <h3 className="font-serif text-lg font-semibold text-charcoal">No Order Requests Yet</h3>
-          <p className="text-xs text-charcoal-muted font-light leading-relaxed">
-            You haven't submitted any bespoke order requests yet. Browse our catalogue to enquire about sanctified brassware and gifting.
-          </p>
-          <button
-            onClick={() => navigate('/shop')}
-            className="inline-flex items-center space-x-2 px-6 py-2.5 rounded-md bg-burgundy text-white text-xs font-medium hover:bg-burgundy-hover"
-          >
-            <span>Browse Catalogue</span>
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {orders.map(order => {
-            const statusMeta = getStatusMeta(order.status);
-            const isExpanded = expandedOrderId === order.id;
-            const details = expandedDetails[order.id];
-
-            return (
-              <div
-                key={order.id}
-                className="bg-white rounded-2xl border border-ivory-border shadow-subtle overflow-hidden transition-all"
-              >
-                {/* Header Row */}
-                <div
-                  onClick={() => toggleOrder(order.id)}
-                  className="p-5 sm:p-6 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-ivory-light/50 transition-colors"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-3">
-                      <span className="font-mono text-xs sm:text-sm font-bold text-burgundy">
-                        {order.id}
-                      </span>
-                      <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-ivory-muted text-charcoal border border-ivory-border">
-                        {statusMeta.label}
-                      </span>
+      <div className="pt-8">
+        {status === 'loading' && (
+          <div className="space-y-3" aria-busy="true">
+            {[0, 1].map(i => (
+              <div key={i} className="skeleton h-24" />
+            ))}
+          </div>
+        )}
+        {status === 'error' && <LoadError onRetry={() => setAttempt(a => a + 1)} />}
+        {status === 'ready' && orders.length === 0 && (
+          <EmptyState
+            title="No requests yet"
+            body={<p>When you send a request, it will appear here with any updates from our team.</p>}
+            action={{ to: '/shop', label: 'Explore the Collection' }}
+          />
+        )}
+        {status === 'ready' && orders.length > 0 && (
+          <ul className="divide-y divide-stone-deep border-y border-stone-deep">
+            {orders.map(order => {
+              const isOpen = open === order.id;
+              const detail = details[order.id];
+              const thumb = productImageSources(order.firstImage);
+              return (
+                <li key={order.id}>
+                  <button
+                    type="button"
+                    onClick={() => toggle(order.id)}
+                    aria-expanded={isOpen}
+                    aria-controls={`order-${order.id}`}
+                    className="grid w-full grid-cols-[56px_1fr_auto] items-center gap-4 py-5 text-left sm:grid-cols-[64px_1fr_auto_auto] sm:gap-6"
+                  >
+                    <div className="bg-stone">
+                      {thumb && <Picture sources={thumb} sizes="64px" width={128} height={160} alt="" className="aspect-product w-full object-cover" />}
                     </div>
-                    <div className="flex items-center space-x-3 text-xs text-charcoal-light font-light pt-1">
-                      <span className="flex items-center space-x-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>Submitted on {formatDate(order.createdAt)}</span>
-                      </span>
-                      <span>•</span>
-                      <span>Delivery: {order.deliveryCity}, {order.deliveryState}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between sm:justify-end sm:space-x-6">
-                    <div className="text-left sm:text-right">
-                      <span className="text-[10px] text-charcoal-light uppercase block">Indicative Subtotal:</span>
-                      <span className="font-serif text-sm sm:text-base font-semibold text-charcoal">
-                        {order.initialIndicativeSubtotal ? formatPrice(order.initialIndicativeSubtotal) : 'Price on Request'}
-                      </span>
-                    </div>
-
-                    <button
-                      className="p-1 text-charcoal-muted hover:text-burgundy"
-                      aria-label={isExpanded ? 'Collapse order' : 'Expand order'}
-                    >
-                      {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Expanded Details Section */}
-                {isExpanded && (
-                  <div className="border-t border-ivory-border/70 p-5 sm:p-6 bg-ivory/40 space-y-6 animate-fadeIn">
-                    
-                    {/* Items Snapshot */}
-                    <div className="space-y-3">
-                      <h4 className="font-serif text-xs font-semibold uppercase tracking-wider text-charcoal">
-                        Requested Pieces
-                      </h4>
-                      {details?.items ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {details.items.map(it => (
-                            <div
-                              key={it.id}
-                              className="p-3 bg-white rounded-xl border border-ivory-border flex items-center space-x-3"
-                            >
-                              <img
-                                src={it.imageUrl || '/assets/demo/sample_product_1.jpeg'}
-                                alt={it.name}
-                                className="w-12 h-14 object-cover rounded bg-ivory-muted"
-                              />
-                              <div className="flex-1 text-xs">
-                                <p className="font-medium text-charcoal leading-snug">{it.name}</p>
-                                <p className="text-[11px] text-charcoal-muted mt-0.5">
-                                  Qty: {it.quantity} {it.variant ? `• ${it.variant}` : ''}
-                                </p>
-                                <p className="font-serif text-burgundy font-semibold mt-1">
-                                  {it.indicativePrice ? formatPrice(it.indicativePrice * it.quantity) : 'Price on Request'}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-xs text-charcoal-muted">Loading items details...</p>
-                      )}
-                    </div>
-
-                    {/* Official Quotation Revisions if published by Studio */}
-                    {details?.quotations && details.quotations.length > 0 && (
-                      <div className="space-y-3 pt-3 border-t border-ivory-border/60">
-                        <div className="flex items-center space-x-2">
-                          <FileText className="w-4 h-4 text-burgundy" />
-                          <h4 className="font-serif text-xs font-semibold uppercase tracking-wider text-charcoal">
-                            Official Studio Quotation (Revision #{details.quotations[0].revisionNumber})
-                          </h4>
-                        </div>
-
-                        <div className="bg-white p-4 rounded-xl border border-ivory-border space-y-3 text-xs">
-                          <div className="space-y-1.5">
-                            {details.quotations[0].items.map((qItem, qIdx) => (
-                              <div key={qIdx} className="flex justify-between py-1 border-b border-ivory-border/40">
-                                <span className="text-charcoal">{qItem.productName} (x{qItem.quantity})</span>
-                                <span className="font-serif font-medium text-charcoal">
-                                  {formatPrice(qItem.agreedUnitPrice * qItem.quantity)}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-
-                          <div className="pt-2 space-y-1 text-charcoal-muted">
-                            <div className="flex justify-between">
-                              <span>Shipping &amp; Insurance:</span>
-                              <span className="font-medium text-charcoal">
-                                {details.quotations[0].shippingCharge ? formatPrice(details.quotations[0].shippingCharge) : 'Included'}
-                              </span>
-                            </div>
-                            <div className="flex justify-between text-sm font-bold text-burgundy pt-1 border-t border-ivory-border">
-                              <span>Total Confirmed Amount:</span>
-                              <span>{formatPrice(details.quotations[0].totalQuotedAmount)}</span>
-                            </div>
-                          </div>
-
-                          {details.quotations[0].notes && (
-                            <p className="text-[11px] text-charcoal-muted italic pt-1 border-t border-ivory-border/40">
-                              Studio Note: {details.quotations[0].notes}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Delivery Information */}
-                    <div className="pt-3 border-t border-ivory-border/60 text-xs text-charcoal-muted">
-                      <span className="font-semibold text-charcoal block mb-0.5">Delivery Address:</span>
-                      <p className="font-light">
-                        {order.deliveryAddress}, {order.deliveryCity}, {order.deliveryState} - {order.deliveryPincode}
+                    <div className="min-w-0">
+                      <p className="font-mono text-[0.9375rem] text-burgundy">{order.id}</p>
+                      <p className="mt-1 text-sm text-ink-soft">
+                        {formatDate(order.createdAt)} · {order.itemCount} {order.itemCount === 1 ? 'piece' : 'pieces'} · {order.deliveryCity}
                       </p>
-                      {order.customerNotes && (
-                        <p className="mt-1 font-light italic">
-                          Special Note: {order.customerNotes}
-                        </p>
+                      <div className="mt-2 sm:hidden">
+                        <StatusPill status={order.status} />
+                      </div>
+                    </div>
+                    <div className="hidden sm:block">
+                      <StatusPill status={order.status} />
+                    </div>
+                    <ChevronDown className={`h-5 w-5 text-ink-soft transition-transform ${isOpen ? 'rotate-180' : ''}`} aria-hidden />
+                  </button>
+
+                  {isOpen && (
+                    <div id={`order-${order.id}`} className="pb-8 sm:pl-[88px]">
+                      {!detail && <div className="skeleton h-28" aria-busy="true" />}
+                      {detail === 'error' && <p className="text-sm text-red-800">We couldn’t load this request. Please try again.</p>}
+                      {detail && detail !== 'error' && (
+                        <div className="grid gap-8 md:grid-cols-2">
+                          <div>
+                            <h3 className="font-sans text-label uppercase text-ink-soft">Requested</h3>
+                            <ul className="mt-3 space-y-3">
+                              {detail.items.map(it => (
+                                <li key={it.id} className="flex justify-between gap-4 text-[0.9375rem]">
+                                  <span>
+                                    {it.name} <span className="text-ink-soft">× {it.quantity}</span>
+                                    {it.variant && <span className="block text-sm text-ink-soft">{it.variant}</span>}
+                                  </span>
+                                  <PriceText value={it.indicativePrice === null ? null : it.indicativePrice * it.quantity} className="whitespace-nowrap text-ink-soft" />
+                                </li>
+                              ))}
+                            </ul>
+                            <p className="mt-5 text-sm text-ink-soft">
+                              Delivery: {detail.deliveryAddress}, {detail.deliveryCity}, {detail.deliveryState} {detail.deliveryPincode}
+                            </p>
+                            {detail.customerNotes && <p className="mt-2 text-sm text-ink-soft">Your note: {detail.customerNotes}</p>}
+                          </div>
+
+                          <div>
+                            <h3 className="font-sans text-label uppercase text-ink-soft">Quotation from our team</h3>
+                            {detail.quotations.length === 0 ? (
+                              <p className="mt-3 text-[0.9375rem] text-ink-soft">
+                                No quotation yet. Our team will contact you to confirm availability, final pricing and delivery.
+                              </p>
+                            ) : (
+                              <QuotationView quotation={detail.quotations[0]} total={detail.quotations.length} />
+                            )}
+                          </div>
+                        </div>
                       )}
                     </div>
-
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };
+
+const QuotationView: React.FC<{ quotation: Quotation; total: number }> = ({ quotation, total }) => (
+  <div className="mt-3 bg-stone p-5">
+    <p className="text-sm text-ink-soft">
+      Revision {quotation.revisionNumber}
+      {total > 1 ? ` (latest of ${total})` : ''} · {formatDate(quotation.createdAt)}
+    </p>
+    <ul className="mt-3 space-y-2 text-[0.9375rem]">
+      {quotation.items.map((q, i) => (
+        <li key={i} className="flex justify-between gap-4">
+          <span>
+            {q.productName} × {q.quantity}
+          </span>
+          <span>{formatPrice(q.agreedUnitPrice * q.quantity)}</span>
+        </li>
+      ))}
+    </ul>
+    <dl className="mt-3 space-y-1.5 border-t border-stone-deep pt-3 text-[0.9375rem]">
+      <div className="flex justify-between">
+        <dt className="text-ink-soft">Shipping</dt>
+        <dd>{formatPrice(quotation.shippingCharge || 0)}</dd>
+      </div>
+      {quotation.taxAmount > 0 && (
+        <div className="flex justify-between">
+          <dt className="text-ink-soft">Taxes</dt>
+          <dd>{formatPrice(quotation.taxAmount)}</dd>
+        </div>
+      )}
+      <div className="flex justify-between font-medium">
+        <dt>Quoted total</dt>
+        <dd>{formatPrice(quotation.totalQuotedAmount)}</dd>
+      </div>
+    </dl>
+    {quotation.notes && <p className="mt-3 text-sm text-ink-soft">{quotation.notes}</p>}
+  </div>
+);

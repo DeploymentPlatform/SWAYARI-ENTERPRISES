@@ -15,17 +15,30 @@ export async function onRequestGet(context) {
     // If orderId is 'my' or empty, list customer's orders
     if (!orderId || orderId === 'my') {
       const { results: orders } = await env.DB.prepare(`
-        SELECT id, customer_name, customer_email, customer_phone,
-               delivery_city, delivery_state, status, initial_indicative_subtotal,
-               created_at, updated_at
-        FROM orders
-        WHERE customer_id = ?
-        ORDER BY created_at DESC
+        SELECT o.id, o.delivery_city, o.delivery_state, o.status, o.initial_indicative_subtotal,
+               o.created_at, o.updated_at,
+               (SELECT COALESCE(SUM(quantity), 0) FROM order_items oi WHERE oi.order_id = o.id) AS item_count,
+               (SELECT snapshot_image_url FROM order_items oi WHERE oi.order_id = o.id LIMIT 1) AS first_image,
+               (SELECT COUNT(*) FROM order_quotations q WHERE q.order_id = o.id) AS quotation_count
+        FROM orders o
+        WHERE o.customer_id = ?
+        ORDER BY o.created_at DESC
       `).bind(session.user.id).all();
 
       return jsonResponse({
         success: true,
-        orders: orders || []
+        orders: (orders || []).map(o => ({
+          id: o.id,
+          status: o.status,
+          deliveryCity: o.delivery_city,
+          deliveryState: o.delivery_state,
+          indicativeSubtotal: o.initial_indicative_subtotal,
+          itemCount: Number(o.item_count || 0),
+          firstImage: o.first_image,
+          quotationCount: Number(o.quotation_count || 0),
+          createdAt: o.created_at,
+          updatedAt: o.updated_at
+        }))
       });
     }
 

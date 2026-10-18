@@ -1,8 +1,9 @@
 import { jsonResponse, errorResponse } from '../../_utils.js';
 
 export async function onRequestGet(context) {
-  const { params, env } = context;
+  const { params, env, request } = context;
   const slug = params.slug;
+  const includeDemo = new URL(request.url).searchParams.get('include_demo') === '1';
 
   if (!slug) {
     return errorResponse('Product slug is required', 400);
@@ -17,7 +18,7 @@ export async function onRequestGet(context) {
              c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.slug = ? AND p.status = 'published'
+      WHERE p.slug = ? AND p.status = 'published' ${includeDemo ? '' : 'AND p.is_demo = 0'}
     `).bind(slug).first();
 
     if (!row) {

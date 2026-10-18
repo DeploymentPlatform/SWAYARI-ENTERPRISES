@@ -1,142 +1,168 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { User, CartItem } from '@swayari/shared';
+
+interface AuthConfig {
+  googleClientId: string | null;
+  devLoginAvailable: boolean;
+}
+
+interface SignInRequest {
+  reason: 'add' | 'checkout' | 'orders' | 'account';
+  pendingItem?: CartItem;
+}
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  initiateGoogleSignIn: (pendingItem?: CartItem) => void;
+  config: AuthConfig;
+  signInRequest: SignInRequest | null;
+  signInError: string | null;
+  /** Opens the sign-in dialog; an optional item is added to the bag once, after sign-in. */
+  initiateGoogleSignIn: (pendingItem?: CartItem, reason?: SignInRequest['reason']) => void;
+  closeSignIn: () => void;
+  /** Hides the dialog but keeps the pending item (used when switching to local dev sign-in). */
+  hideSignIn: () => void;
   handleGoogleCallback: (credential: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  pendingAddToCart: CartItem | null;
   consumePendingAddToCart: () => CartItem | null;
-  devLoginCustomer: () => Promise<void>;
+  devLoginCustomer: () => Promise<boolean>;
 }
 
+const PENDING_KEY = 'swayari_pending_add';
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function readPending(): CartItem | null {
+  try {
+    const raw = sessionStorage.getItem(PENDING_KEY);
+    return raw ? (JSON.parse(raw) as CartItem) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writePending(item: CartItem | null) {
+  try {
+    if (item) sessionStorage.setItem(PENDING_KEY, JSON.stringify(item));
+    else sessionStorage.removeItem(PENDING_KEY);
+  } catch {
+    /* ignore */
+  }
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [pendingAddToCart, setPendingAddToCart] = useState<CartItem | null>(null);
+  const [config, setConfig] = useState<AuthConfig>({ googleClientId: null, devLoginAvailable: false });
+  const [signInRequest, setSignInRequest] = useState<SignInRequest | null>(null);
+  const [signInError, setSignInError] = useState<string | null>(null);
+  const pendingRef = useRef<CartItem | null>(readPending());
 
-  // Check current session on mount
   useEffect(() => {
     checkSession();
+    fetch('/api/auth/config')
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (data) setConfig({ googleClientId: data.googleClientId || null, devLoginAvailable: Boolean(data.devLoginAvailable) });
+      })
+      .catch(() => undefined);
   }, []);
 
   async function checkSession() {
     try {
       const res = await fetch('/api/auth/me');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.authenticated && data.user) {
-          setUser(data.user);
-        } else {
-          setUser(null);
-        }
-      } else {
-        setUser(null);
-      }
-    } catch (err) {
-      console.warn('Session check failed:', err);
+      const data = res.ok ? await res.json() : null;
+      setUser(data?.authenticated && data.user ? data.user : null);
+    } catch {
       setUser(null);
     } finally {
       setIsLoading(false);
     }
   }
 
-  function initiateGoogleSignIn(pendingItem?: CartItem) {
-    if (pendingItem) {
-      setPendingAddToCart(pendingItem);
-    }
+  const initiateGoogleSignIn = useCallback((pendingItem?: CartItem, reason: SignInRequest['reason'] = 'account') => {
+    pendingRef.current = pendingItem || null;
+    writePending(pendingItem || null);
+    setSignInError(null);
+    setSignInRequest({ reason: pendingItem ? 'add' : reason, pendingItem });
+  }, []);
 
-    // Trigger Google OneTap or Google Identity Services prompt
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.prompt((notification: any) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          console.log('Google OneTap prompt was not displayed or skipped. Falling back to explicit prompt.');
-        }
-      });
-    } else {
-      console.warn('Google Identity Services script not yet loaded.');
-    }
-  }
+  const closeSignIn = useCallback(() => {
+    setSignInRequest(null);
+    setSignInError(null);
+    // Closing without signing in abandons the intended add.
+    pendingRef.current = null;
+    writePending(null);
+  }, []);
+
+  const hideSignIn = useCallback(() => setSignInRequest(null), []);
 
   async function handleGoogleCallback(credential: string): Promise<boolean> {
+    setSignInError(null);
     try {
-      setIsLoading(true);
       const res = await fetch('/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken: credential })
       });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Authentication failed');
-      }
-
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.user) throw new Error(data.error || 'Sign-in could not be completed.');
       setUser(data.user);
+      setSignInRequest(null);
       return true;
     } catch (err: any) {
-      alert(`Sign in could not be completed: ${err.message}`);
-      setPendingAddToCart(null);
+      setSignInError(err.message || 'Sign-in could not be completed. Please try again.');
       return false;
-    } finally {
-      setIsLoading(false);
+    }
+  }
+
+  async function devLoginCustomer(): Promise<boolean> {
+    try {
+      const res = await fetch('/api/auth/dev-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customEmail: 'preview.customer@example.com', customName: 'Preview Customer' })
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      setUser(data.user);
+      setSignInRequest(null);
+      return true;
+    } catch {
+      return false;
     }
   }
 
   async function logout() {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-    } catch (err) {
-      console.error('Logout error:', err);
     } finally {
       setUser(null);
-      setPendingAddToCart(null);
+      pendingRef.current = null;
+      writePending(null);
     }
   }
 
-  function consumePendingAddToCart(): CartItem | null {
-    const item = pendingAddToCart;
-    setPendingAddToCart(null);
+  /** Returns the pending item at most once, then clears it everywhere. */
+  const consumePendingAddToCart = useCallback((): CartItem | null => {
+    const item = pendingRef.current || readPending();
+    pendingRef.current = null;
+    writePending(null);
     return item;
-  }
-
-  // Quick dev login for local preview testing
-  async function devLoginCustomer() {
-    try {
-      setIsLoading(true);
-      const res = await fetch('/api/auth/dev-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customEmail: 'ananya.sharma@example.com',
-          customName: 'Ananya Sharma'
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      }
-    } catch (err) {
-      console.error('Dev login error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
         isLoading,
+        config,
+        signInRequest,
+        signInError,
         initiateGoogleSignIn,
+        closeSignIn,
+        hideSignIn,
         handleGoogleCallback,
         logout,
-        pendingAddToCart,
         consumePendingAddToCart,
         devLoginCustomer
       }}
@@ -148,13 +174,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 }
 
-// Global declaration for Google Identity Services
 declare global {
   interface Window {
     google?: {
@@ -163,6 +186,7 @@ declare global {
           initialize: (config: any) => void;
           prompt: (callback?: (notification: any) => void) => void;
           renderButton: (parent: HTMLElement, options: any) => void;
+          cancel?: () => void;
         };
       };
     };

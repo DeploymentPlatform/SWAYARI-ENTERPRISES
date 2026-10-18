@@ -1,106 +1,44 @@
-# SWAYARI Design System & Brand Visual Standard
+# SWAYARI — Design System
 
-> **Brand:** SWAYARI  
-> **Subtitle:** Décor & Gifting  
-> **Aesthetic Philosophy:** Warm ivory minimalism, sacred metal craftsmanship, and editorial restraint inspired by luxury Indian homeware traditions (referencing the compositional clarity of *Ellementry*).
+> **Source of truth for values:** `packages/ui/src/tailwind-preset.cjs` (Tailwind) and
+> `packages/ui/src/tokens.ts` (TypeScript). Rationale and art direction: `docs/DESIGN_DIRECTION.md`.
+> Replaces the Milestone 2 system (Playfair Display / Plus Jakarta Sans, rounded cards and badges).
+> **Last updated:** 2026-10-18 (Asia/Kolkata)
 
----
+## Colour
+| Token | Hex | Notes |
+| --- | --- | --- |
+| `ivory` | #FBF8F3 | Page background |
+| `stone` / `stone-deep` / `stone-shade` | #F2ECE3 / #E6DDD0 / #D8CCBB | Alternate sections, hairlines, input borders |
+| `ink` / `ink-soft` / `ink-faint` | #231C18 / #5A4F48 / #776B62 | Text. `ink-faint` only on ivory (4.9:1) |
+| `burgundy` / `-hover` / `-deep` / `-soft` | #6B1F2A / #581923 / #3F131A / #F6ECEB | Actions, footer, selection |
+| `gold` / `gold-light` | #B08A4A / #D9C29A | Decorative rules and emblem; `gold-light` text only on dark |
+| `umber` | #120C08 | Hero panel sampled from the hero photograph |
 
-## 1. Brand Color Tokens
+## Type
+- `font-wordmark` Cinzel 600 — SWAYARI wordmark only.
+- `font-display` Cormorant Garamond 500/600 — headings ≥ 28px (`text-display-sm/md/lg/xl` = 32/44/56/72px).
+- `font-sans` Jost 400/500 — body 16–18px; `text-label` 13px uppercase, 0.14em tracking.
+- Admin uses Jost for all figures (Cormorant's old-style numerals read poorly in data).
 
-| Token Name | Hex Code | HSL / Opacity | Purpose |
-| :--- | :--- | :--- | :--- |
-| **`ivory-light`** | `#FDFBF7` | `43°, 50%, 98%` | Top notification banner, high-light card backgrounds |
-| **`ivory-surface` (Base)** | `#FAF7F2` | `38°, 43%, 96%` | Primary application canvas, body background |
-| **`ivory-muted`** | `#F4EFEB` | `33°, 31%, 94%` | Secondary panels, subtle dividers, pill buttons |
-| **`ivory-border`** | `#E8E0D5` | `35°, 28%, 87%` | Structural card borders, input borders, divider rules |
-| **`burgundy-deep`** | `#421217` | `354°, 57%, 17%` | Heritage top ribbon, high-contrast dark accents |
-| **`burgundy` (Primary)** | `#5C1D24` | `353°, 52%, 24%` | Primary brand accent, CTA buttons, active state, price highlights |
-| **`burgundy-hover`** | `#4A161D` | `353°, 54%, 19%` | Interactive hover state for primary controls |
-| **`burgundy-light`** | `#FBF0F1` | `351°, 58%, 96%` | Icon badge backdrops, subtle notification badges |
-| **`gold` (Accent)** | `#C49A45` | `40°, 52%, 52%` | Fine decorative rules, lotus crest accents, trust emblems |
-| **`gold-light`** | `#E8D29E` | `42°, 62%, 77%` | Subtle gold gradients, emblem fills |
-| **`charcoal` (Text)** | `#2B2625` | `12°, 6%, 16%` | Primary heading and high-legibility body text |
-| **`charcoal-muted`** | `#6B6362` | `10°, 4%, 40%` | Secondary descriptions, captions, dimensions |
-| **`charcoal-light`** | `#9E9493` | `7°, 5%, 60%` | SKU codes, timestamps, unselected tabs |
+## Layout
+- `max-w-content` 1320px with `.container-content` gutters 16 / 24 / 40px.
+- Section spacing 64–112px desktop, 56–64px mobile; groups 16–32px.
+- Ratios: `aspect-product` 4:5, `aspect-editorial` 4:5, `aspect-wide` 3:2, hero 2.32:1 desktop + square mobile crop.
 
----
+## Components (storefront, `apps/storefront/src/index.css` + `components/ui.tsx`)
+- Buttons: `.btn-primary` (burgundy), `.btn-secondary` (ink outline), `.btn-light` / `.btn-ghost-light` (on dark imagery). 48px high, 2px radius.
+- Forms: `.field-label`, `.field-input` (aria-invalid styling), `.field-error`; error summary focused on submit.
+- `OrderDisclaimer` renders the mandatory notice from `@swayari/shared` (exact wording).
+- `ProductCollection` chooses featured / balanced row / grid from the real item count.
+- Drawers and dialogs share `useDialogBehaviour` (focus trap, Escape, scroll lock, focus restore).
 
-## 2. Typography Scale & Fonts
+## Components (admin, `apps/admin/src/index.css` + `components/ui.tsx`)
+- `.adm-card`, `.adm-btn-primary/secondary/quiet`, `.adm-input`, `.adm-table`, `.adm-chip-on/off`.
+- `StatusBadge`, `Thumb`, `ErrorBanner`, `PageHeader`, `Drawer` (focus-trapped right drawer).
+- Staff-only notes use an amber panel labelled “Staff only — never shown to the customer”.
 
-SWAYARI uses three curated Google Fonts:
-
-1. **Display & Brand Wordmark:** `Cinzel` (`500`, `600`, `700`)
-   - Used for the SWAYARI brand wordmark, crest headings, and ceremonial ribbons.
-   - Letter-spacing: `0.15em` to `0.25em` tracking.
-2. **Headings & Titles:** `Playfair Display` (`400`, `500`, `600`, `700`, `italic`)
-   - Used for editorial hero titles, section headlines, and product names.
-   - Line-height: `1.15` to `1.25` for editorial elegance.
-3. **Body & Controls:** `Plus Jakarta Sans` (`300`, `400`, `500`, `600`, `700`)
-   - Used for body text, specifications, form fields, and administrative tabular data.
-   - High x-height ensures superior readability across mobile and desktop viewports.
-
-### Heading Hierarchy
-- **`Hero Display H1`:** `text-3xl sm:text-4xl lg:text-5xl font-serif tracking-tight leading-[1.15]`
-- **`Section H2`:** `text-2xl sm:text-3xl font-serif text-charcoal tracking-tight`
-- **`Card / Subheading H3`:** `text-base sm:text-lg font-serif font-medium text-charcoal`
-- **`Micro Heading H4`:** `text-xs uppercase tracking-wider font-semibold text-charcoal`
-- **`Body Text`:** `text-xs sm:text-sm font-light text-charcoal-muted leading-relaxed`
-
----
-
-## 3. Product Photography & Image Aspect Ratios
-
-- **Catalogue & Product Cards:** Strict **`4:5` aspect ratio** (`aspect-[4/5]`)
-  - Ensures tall, dignified vertical framing for idols, urulis, and framed artwork.
-  - Consistent neutral background behind all product shots.
-  - Subtle hover transition: `transform duration-500 scale-103`.
-- **Editorial Brand Banners:** **`4:3` or `21:9` aspect ratio** for studio and craftsmanship visuals.
-- **Thumbnails:** Strict **`1:1` square or `4:5` mini-cards** with `rounded-lg` borders.
-
----
-
-## 4. Spacing & Grid System
-
-- **Container:** Max-width `max-w-7xl` (`1280px`) with fluid padding `px-4 sm:px-6 lg:px-8`.
-- **Vertical Flow:** Generous spacing between sections: `py-12 lg:py-20`, `space-y-16 sm:space-y-24`.
-- **Product Grids:**
-  - Mobile (< 640px): 1 column (`grid-cols-1`) or 2 columns where comfortable.
-  - Tablet (640px – 1024px): 2 columns (`sm:grid-cols-2`).
-  - Desktop (1024px – 1280px): 3 columns (`lg:grid-cols-3`).
-  - Wide Desktop (1280px+): 4 columns (`xl:grid-cols-4`).
-- **Gap:** `gap-6 sm:gap-8` ensures items breathe without clutter.
-
----
-
-## 5. Controls & Component Standards
-
-### Primary Action Buttons
-- Surface: `#5C1D24` (Burgundy)
-- Text: `#FDFBF7` (Ivory Light), `font-medium tracking-wide`
-- Radius: `rounded-md` (4px to 6px) — avoided hyper-rounded pill buttons for structural formality.
-- Shadow: `shadow-card` transitioning to `shadow-card-hover` on hover.
-
-### Secondary Action Buttons
-- Surface: `bg-white`, Border: `border-ivory-border`
-- Text: `#2B2625` (Charcoal)
-- Hover: `hover:bg-ivory-muted hover:border-burgundy/40`
-
-### Input Fields & Selects
-- Background: `bg-ivory-light` or `bg-white`
-- Border: `border border-ivory-border`
-- Focus: `focus:border-burgundy focus:ring-1 focus:ring-burgundy/20`
-- Padding: `p-2.5 sm:p-3 text-xs`
-
-### Mandatory Disclaimer Treatment
-- Box style: `bg-ivory-muted/80 rounded-xl p-4 border border-ivory-border`
-- Text: Exact required phrasing in quotes, italic or light font with warning/info icon.
-
----
-
-## 6. Motion & Accessibility
-
-- **Micro-Transitions:** Durations kept between `150ms` and `300ms` with luxury timing `cubic-bezier(0.16, 1, 0.3, 1)`.
-- **Reduced Motion:** All transforms and scale effects gracefully degrade when `@media (prefers-reduced-motion: reduce)` is active.
-- **Focus Rings:** Visible high-contrast focus rings on keyboard navigation (`focus-visible:outline-2 focus-visible:outline-burgundy`).
-- **Contrast Ratios:** All body text meets WCAG AA standards (minimum 4.5:1 against ivory backgrounds).
+## Motion & accessibility
+- `MotionConfig reducedMotion="user"`; motion limited to hero entrance, drawers/dialogs and image hover zoom.
+- Visible `:focus-visible` outline in burgundy; skip link; real links (`<a href>`) for navigation.
+- Hero image is eager with `fetchpriority="high"` and preloaded per breakpoint; other images lazy-load with width/height set.

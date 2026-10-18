@@ -1,79 +1,104 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { formatPrice, validateOrderSubmission } from '@swayari/shared';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { formatPrice, ORDER_DISCLAIMER_TEXT, validateOrderSubmission } from '@swayari/shared';
-import { ShieldCheck, AlertCircle, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
+import { Link, useRouter } from '../lib/router';
+import { productImageSources } from '../lib/media';
+import { usePageMeta } from '../lib/meta';
+import { EmptyState, PageIntro } from '../components/States';
+import { OrderDisclaimer, Picture, PriceText, Spinner } from '../components/ui';
 
-interface CheckoutPageProps {
-  navigate: (path: string) => void;
+const KEY_STORAGE = 'swayari_request_key';
+
+/** One idempotency key per bag: retries after a network error reuse it, so nothing is duplicated. */
+function requestKey(): string {
+  try {
+    const existing = sessionStorage.getItem(KEY_STORAGE);
+    if (existing) return existing;
+    const created = `req-${crypto.randomUUID()}`;
+    sessionStorage.setItem(KEY_STORAGE, created);
+    return created;
+  } catch {
+    return `req-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+  }
 }
 
-export const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigate }) => {
-  const { items, subtotal, clearCart } = useCart();
-  const { user, initiateGoogleSignIn } = useAuth();
+type Fields = 'customerName' | 'customerPhone' | 'deliveryAddress' | 'deliveryCity' | 'deliveryState' | 'deliveryPincode' | 'customerNotes';
 
-  const [customerName, setCustomerName] = useState(user?.name || '');
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [deliveryAddress, setDeliveryAddress] = useState('');
-  const [deliveryCity, setDeliveryCity] = useState('');
-  const [deliveryState, setDeliveryState] = useState('');
-  const [deliveryPincode, setDeliveryPincode] = useState('');
-  const [customerNotes, setCustomerNotes] = useState('');
+const LABELS: Record<Fields, string> = {
+  customerName: 'Full name',
+  customerPhone: 'Mobile number',
+  deliveryAddress: 'Address',
+  deliveryCity: 'City',
+  deliveryState: 'State',
+  deliveryPincode: 'PIN code',
+  customerNotes: 'Anything else we should know?'
+};
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+export const CheckoutPage: React.FC = () => {
+  const { items, subtotal, hasUnpricedItems, clearCart } = useCart();
+  const { user, isLoading, initiateGoogleSignIn } = useAuth();
+  const { navigate } = useRouter();
+  usePageMeta('Send your request', undefined, { noindex: true });
+
+  const [values, setValues] = useState<Record<Fields, string>>({
+    customerName: user?.name || '',
+    customerPhone: '',
+    deliveryAddress: '',
+    deliveryCity: '',
+    deliveryState: '',
+    deliveryPincode: '',
+    customerNotes: ''
+  });
+  const [errors, setErrors] = useState<Partial<Record<Fields | 'items', string>>>({});
   const [serverError, setServerError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const errorSummaryRef = useRef<HTMLDivElement>(null);
 
-  // Generate or retrieve an idempotency key for this session submission
-  const [idempotencyKey] = useState(() => 'req-' + Math.random().toString(36).substring(2, 12) + '-' + Date.now());
+  // Pre-fill the name once the session has loaded (never overwrite what the customer typed).
+  useEffect(() => {
+    if (user?.name) setValues(v => (v.customerName ? v : { ...v, customerName: user.name }));
+  }, [user?.name]);
 
+  if (isLoading) {
+    return <div className="container-content py-24 text-center text-ink-soft">Checking your account…</div>;
+  }
   if (!user) {
     return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center space-y-4">
-        <h2 className="font-serif text-2xl font-bold text-charcoal">Sign In Required</h2>
-        <p className="text-xs text-charcoal-muted font-light leading-relaxed">
-          Please sign in with your verified Google account to submit an order request and track progress.
-        </p>
-        <button
-          onClick={() => initiateGoogleSignIn()}
-          className="w-full py-3.5 rounded-md bg-burgundy text-white text-xs font-semibold hover:bg-burgundy-hover shadow-sm"
-        >
-          Sign In with Google
-        </button>
+      <div className="container-content">
+        <EmptyState
+          title="Sign in to send your request"
+          body={<p>We use your verified Google email to keep track of your request and its updates.</p>}
+          secondary={
+            <button type="button" className="btn-primary" onClick={() => initiateGoogleSignIn(undefined, 'checkout')}>
+              Sign in with Google
+            </button>
+          }
+        />
       </div>
     );
   }
-
   if (items.length === 0) {
     return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center space-y-4">
-        <h2 className="font-serif text-2xl font-bold text-charcoal">No Items in Request</h2>
-        <p className="text-xs text-charcoal-muted font-light">
-          Your request list is currently empty. Please select products from the catalogue.
-        </p>
-        <button
-          onClick={() => navigate('/shop')}
-          className="px-6 py-2.5 rounded-md bg-burgundy text-white text-xs font-medium hover:bg-burgundy-hover"
-        >
-          Browse Catalogue
-        </button>
+      <div className="container-content">
+        <EmptyState title="Your bag is empty" body={<p>Add pieces to your bag before sending a request.</p>} action={{ to: '/shop', label: 'Explore the Collection' }} />
       </div>
     );
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  const set = (field: Fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setValues(v => ({ ...v, [field]: e.target.value }));
+    if (errors[field]) setErrors(err => ({ ...err, [field]: undefined }));
+  };
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (submitting) return;
     setServerError(null);
 
     const payload = {
-      idempotencyKey,
-      customerName,
-      customerPhone,
-      deliveryAddress,
-      deliveryCity,
-      deliveryState,
-      deliveryPincode,
-      customerNotes,
+      idempotencyKey: requestKey(),
+      ...values,
       items: items.map(it => ({
         productId: it.productId,
         productSku: it.sku,
@@ -86,308 +111,211 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigate }) => {
 
     const validation = validateOrderSubmission(payload);
     if (!validation.isValid) {
-      const errMap: Record<string, string> = {};
+      const map: Partial<Record<Fields | 'items', string>> = {};
       validation.errors.forEach(err => {
-        errMap[err.field] = err.message;
+        const key = (err.field.startsWith('items') ? 'items' : err.field) as Fields | 'items';
+        if (!map[key]) map[key] = err.message;
       });
-      setFormErrors(errMap);
+      setErrors(map);
+      window.setTimeout(() => errorSummaryRef.current?.focus(), 0);
       return;
     }
 
-    setFormErrors({});
-    setIsSubmitting(true);
-
+    setErrors({});
+    setSubmitting(true);
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(validation.data)
       });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Server rejected order request. Please review details.');
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success || !data.orderId) {
+        throw new Error(data.error || 'We could not save your request. Your bag has been kept — please try again.');
       }
-
-      // Order saved confirmed!
+      // Only after the server has saved the request do we clear the bag and show success.
+      try {
+        sessionStorage.removeItem(KEY_STORAGE);
+      } catch {
+        /* ignore */
+      }
       clearCart();
-      navigate(`/order-confirmation/${data.orderId}`);
+      navigate(`/order-confirmation/${encodeURIComponent(data.orderId)}`);
     } catch (err: any) {
-      console.error('Order submission failed:', err);
-      // PRESERVE CART and display friendly retry error
-      setServerError(err.message || 'Unable to save order request. Your items remain preserved in your bag.');
+      setServerError(err.message || 'We could not save your request. Your bag has been kept — please try again.');
+      window.setTimeout(() => errorSummaryRef.current?.focus(), 0);
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   }
 
+  const errorEntries = Object.entries(errors).filter(([, v]) => v) as [Fields | 'items', string][];
+
+  const field = (name: Fields, opts: { type?: string; autoComplete?: string; inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode']; maxLength?: number; className?: string; hint?: string; textarea?: boolean; optional?: boolean } = {}) => (
+    <div className={opts.className}>
+      <label htmlFor={name} className="field-label">
+        {LABELS[name]} {opts.optional && <span className="font-normal text-ink-soft">(optional)</span>}
+      </label>
+      {opts.textarea ? (
+        <textarea
+          id={name}
+          rows={name === 'deliveryAddress' ? 3 : 3}
+          value={values[name]}
+          onChange={set(name)}
+          autoComplete={opts.autoComplete}
+          aria-invalid={Boolean(errors[name])}
+          aria-describedby={errors[name] ? `${name}-error` : opts.hint ? `${name}-hint` : undefined}
+          className="field-input"
+          maxLength={opts.maxLength}
+        />
+      ) : (
+        <input
+          id={name}
+          type={opts.type || 'text'}
+          value={values[name]}
+          onChange={set(name)}
+          autoComplete={opts.autoComplete}
+          inputMode={opts.inputMode}
+          maxLength={opts.maxLength}
+          aria-invalid={Boolean(errors[name])}
+          aria-describedby={errors[name] ? `${name}-error` : opts.hint ? `${name}-hint` : undefined}
+          className="field-input"
+        />
+      )}
+      {opts.hint && !errors[name] && (
+        <p id={`${name}-hint`} className="mt-1.5 text-sm text-ink-soft">
+          {opts.hint}
+        </p>
+      )}
+      {errors[name] && (
+        <p id={`${name}-error`} className="field-error">
+          {errors[name]}
+        </p>
+      )}
+    </div>
+  );
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <button
-        onClick={() => navigate('/cart')}
-        className="inline-flex items-center space-x-1.5 text-xs text-charcoal-muted hover:text-burgundy transition-colors mb-6"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        <span>Back to Cart Review</span>
-      </button>
+    <div className="container-content pb-20 md:pb-28">
+      <PageIntro eyebrow="Order request" title="Send your request">
+        Share where to reach you and where the pieces would go. Our team will contact you before anything is confirmed.
+      </PageIntro>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        
-        {/* Left Form: Contact & Delivery Information */}
-        <div className="lg:col-span-7 space-y-6">
-          <div>
-            <h1 className="font-serif text-2xl sm:text-3xl font-medium text-charcoal">
-              Contact &amp; Delivery Information
-            </h1>
-            <p className="text-xs text-charcoal-muted mt-1 font-light">
-              Our studio team will use this information to calculate courier logistics and confirm delivery schedules.
-            </p>
-          </div>
-
-          {serverError && (
-            <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start space-x-2.5">
-              <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold">Submission Could Not Complete</p>
-                <p className="mt-0.5">{serverError}</p>
-              </div>
+      <div className="grid gap-12 pt-10 lg:grid-cols-12 lg:gap-16">
+        <form onSubmit={submit} noValidate className="space-y-10 lg:col-span-7" aria-describedby="request-disclaimer">
+          {(errorEntries.length > 0 || serverError) && (
+            <div ref={errorSummaryRef} tabIndex={-1} role="alert" className="border-l-2 border-red-800 bg-red-50 px-5 py-4 text-sm text-red-900">
+              {serverError ? (
+                <p>{serverError}</p>
+              ) : (
+                <>
+                  <p className="font-medium">Please check the following:</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5">
+                    {errorEntries.map(([k, msg]) => (
+                      <li key={k}>
+                        {k === 'items' ? (
+                          msg
+                        ) : (
+                          <a href={`#${k}`} className="underline underline-offset-2">
+                            {LABELS[k as Fields]}: {msg}
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            
-            {/* Contact Group */}
-            <div className="bg-white p-5 sm:p-6 rounded-2xl border border-ivory-border shadow-subtle space-y-4">
-              <h3 className="font-serif text-base font-semibold text-charcoal border-b border-ivory-border/60 pb-2">
-                1. Customer Details
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-medium text-charcoal block mb-1">Full Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={customerName}
-                    onChange={e => setCustomerName(e.target.value)}
-                    placeholder="Enter your full name"
-                    className="w-full text-xs p-3 rounded-lg border border-ivory-border focus:border-burgundy focus:outline-none bg-ivory-light"
-                  />
-                  {formErrors.customerName && (
-                    <p className="text-[11px] text-red-600 mt-1">{formErrors.customerName}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="text-xs font-medium text-charcoal block mb-1">
-                    Mobile Number (for Order Verification) *
-                  </label>
-                  <div className="flex">
-                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-ivory-border bg-ivory-muted text-xs text-charcoal font-medium">
-                      +91
-                    </span>
-                    <input
-                      type="tel"
-                      required
-                      value={customerPhone}
-                      onChange={e => setCustomerPhone(e.target.value)}
-                      placeholder="10-digit mobile number"
-                      maxLength={10}
-                      className="w-full text-xs p-3 rounded-r-lg border border-ivory-border focus:border-burgundy focus:outline-none bg-ivory-light"
-                    />
-                  </div>
-                  {formErrors.customerPhone && (
-                    <p className="text-[11px] text-red-600 mt-1">{formErrors.customerPhone}</p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-medium text-charcoal block mb-1">Verified Email</label>
-                <input
-                  type="email"
-                  disabled
-                  value={user.email}
-                  className="w-full text-xs p-3 rounded-lg border border-ivory-border bg-ivory-muted text-charcoal-muted cursor-not-allowed"
-                />
-                <span className="text-[10px] text-charcoal-light mt-1 block">
-                  Linked to your active Google account
-                </span>
-              </div>
+          <fieldset className="space-y-5">
+            <legend className="mb-2 font-display text-[1.75rem]">Your details</legend>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {field('customerName', { autoComplete: 'name', maxLength: 120 })}
+              {field('customerPhone', { type: 'tel', autoComplete: 'tel-national', inputMode: 'numeric', maxLength: 14, hint: '10-digit Indian mobile number' })}
             </div>
-
-            {/* Delivery Address Group */}
-            <div className="bg-white p-5 sm:p-6 rounded-2xl border border-ivory-border shadow-subtle space-y-4">
-              <h3 className="font-serif text-base font-semibold text-charcoal border-b border-ivory-border/60 pb-2">
-                2. Shipping &amp; Sanctuary Address
-              </h3>
-
-              <div>
-                <label className="text-xs font-medium text-charcoal block mb-1">
-                  Street Address / Apartment / Landmark *
-                </label>
-                <textarea
-                  required
-                  rows={3}
-                  value={deliveryAddress}
-                  onChange={e => setDeliveryAddress(e.target.value)}
-                  placeholder="House/Flat number, building name, street, nearby landmark"
-                  className="w-full text-xs p-3 rounded-lg border border-ivory-border focus:border-burgundy focus:outline-none bg-ivory-light"
-                />
-                {formErrors.deliveryAddress && (
-                  <p className="text-[11px] text-red-600 mt-1">{formErrors.deliveryAddress}</p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="text-xs font-medium text-charcoal block mb-1">City *</label>
-                  <input
-                    type="text"
-                    required
-                    value={deliveryCity}
-                    onChange={e => setDeliveryCity(e.target.value)}
-                    placeholder="E.g. Hyderabad"
-                    className="w-full text-xs p-3 rounded-lg border border-ivory-border focus:border-burgundy focus:outline-none bg-ivory-light"
-                  />
-                  {formErrors.deliveryCity && (
-                    <p className="text-[11px] text-red-600 mt-1">{formErrors.deliveryCity}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="text-xs font-medium text-charcoal block mb-1">State *</label>
-                  <input
-                    type="text"
-                    required
-                    value={deliveryState}
-                    onChange={e => setDeliveryState(e.target.value)}
-                    placeholder="E.g. Telangana"
-                    className="w-full text-xs p-3 rounded-lg border border-ivory-border focus:border-burgundy focus:outline-none bg-ivory-light"
-                  />
-                  {formErrors.deliveryState && (
-                    <p className="text-[11px] text-red-600 mt-1">{formErrors.deliveryState}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="text-xs font-medium text-charcoal block mb-1">6-Digit PIN Code *</label>
-                  <input
-                    type="text"
-                    required
-                    maxLength={6}
-                    value={deliveryPincode}
-                    onChange={e => setDeliveryPincode(e.target.value)}
-                    placeholder="E.g. 500034"
-                    className="w-full text-xs p-3 rounded-lg border border-ivory-border focus:border-burgundy focus:outline-none bg-ivory-light"
-                  />
-                  {formErrors.deliveryPincode && (
-                    <p className="text-[11px] text-red-600 mt-1">{formErrors.deliveryPincode}</p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-medium text-charcoal block mb-1">
-                  Special Notes, Delivery Timing or Inscription Instructions (Optional)
-                </label>
-                <textarea
-                  rows={2}
-                  value={customerNotes}
-                  onChange={e => setCustomerNotes(e.target.value)}
-                  placeholder="E.g. Auspicious delivery date required, housewarming gift wrapping, etc."
-                  className="w-full text-xs p-3 rounded-lg border border-ivory-border focus:border-burgundy focus:outline-none bg-ivory-light"
-                />
-              </div>
+            <div>
+              <p className="field-label">Email</p>
+              <p className="border border-stone-deep bg-stone px-3.5 py-3 text-ink-soft">{user.email}</p>
+              <p className="mt-1.5 text-sm text-ink-soft">From your Google account.</p>
             </div>
+          </fieldset>
 
-            {/* MANDATORY DISCLAIMER TEXT BOX (EXACT PHRASING) */}
-            <div className="bg-ivory-muted/90 rounded-2xl p-5 border border-ivory-border shadow-subtle space-y-2">
-              <div className="flex items-center space-x-2 text-burgundy font-medium text-xs">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span className="font-serif font-semibold text-sm">Non-Transactional Order Policy</span>
-              </div>
-              <p className="text-xs text-charcoal-muted leading-relaxed font-light pl-6">
-                “{ORDER_DISCLAIMER_TEXT}”
-              </p>
+          <fieldset className="space-y-5">
+            <legend className="mb-2 font-display text-[1.75rem]">Delivery address</legend>
+            {field('deliveryAddress', { textarea: true, autoComplete: 'street-address', maxLength: 500, hint: 'House or flat, building, street and landmark' })}
+            <div className="grid gap-5 sm:grid-cols-3">
+              {field('deliveryCity', { autoComplete: 'address-level2', maxLength: 80 })}
+              {field('deliveryState', { autoComplete: 'address-level1', maxLength: 80 })}
+              {field('deliveryPincode', { autoComplete: 'postal-code', inputMode: 'numeric', maxLength: 6 })}
             </div>
+            {field('customerNotes', { textarea: true, optional: true, maxLength: 1000, hint: 'For example, an occasion date or a gift message' })}
+          </fieldset>
 
-            {/* Submission Action */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full flex items-center justify-center space-x-2 py-4 rounded-md bg-burgundy hover:bg-burgundy-hover text-white text-sm font-semibold tracking-wide shadow-card hover:shadow-card-hover transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Submitting Order Request Securely...</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Submit Order Request</span>
-                </>
-              )}
-            </button>
-          </form>
-        </div>
-
-        {/* Right Sticky Order Summary */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white p-6 rounded-2xl border border-ivory-border shadow-card sticky top-28 space-y-4">
-            <h3 className="font-serif text-lg font-semibold text-charcoal border-b border-ivory-border pb-3">
-              Request Overview ({items.length} piece{items.length > 1 ? 's' : ''})
-            </h3>
-
-            <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
-              {items.map(it => (
-                <div key={`${it.productId}-${it.selectedVariant}`} className="flex space-x-3 text-xs">
-                  <img
-                    src={it.image || '/assets/demo/sample_product_1.jpeg'}
-                    alt={it.name}
-                    className="w-14 h-18 object-cover rounded bg-ivory-muted flex-shrink-0"
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium text-charcoal line-clamp-1">{it.name}</p>
-                    <p className="text-charcoal-muted text-[11px]">
-                      Qty: {it.quantity} {it.selectedVariant ? `• ${it.selectedVariant}` : ''}
-                    </p>
-                    <p className="font-serif font-semibold text-burgundy mt-1">
-                      {it.indicativePrice ? formatPrice(it.indicativePrice * it.quantity) : 'Price on Request'}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="border-t border-ivory-border pt-4 space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-charcoal-muted">Indicative Items Subtotal:</span>
-                <span className="font-serif font-bold text-burgundy text-base">
-                  {subtotal ? formatPrice(subtotal) : 'Price on Request'}
-                </span>
-              </div>
-              <div className="flex justify-between text-charcoal-light">
-                <span>Shipping, Insurance &amp; Taxes:</span>
-                <span>Calculated manually by studio</span>
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-ivory-border/70 text-[11px] text-charcoal-muted space-y-1">
-              <p className="flex items-center space-x-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-gold flex-shrink-0" />
-                <span>Zero online card payment processed at this stage.</span>
-              </p>
-              <p className="flex items-center space-x-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-gold flex-shrink-0" />
-                <span>Our team calls you directly to confirm packaging &amp; delivery.</span>
-              </p>
-            </div>
+          <div id="request-disclaimer">
+            <OrderDisclaimer />
           </div>
-        </div>
 
+          <button type="submit" className="btn-primary w-full sm:w-auto sm:min-w-[260px]" disabled={submitting} aria-busy={submitting}>
+            {submitting ? (
+              <>
+                <Spinner /> Sending your request…
+              </>
+            ) : (
+              'Send request'
+            )}
+          </button>
+        </form>
+
+        <aside className="lg:col-span-5" aria-labelledby="checkout-summary">
+          <div className="bg-stone p-6 md:p-8 lg:sticky lg:top-28">
+            <div className="flex items-baseline justify-between">
+              <h2 id="checkout-summary" className="text-[1.75rem]">
+                Your bag
+              </h2>
+              <Link to="/cart" className="text-sm text-ink-soft underline underline-offset-4 hover:text-burgundy">
+                Edit
+              </Link>
+            </div>
+            <ul className="mt-5 divide-y divide-stone-deep">
+              {items.map(it => {
+                const sources = productImageSources(it.image);
+                return (
+                  <li key={`${it.productId}-${it.selectedVariant || ''}`} className="flex gap-4 py-4">
+                    <div className="w-16 flex-shrink-0 bg-ivory">
+                      {sources && <Picture sources={sources} sizes="64px" width={128} height={160} alt="" className="aspect-product w-full object-cover" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-display text-lg leading-snug">{it.name}</p>
+                      <p className="text-sm text-ink-soft">
+                        Qty {it.quantity}
+                        {it.selectedVariant ? ` · ${it.selectedVariant}` : ''}
+                      </p>
+                    </div>
+                    <PriceText value={it.indicativePrice === null ? null : it.indicativePrice * it.quantity} className="whitespace-nowrap text-sm text-ink-soft" />
+                  </li>
+                );
+              })}
+            </ul>
+            <dl className="mt-4 space-y-2 border-t border-stone-deep pt-4 text-[0.9375rem]">
+              <div className="flex justify-between gap-4">
+                <dt className="text-ink-soft">Estimated total</dt>
+                <dd className="text-right">
+                  {subtotal === null ? 'Price on request' : formatPrice(subtotal)}
+                  {subtotal !== null && hasUnpricedItems && <span className="block text-sm text-ink-soft">+ items priced on request</span>}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-ink-soft">Shipping</dt>
+                <dd>Confirmed by our team</dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-ink-soft">Payment</dt>
+                <dd>Not taken online</dd>
+              </div>
+            </dl>
+          </div>
+        </aside>
       </div>
     </div>
   );

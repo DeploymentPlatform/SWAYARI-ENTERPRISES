@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import React, { useState } from 'react';
+import { MotionConfig } from 'framer-motion';
+import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { RouterProvider, useRouter } from './lib/router';
+import { initPreviewMode, isPreviewMode, setPreviewMode } from './lib/preview';
 import { Header } from './components/Header';
-import { CartDrawer } from './components/CartDrawer';
 import { Footer } from './components/Footer';
+import { CartDrawer } from './components/CartDrawer';
+import { SignInDialog } from './components/SignInDialog';
 
 import { HomePage } from './pages/HomePage';
 import { ShopPage } from './pages/ShopPage';
@@ -16,133 +20,78 @@ import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import { OrderingPolicyPage } from './pages/OrderingPolicyPage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { NotFoundPage } from './pages/NotFoundPage';
+import { DevLoginPage } from './pages/DevLoginPage';
 
-const AppContent: React.FC = () => {
-  const { user, handleGoogleCallback, devLoginCustomer } = useAuth();
-  const [currentPath, setCurrentPath] = useState(() => window.location.pathname || '/');
+initPreviewMode();
 
-  // Sync route on popstate
-  useEffect(() => {
-    const handlePopState = () => {
-      setCurrentPath(window.location.pathname || '/');
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+function Routes() {
+  const { path, search } = useRouter();
 
-  // Scroll to top on route navigation
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentPath]);
+  if (path === '/') return <HomePage />;
+  if (path === '/shop') return <ShopPage />;
+  if (path === '/search') return <ShopPage searchQuery={search.get('q') || ''} />;
+  if (path.startsWith('/product/')) return <ProductDetailPage slug={decodeURIComponent(path.slice('/product/'.length))} />;
+  if (path === '/cart') return <CartPage />;
+  if (path === '/checkout') return <CheckoutPage />;
+  if (path.startsWith('/order-confirmation/')) return <OrderConfirmationPage orderId={decodeURIComponent(path.slice('/order-confirmation/'.length))} />;
+  if (path === '/orders' || path === '/account' || path === '/account/orders') return <AccountOrdersPage />;
+  if (path === '/about') return <AboutPage />;
+  if (path === '/contact') return <ContactPage />;
+  if (path === '/ordering-policy') return <OrderingPolicyPage />;
+  if (path === '/privacy-policy' || path === '/privacy') return <PrivacyPolicyPage />;
+  if (path === '/dev-login') return <DevLoginPage />;
+  return <NotFoundPage />;
+}
 
-  // Initialize Google Identity Services
-  useEffect(() => {
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.initialize({
-        client_id: '1097223362145-storefront.apps.googleusercontent.com', // Will use server verified env or real GIS
-        callback: (response: any) => {
-          if (response.credential) {
-            handleGoogleCallback(response.credential);
-          }
-        },
-        auto_select: false,
-        cancel_on_tap_outside: true
-      });
-    }
-  }, []);
-
-  function navigate(path: string) {
-    window.history.pushState({}, '', path);
-    setCurrentPath(path);
-  }
-
-  // Parse route
-  function renderPage() {
-    if (currentPath === '/' || currentPath === '') {
-      return <HomePage navigate={navigate} />;
-    }
-    if (currentPath === '/shop') {
-      return <ShopPage navigate={navigate} />;
-    }
-    if (currentPath.startsWith('/product/')) {
-      const slug = currentPath.replace('/product/', '').replace(/\/$/, '');
-      return <ProductDetailPage slug={slug} navigate={navigate} />;
-    }
-    if (currentPath === '/cart') {
-      return <CartPage navigate={navigate} />;
-    }
-    if (currentPath === '/checkout') {
-      return <CheckoutPage navigate={navigate} />;
-    }
-    if (currentPath.startsWith('/order-confirmation/')) {
-      const id = currentPath.replace('/order-confirmation/', '').replace(/\/$/, '');
-      return <OrderConfirmationPage orderId={id} navigate={navigate} />;
-    }
-    if (currentPath === '/orders' || currentPath === '/account') {
-      return <AccountOrdersPage navigate={navigate} />;
-    }
-    if (currentPath === '/about') {
-      return <AboutPage navigate={navigate} />;
-    }
-    if (currentPath === '/contact') {
-      return <ContactPage />;
-    }
-    if (currentPath === '/ordering-policy') {
-      return <OrderingPolicyPage />;
-    }
-    if (currentPath === '/privacy-policy') {
-      return <PrivacyPolicyPage />;
-    }
-
-    // Default Fallback
-    return <HomePage navigate={navigate} />;
-  }
-
-  const isLocalDev = window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1');
-
+/** Small, out-of-layout indicator shown only while the sample preview dataset is active. */
+const PreviewIndicator: React.FC = () => {
+  const [on, setOn] = useState(isPreviewMode());
+  if (!on) return null;
   return (
-    <div className="min-h-screen flex flex-col bg-ivory text-charcoal font-sans">
-      {/* Local Preview Dev Login Helper (Only visible in localhost) */}
-      {isLocalDev && !user && (
-        <div className="bg-amber-100/90 border-b border-amber-300 py-1 px-4 text-xs text-amber-900 flex items-center justify-between z-50">
-          <span>Local Development Mode — Storefront Preview</span>
-          <button
-            onClick={() => devLoginCustomer()}
-            className="underline font-semibold hover:text-amber-950"
-          >
-            Quick Customer Test Sign-In
-          </button>
-        </div>
-      )}
-
-      {/* Header */}
-      <Header currentPath={currentPath} navigate={navigate} />
-
-      {/* Cart Drawer */}
-      <CartDrawer
-        onProceedToCheckout={() => navigate('/checkout')}
-        onExplore={() => navigate('/shop')}
-      />
-
-      {/* Dynamic Route Body */}
-      <main className="flex-1">
-        {renderPage()}
-      </main>
-
-      {/* Footer (STRICTLY NO ADMIN LINK) */}
-      <Footer navigate={navigate} />
+    <div className="fixed bottom-2 left-2 z-30 flex items-center gap-1 border border-gold/50 bg-ivory/95 py-0.5 pl-2 pr-0.5 text-[0.6875rem] text-ink-soft shadow-subtle backdrop-blur">
+      <span>Sample preview</span>
+      <button
+        type="button"
+        className="px-1.5 py-1 font-medium text-burgundy underline underline-offset-2"
+        aria-label="Hide sample preview items"
+        onClick={() => {
+          setPreviewMode(false);
+          setOn(false);
+          window.location.reload();
+        }}
+      >
+        Hide
+      </button>
     </div>
   );
 };
 
-export const App: React.FC = () => {
-  return (
-    <AuthProvider>
-      <CartProvider>
-        <AppContent />
-      </CartProvider>
-    </AuthProvider>
-  );
-};
+export const App: React.FC = () => (
+  <MotionConfig reducedMotion="user">
+    <RouterProvider>
+      <AuthProvider>
+        <CartProvider>
+          <a
+            href="#main"
+            className="sr-only z-[70] bg-burgundy px-4 py-3 text-ivory focus:not-sr-only focus:fixed focus:left-3 focus:top-3"
+          >
+            Skip to content
+          </a>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main id="main" className="flex-1" tabIndex={-1}>
+              <Routes />
+            </main>
+            <Footer />
+          </div>
+          <CartDrawer />
+          <SignInDialog />
+          <PreviewIndicator />
+        </CartProvider>
+      </AuthProvider>
+    </RouterProvider>
+  </MotionConfig>
+);
 
 export default App;

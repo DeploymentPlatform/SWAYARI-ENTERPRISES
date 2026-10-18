@@ -1,4 +1,5 @@
-import { ORDER_STATUSES, OrderStatus } from './constants.js';
+import { ORDER_STATUSES } from './constants.js';
+import type { OrderStatus } from './types.js';
 
 export function formatPrice(amount: number | null | undefined): string {
   if (amount === null || amount === undefined || isNaN(amount)) {

@@ -1,181 +1,147 @@
-import React, { useState, useEffect } from 'react';
-import { Order, formatPrice, formatDate, getStatusMeta, ORDER_STATUSES } from '@swayari/shared';
-import { Search, ShoppingBag, Eye, RefreshCw } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Search } from 'lucide-react';
+import { formatDate, formatPrice, ORDER_STATUSES } from '@swayari/shared';
 import { OrderDetailModal } from '../components/OrderDetailModal';
+import { ErrorBanner, PageHeader, StatusBadge, Thumb } from '../components/ui';
 
-interface OrdersPageProps {
-  initialSelectedOrderId?: string | null;
+interface OrderRow {
+  id: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  deliveryCity: string;
+  deliveryState: string;
+  status: string;
+  indicativeSubtotal: number | null;
+  itemCount: number;
+  firstImage: string | null;
+  createdAt: string;
 }
 
-export const OrdersPage: React.FC<OrdersPageProps> = ({ initialSelectedOrderId }) => {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeOrderId, setActiveOrderId] = useState<string | null>(initialSelectedOrderId || null);
+export const OrdersPage: React.FC<{ initialSelectedOrderId?: string | null }> = ({ initialSelectedOrderId }) => {
+  const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [status, setStatus] = useState('all');
+  const [query, setQuery] = useState('');
+  const [appliedQuery, setAppliedQuery] = useState('');
+  const [activeId, setActiveId] = useState<string | null>(initialSelectedOrderId || null);
 
-  useEffect(() => {
-    fetchOrders();
-  }, [selectedStatus]);
-
-  async function fetchOrders() {
-    setLoading(true);
+  async function load() {
+    setState('loading');
+    const params = new URLSearchParams();
+    if (status !== 'all') params.set('status', status);
+    if (appliedQuery) params.set('search', appliedQuery);
     try {
-      let url = '/api/admin/orders';
-      const params = [];
-      if (selectedStatus !== 'all') {
-        params.push(`status=${encodeURIComponent(selectedStatus)}`);
-      }
-      if (searchQuery.trim()) {
-        params.push(`search=${encodeURIComponent(searchQuery.trim())}`);
-      }
-      if (params.length > 0) {
-        url += '?' + params.join('&');
-      }
-
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        setOrders(data.orders || []);
-      }
-    } catch (err) {
-      console.error('Failed to load orders:', err);
-    } finally {
-      setLoading(false);
+      const res = await fetch(`/api/admin/orders${params.toString() ? `?${params}` : ''}`);
+      if (!res.ok) throw new Error();
+      setOrders((await res.json()).orders || []);
+      setState('ready');
+    } catch {
+      setState('error');
     }
   }
 
-  function handleSearchSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    fetchOrders();
-  }
+  useEffect(() => {
+    load();
+  }, [status, appliedQuery]);
 
   return (
     <div className="space-y-6">
-      {/* Title & Filter Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-ivory-border shadow-subtle">
-        <div>
-          <h1 className="font-serif text-2xl font-bold text-charcoal">Customer Order Requests</h1>
-          <p className="text-xs text-charcoal-muted mt-0.5">
-            Manage telephone consultations, quotation revisions, and dispatch statuses.
-          </p>
-        </div>
+      <PageHeader title="Order requests" description="Contact the customer, record notes, and publish quotation revisions. Original requests are never changed." />
 
-        <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-charcoal-light absolute left-3 top-1/2 -translate-y-1/2" />
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Filter by status">
+          {[{ value: 'all', label: 'All' }, ...ORDER_STATUSES].map(s => (
+            <button key={s.value} type="button" aria-pressed={status === s.value} onClick={() => setStatus(s.value)} className={status === s.value ? 'adm-chip-on' : 'adm-chip-off'}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+        <form
+          role="search"
+          className="relative w-full lg:w-80"
+          onSubmit={e => {
+            e.preventDefault();
+            setAppliedQuery(query.trim());
+          }}
+        >
+          <label htmlFor="order-search" className="sr-only">
+            Search requests
+          </label>
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" aria-hidden />
           <input
-            type="text"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search by order ref, name, phone..."
-            className="w-full pl-9 pr-4 py-2 text-xs bg-ivory rounded-lg border border-ivory-border focus:border-burgundy focus:outline-none"
+            id="order-search"
+            type="search"
+            className="adm-input pl-9"
+            placeholder="Reference, name, phone, email or city"
+            value={query}
+            onChange={e => {
+              setQuery(e.target.value);
+              if (!e.target.value) setAppliedQuery('');
+            }}
           />
         </form>
       </div>
 
-      {/* Status Filter Tabs */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none">
-        <button
-          onClick={() => setSelectedStatus('all')}
-          className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
-            selectedStatus === 'all'
-              ? 'bg-burgundy text-white font-semibold shadow-sm'
-              : 'bg-white text-charcoal hover:bg-ivory border border-ivory-border'
-          }`}
-        >
-          All Requests
-        </button>
-        {ORDER_STATUSES.map(s => (
-          <button
-            key={s.value}
-            onClick={() => setSelectedStatus(s.value)}
-            className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
-              selectedStatus === s.value
-                ? 'bg-burgundy text-white font-semibold shadow-sm'
-                : 'bg-white text-charcoal hover:bg-ivory border border-ivory-border'
-            }`}
-          >
-            {s.label}
-          </button>
-        ))}
-      </div>
+      {state === 'error' && <ErrorBanner message="Could not load order requests." onRetry={load} />}
 
-      {/* Orders Table */}
-      <div className="bg-white rounded-2xl border border-ivory-border shadow-subtle overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center text-xs text-charcoal-muted animate-pulse">
-            Loading orders list...
-          </div>
+      <div className="adm-card overflow-hidden">
+        {state === 'loading' ? (
+          <p className="px-5 py-12 text-center text-sm text-ink-soft">Loading requests…</p>
         ) : orders.length === 0 ? (
-          <div className="p-16 text-center text-xs text-charcoal-muted space-y-2">
-            <ShoppingBag className="w-10 h-10 mx-auto text-charcoal-light stroke-[1.5]" />
-            <p className="font-semibold text-charcoal text-sm">No matching order requests found</p>
-            <p className="font-light">Try adjusting your status filter or search keywords.</p>
+          <div className="px-5 py-14 text-center">
+            <p className="font-medium">{appliedQuery || status !== 'all' ? 'No requests match these filters' : 'No order requests yet'}</p>
+            <p className="mt-1 text-sm text-ink-soft">
+              {appliedQuery || status !== 'all' ? 'Try another status or search term.' : 'Requests from the customer website will appear here.'}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-ivory/60 text-charcoal-muted uppercase tracking-wider text-[10px] border-b border-ivory-border">
+            <table className="adm-table">
+              <thead>
                 <tr>
-                  <th className="py-3 px-4 font-semibold">Reference</th>
-                  <th className="py-3 px-4 font-semibold">Customer</th>
-                  <th className="py-3 px-4 font-semibold">Contact Phone</th>
-                  <th className="py-3 px-4 font-semibold">Location</th>
-                  <th className="py-3 px-4 font-semibold">Items</th>
-                  <th className="py-3 px-4 font-semibold">Status</th>
-                  <th className="py-3 px-4 font-semibold">Submitted</th>
-                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                  <th>Request</th>
+                  <th>Customer</th>
+                  <th>Delivery</th>
+                  <th className="text-right">Pieces</th>
+                  <th className="text-right">Estimate</th>
+                  <th>Status</th>
+                  <th>Received</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ivory-border/60">
-                {orders.map(o => {
-                  const statusMeta = getStatusMeta(o.status);
-                  return (
-                    <tr
-                      key={o.id}
-                      onClick={() => setActiveOrderId(o.id)}
-                      className="hover:bg-ivory-light/70 cursor-pointer transition-colors"
-                    >
-                      <td className="py-3.5 px-4 font-mono font-bold text-burgundy">{o.id}</td>
-                      <td className="py-3.5 px-4 font-semibold text-charcoal">{o.customerName}</td>
-                      <td className="py-3.5 px-4 text-charcoal-muted font-mono">+91 {o.customerPhone}</td>
-                      <td className="py-3.5 px-4 text-charcoal-muted">{o.deliveryCity}, {o.deliveryState}</td>
-                      <td className="py-3.5 px-4 font-medium text-charcoal">{o.itemCount} items</td>
-                      <td className="py-3.5 px-4">
-                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-ivory-muted text-charcoal border border-ivory-border">
-                          {statusMeta.label}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-charcoal-light text-[11px]">{formatDate(o.createdAt)}</td>
-                      <td className="py-3.5 px-4 text-right">
-                        <button
-                          onClick={e => {
-                            e.stopPropagation();
-                            setActiveOrderId(o.id);
-                          }}
-                          className="px-3 py-1 rounded bg-burgundy-light text-burgundy hover:bg-burgundy hover:text-white font-medium transition-colors text-[11px] inline-flex items-center space-x-1"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>Details</span>
+              <tbody>
+                {orders.map(o => (
+                  <tr key={o.id} className={`cursor-pointer hover:bg-[#FAF8F5] ${activeId === o.id ? 'bg-burgundy-soft/40' : ''}`} onClick={() => setActiveId(o.id)}>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <Thumb src={o.firstImage} />
+                        <button type="button" onClick={() => setActiveId(o.id)} className="font-mono text-[0.8125rem] font-medium text-burgundy hover:underline">
+                          {o.id}
                         </button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                      </div>
+                    </td>
+                    <td>
+                      <p className="font-medium">{o.customerName}</p>
+                      <p className="text-[0.8125rem] text-ink-soft">+91 {o.customerPhone}</p>
+                    </td>
+                    <td className="text-ink-soft">
+                      {o.deliveryCity}, {o.deliveryState}
+                    </td>
+                    <td className="text-right tabular-nums">{o.itemCount}</td>
+                    <td className="whitespace-nowrap text-right tabular-nums text-ink-soft">{o.indicativeSubtotal === null ? 'On request' : formatPrice(o.indicativeSubtotal)}</td>
+                    <td>
+                      <StatusBadge status={o.status} />
+                    </td>
+                    <td className="whitespace-nowrap text-ink-soft">{formatDate(o.createdAt)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         )}
       </div>
 
-      {/* Order Detail Modal */}
-      {activeOrderId && (
-        <OrderDetailModal
-          orderId={activeOrderId}
-          onClose={() => setActiveOrderId(null)}
-          onOrderUpdated={() => fetchOrders()}
-        />
-      )}
+      {activeId && <OrderDetailModal orderId={activeId} onClose={() => setActiveId(null)} onOrderUpdated={load} />}
     </div>
   );
 };

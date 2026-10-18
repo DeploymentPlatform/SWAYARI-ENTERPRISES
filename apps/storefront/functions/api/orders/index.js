@@ -48,12 +48,16 @@ export async function onRequestPost(context) {
 
     // 3. Idempotency Check: Return existing order if identical idempotency token submitted
     const existingOrder = await env.DB.prepare(`
-      SELECT id, status, initial_indicative_subtotal, created_at
+      SELECT id, customer_id, status, initial_indicative_subtotal, created_at
       FROM orders
       WHERE idempotency_key = ?
     `).bind(idempotencyKey).first();
 
     if (existingOrder) {
+      // Idempotency keys are only honoured for the customer who created the order.
+      if (existingOrder.customer_id !== session.user.id) {
+        return errorResponse('This request reference has already been used. Please refresh and try again.', 409);
+      }
       return jsonResponse({
         success: true,
         orderId: existingOrder.id,
@@ -72,13 +76,17 @@ export async function onRequestPost(context) {
 
     for (const item of items) {
       const prod = await env.DB.prepare(`
-        SELECT id, sku, name, indicative_price, images, status, min_quantity
+        SELECT id, sku, name, indicative_price, images, status, min_quantity, is_demo
         FROM products
         WHERE id = ?
       `).bind(item.productId).first();
 
-      if (!prod) {
+      if (!prod || prod.status !== 'published') {
         return errorResponse(`Product ${item.productId} was not found or is no longer available`, 404);
+      }
+      // Preview/sample items can only be requested in local development, never in production.
+      if (prod.is_demo && env.ENVIRONMENT !== 'development') {
+        return errorResponse(`${prod.name} is a preview sample and cannot be requested`, 400);
       }
 
       const qty = Math.max(1, parseInt(item.quantity, 10) || 1);

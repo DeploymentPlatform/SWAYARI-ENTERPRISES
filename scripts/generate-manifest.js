@@ -9,14 +9,21 @@ const assetsDir = path.join(projectRoot, 'public', 'assets');
 const manifestPath = path.join(assetsDir, 'manifest.json');
 
 const KNOWN_LABELS = {
-  'brand_card.jpeg': 'SWAYARI Official Brand Artwork (Burgundy & Gold)',
-  'swayari-logo.svg': 'SWAYARI Scalable Vector Logo Wordmark',
-  'favicon.svg': 'SWAYARI Lotus Crest Favicon',
-  'sample_product_1.jpeg': 'Radha Krishna Embossed Silver Plaque Frame (Preview Demo)',
-  'sample_product_2.jpeg': 'Bala Krishna Makhan Chor Embossed Silver Frame (Preview Demo)',
-  'sample_product_3.jpeg': 'Sri Venkateswara Balaji Embossed Silver Frame (Preview Demo)',
-  'sample_product_4.jpeg': 'Sri Hanuman Embossed Silver Frame (Preview Demo)'
+  'swayari_brand_card.jpeg': 'SWAYARI brand card (reference artwork)',
+  'swayari-logo.svg': 'SWAYARI wordmark (SVG)',
+  'favicon.svg': 'SWAYARI lotus favicon',
+  'sample_product_1.jpeg': 'Radha Krishna framed relief — original photo',
+  'sample_product_2.jpeg': 'Bala Krishna framed relief — original photo',
+  'sample_product_3.jpeg': 'Sri Venkateswara framed relief — original photo',
+  'sample_product_4.jpeg': 'Hanuman framed relief — original photo'
 };
+
+// Editorial images are licensed stock photography (docs/ASSET_SOURCES.md) — never products.
+function labelFor(relPath, filename) {
+  if (KNOWN_LABELS[filename]) return KNOWN_LABELS[filename];
+  const base = filename.replace(/\.[^.]+$/, '').replace(/-\d+$/, '').replace(/[-_]/g, ' ');
+  return relPath.startsWith('editorial') ? `${base} (licensed stock — styling inspiration)` : base;
+}
 
 function scanDir(dir, baseDir = '') {
   let results = [];
@@ -31,7 +38,7 @@ function scanDir(dir, baseDir = '') {
     } else if (/\.(jpg|jpeg|png|webp|svg|gif)$/i.test(item.name)) {
       const stats = fs.statSync(fullPath);
       const urlPath = '/assets/' + relPath.split(path.sep).join('/');
-      const label = KNOWN_LABELS[item.name] || item.name.replace(/[-_]/g, ' ').replace(/\.[^.]+$/, '');
+      const label = labelFor(relPath, item.name);
       results.push({
         id: relPath.replace(/[^a-zA-Z0-9-_]/g, '_'),
         filename: item.name,

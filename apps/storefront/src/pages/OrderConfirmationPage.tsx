@@ -1,143 +1,159 @@
-import React, { useState, useEffect } from 'react';
-import { CheckCircle2, ArrowRight, PhoneCall, ShoppingBag, ShieldCheck } from 'lucide-react';
-import { Order, formatPrice, formatDate, getStatusMeta } from '@swayari/shared';
+import React, { useEffect, useState } from 'react';
+import { Check, Copy } from 'lucide-react';
+import { formatDate, formatPrice } from '@swayari/shared';
+import { useAuth } from '../context/AuthContext';
+import { Link } from '../lib/router';
+import { productImageSources } from '../lib/media';
+import { usePageMeta } from '../lib/meta';
+import { EmptyState, LoadError } from '../components/States';
+import { LotusMark, Picture, PriceText } from '../components/ui';
 
-interface OrderConfirmationPageProps {
-  orderId: string;
-  navigate: (path: string) => void;
+interface OrderView {
+  id: string;
+  status: string;
+  createdAt: string;
+  indicativeSubtotal: number | null;
+  deliveryCity: string;
+  deliveryState: string;
+  items: { id: string; name: string; quantity: number; variant: string | null; indicativePrice: number | null; imageUrl: string | null }[];
 }
 
-export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({ orderId, navigate }) => {
-  const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
+const NEXT_STEPS = [
+  'Our team reviews your request.',
+  'We contact you to confirm availability, final pricing, shipping charges and delivery details.',
+  'Nothing is confirmed or charged until you agree with our team.'
+];
+
+export const OrderConfirmationPage: React.FC<{ orderId: string }> = ({ orderId }) => {
+  const { user, isLoading } = useAuth();
+  const [order, setOrder] = useState<OrderView | null>(null);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error' | 'missing'>('loading');
+  const [copied, setCopied] = useState(false);
+  usePageMeta('Request received', undefined, { noindex: true });
 
   useEffect(() => {
-    fetchOrderDetails();
-  }, [orderId]);
-
-  async function fetchOrderDetails() {
-    try {
-      const res = await fetch(`/api/orders/${encodeURIComponent(orderId)}`);
-      if (res.ok) {
+    if (isLoading) return;
+    if (!user) {
+      setStatus('missing');
+      return;
+    }
+    fetch(`/api/orders/${encodeURIComponent(orderId)}`)
+      .then(async res => {
+        if (res.status === 404 || res.status === 403) return setStatus('missing');
+        if (!res.ok) throw new Error();
         const data = await res.json();
         setOrder(data.order);
-      }
-    } catch (err) {
-      console.error('Failed to load order confirmation:', err);
-    } finally {
-      setLoading(false);
+        setStatus('ready');
+      })
+      .catch(() => setStatus('error'));
+  }, [orderId, user, isLoading]);
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(orderId);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard unavailable — the reference stays visible to copy manually */
     }
   }
 
+  if (status === 'missing') {
+    return (
+      <div className="container-content">
+        <EmptyState
+          title="We couldn’t find that request"
+          body={<p>Sign in with the account you used to send it, or see all of your requests.</p>}
+          action={{ to: '/orders', label: 'Your requests' }}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-      <div className="bg-white rounded-3xl border border-ivory-border shadow-card p-6 sm:p-10 space-y-8 text-center sm:text-left">
-        
-        {/* Success Icon & Header */}
-        <div className="text-center space-y-3">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center">
-            <CheckCircle2 className="w-10 h-10" />
-          </div>
-          <span className="text-xs uppercase tracking-widest text-burgundy font-semibold">
-            Order Request Received
-          </span>
-          <h1 className="font-serif text-2xl sm:text-3xl font-medium text-charcoal">
-            Thank You for Entrusting SWAYARI
-          </h1>
-          <p className="text-xs sm:text-sm text-charcoal-muted max-w-lg mx-auto font-light leading-relaxed">
-            Your request has been securely recorded. Our studio team will review stock, packaging, and courier availability and contact you shortly.
+    <div className="container-content max-w-3xl pb-20 pt-12 md:pb-28 md:pt-16">
+      <div className="text-center">
+        <LotusMark className="mx-auto h-7 w-12 text-gold" />
+        <p className="eyebrow mt-6">Request received</p>
+        <h1 className="mt-3 text-display-sm md:text-display-lg">Thank you — we have your request</h1>
+        <p className="mx-auto mt-4 max-w-xl text-lg text-ink-soft">
+          It has been saved to your account. Our team will contact you to confirm the details.
+        </p>
+      </div>
+
+      <div className="mt-10 flex flex-col items-center justify-between gap-4 border-y border-stone-deep py-6 sm:flex-row">
+        <div className="text-center sm:text-left">
+          <p className="text-sm text-ink-soft">Your reference</p>
+          <p className="mt-1 font-mono text-xl tracking-wide text-burgundy">{orderId}</p>
+        </div>
+        <button type="button" onClick={copy} className="btn-secondary">
+          {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
+          {copied ? 'Copied' : 'Copy reference'}
+        </button>
+      </div>
+
+      {status === 'loading' && <div className="skeleton mt-10 h-40" aria-busy="true" />}
+      {status === 'error' && (
+        <div className="mt-10">
+          <LoadError message="Your request was saved, but we couldn’t load its summary. You can see it under Your requests." />
+        </div>
+      )}
+      {status === 'ready' && order && (
+        <section className="mt-10" aria-labelledby="summary">
+          <h2 id="summary" className="text-[1.75rem]">
+            What you requested
+          </h2>
+          <p className="mt-1 text-sm text-ink-soft">
+            Sent {formatDate(order.createdAt)} · Delivery to {order.deliveryCity}, {order.deliveryState}
           </p>
-        </div>
-
-        {/* Reference Banner */}
-        <div className="bg-ivory p-4 sm:p-6 rounded-2xl border border-ivory-border flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <span className="text-[11px] uppercase tracking-wider text-charcoal-light font-medium block">
-              Order Request Reference:
-            </span>
-            <span className="font-mono text-base sm:text-lg font-bold text-burgundy tracking-wide">
-              {orderId}
-            </span>
-          </div>
-
-          <div className="text-right">
-            <span className="text-[11px] uppercase tracking-wider text-charcoal-light font-medium block">
-              Current Status:
-            </span>
-            <span className="inline-block mt-0.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200">
-              New Request Received
-            </span>
-          </div>
-        </div>
-
-        {/* Order Details Preview */}
-        {order && (
-          <div className="space-y-4 text-xs text-left">
-            <h3 className="font-serif text-base font-semibold text-charcoal border-b border-ivory-border pb-2">
-              Requested Items Snapshot
-            </h3>
-
-            <div className="space-y-3">
-              {order.items?.map(it => (
-                <div key={it.id} className="flex items-center justify-between p-3 rounded-xl bg-ivory-light border border-ivory-border">
-                  <div className="flex items-center space-x-3">
-                    <img
-                      src={it.imageUrl || '/assets/demo/sample_product_1.jpeg'}
-                      alt={it.name}
-                      className="w-12 h-14 object-cover rounded bg-ivory-muted"
-                    />
-                    <div>
-                      <p className="font-medium text-charcoal">{it.name}</p>
-                      <p className="text-charcoal-muted text-[11px]">
-                        Qty: {it.quantity} {it.variant ? `• Option: ${it.variant}` : ''}
-                      </p>
-                    </div>
+          <ul className="mt-5 divide-y divide-stone-deep border-y border-stone-deep">
+            {order.items.map(it => {
+              const sources = productImageSources(it.imageUrl);
+              return (
+                <li key={it.id} className="flex items-center gap-4 py-4">
+                  <div className="w-16 flex-shrink-0 bg-stone">
+                    {sources && <Picture sources={sources} sizes="64px" width={128} height={160} alt="" className="aspect-product w-full object-cover" />}
                   </div>
-                  <span className="font-serif font-semibold text-burgundy">
-                    {it.indicativePrice ? formatPrice(it.indicativePrice * it.quantity) : 'Price on Request'}
-                  </span>
-                </div>
-              ))}
-            </div>
+                  <div className="flex-1">
+                    <p className="font-display text-lg">{it.name}</p>
+                    <p className="text-sm text-ink-soft">
+                      Qty {it.quantity}
+                      {it.variant ? ` · ${it.variant}` : ''}
+                    </p>
+                  </div>
+                  <PriceText value={it.indicativePrice === null ? null : it.indicativePrice * it.quantity} className="text-sm text-ink-soft" />
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-4 flex justify-between text-[0.9375rem]">
+            <span className="text-ink-soft">Estimated total</span>
+            <span>{order.indicativeSubtotal === null ? 'Price on request' : formatPrice(order.indicativeSubtotal)}</span>
+          </p>
+        </section>
+      )}
 
-            <div className="pt-2 flex justify-between text-xs font-medium text-charcoal">
-              <span>Indicative Subtotal:</span>
-              <span className="font-serif text-sm font-bold text-burgundy">
-                {order.indicativeSubtotal ? formatPrice(order.indicativeSubtotal) : 'Price on Request'}
-              </span>
-            </div>
-          </div>
-        )}
+      <section className="mt-12 bg-stone p-6 md:p-8" aria-labelledby="next">
+        <h2 id="next" className="text-[1.75rem]">
+          What happens next
+        </h2>
+        <ol className="mt-5 space-y-4">
+          {NEXT_STEPS.map((step, i) => (
+            <li key={step} className="flex gap-4">
+              <span className="font-display text-2xl leading-none text-gold">{i + 1}</span>
+              <span className="text-ink-soft">{step}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
 
-        {/* Next Steps Card */}
-        <div className="bg-ivory-muted/70 p-5 rounded-2xl border border-ivory-border text-left space-y-3">
-          <h4 className="font-serif text-sm font-semibold text-charcoal flex items-center space-x-2">
-            <PhoneCall className="w-4 h-4 text-burgundy" />
-            <span>What happens next?</span>
-          </h4>
-          <ol className="list-decimal list-inside space-y-1.5 text-xs text-charcoal-muted font-light leading-relaxed">
-            <li>Our studio curator reviews your selected dimensions, alloy finishes, and delivery pin code.</li>
-            <li>We will call or message your registered phone number to confirm final pricing, festive gift packaging, and express courier logistics.</li>
-            <li>Once mutually confirmed, an official quotation revision will be published to your client account.</li>
-          </ol>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-          <button
-            onClick={() => navigate('/orders')}
-            className="w-full sm:w-auto px-6 py-3 rounded-md bg-burgundy hover:bg-burgundy-hover text-white text-xs font-semibold tracking-wide shadow-sm"
-          >
-            Track in My Order History
-          </button>
-          <button
-            onClick={() => navigate('/shop')}
-            className="w-full sm:w-auto px-6 py-3 rounded-md border border-ivory-border bg-white hover:bg-ivory-muted text-charcoal text-xs font-medium"
-          >
-            Browse More Pieces
-          </button>
-        </div>
-
+      <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+        <Link to="/orders" className="btn-primary">
+          View your requests
+        </Link>
+        <Link to="/shop" className="btn-secondary">
+          Continue browsing
+        </Link>
       </div>
     </div>
   );

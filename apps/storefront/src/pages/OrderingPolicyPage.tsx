@@ -1,56 +1,46 @@
 import React from 'react';
-import { ShieldCheck, AlertCircle } from 'lucide-react';
-import { ORDER_DISCLAIMER_TEXT } from '@swayari/shared';
+import { usePageMeta } from '../lib/meta';
+import { PageIntro } from '../components/States';
+import { OrderDisclaimer } from '../components/ui';
+
+const SECTIONS = [
+  {
+    title: 'Requests, not online purchases',
+    body: 'SWAYARI does not take card, UPI or bank payments on this website and has no online payment gateway. Adding pieces to your bag and sending a request lets our team know what you are interested in. It does not confirm a purchase or reserve stock.'
+  },
+  {
+    title: 'What happens after you send a request',
+    body: 'Your request is saved to your account with a reference beginning “SW-”. Our team reviews it and contacts you on the mobile number or email you provided to confirm availability, final pricing, shipping charges and delivery details. You can see each request and its status under “Your requests”.'
+  },
+  {
+    title: 'Prices',
+    body: 'Where a price is shown it is indicative. Many pieces are listed as “Price on request”. The final price is confirmed by our team. If we send you a quotation, it appears in your account; any later revision is added as a new version rather than changing the original request.'
+  },
+  {
+    title: 'Delivery',
+    body: 'Requests can be sent for delivery addresses in India (a 6-digit PIN code is required). Packing, courier, charges and timing are discussed and confirmed with you for each request.'
+  },
+  {
+    title: 'Changing or cancelling a request',
+    body: 'Because nothing is confirmed until you agree it with our team, you can change or withdraw a request by replying to us or writing to swayarienterprises@gmail.com with your reference.'
+  }
+];
 
 export const OrderingPolicyPage: React.FC = () => {
+  usePageMeta('How ordering works', 'How SWAYARI order requests work: no online payment, personal confirmation of availability, pricing and delivery.');
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
-      <div>
-        <h1 className="font-serif text-3xl sm:text-4xl text-charcoal">Ordering &amp; Delivery Policy</h1>
-        <p className="text-xs sm:text-sm text-charcoal-muted mt-1 font-light">
-          Last revised: October 2026 • SWAYARI ENTERPRISES
-        </p>
-      </div>
-
-      {/* Mandatory Disclaimer Box */}
-      <div className="bg-ivory-muted/90 rounded-2xl p-6 border border-ivory-border shadow-subtle space-y-2">
-        <div className="flex items-center space-x-2 text-burgundy font-medium text-sm">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <span className="font-serif font-semibold">Mandatory Order Request Notice</span>
-        </div>
-        <p className="text-xs text-charcoal-muted leading-relaxed font-light pl-6">
-          “{ORDER_DISCLAIMER_TEXT}”
-        </p>
-      </div>
-
-      <div className="space-y-6 text-xs sm:text-sm text-charcoal-muted leading-relaxed font-light">
-        <section className="space-y-2">
-          <h3 className="font-serif text-lg font-semibold text-charcoal">1. Non-Transactional Catalogue Model</h3>
-          <p>
-            SWAYARI does not collect card payments, UPI transfers, or credit information online through automated payment gateways. Our storefront operates exclusively as a bespoke enquiry catalogue. Submitting an order request enables our team to inspect inventory, consult with you on customized alloy finishes or frame sizes, and ensure proper protective courier arrangements.
-          </p>
-        </section>
-
-        <section className="space-y-2">
-          <h3 className="font-serif text-lg font-semibold text-charcoal">2. Price Quotation &amp; Revisions</h3>
-          <p>
-            Indicative prices shown on our catalogue serve as estimated starting prices. Final pricing depends on chosen variants, custom engraving, and shipping destination. Official quotations with explicit itemized pricing and shipping charges are published to your client account after direct consultation.
-          </p>
-        </section>
-
-        <section className="space-y-2">
-          <h3 className="font-serif text-lg font-semibold text-charcoal">3. Packaging &amp; Transit Insurance</h3>
-          <p>
-            Devotional icons and framed artworks are delicate and sacred. We employ high-density foam molds, moisture barrier wrapping, and reinforced corrugated wooden boxing where necessary. All transit arrangements are coordinated through reputed express couriers with tracking.
-          </p>
-        </section>
-
-        <section className="space-y-2">
-          <h3 className="font-serif text-lg font-semibold text-charcoal">4. Cancellations &amp; Modifications</h3>
-          <p>
-            You may adjust or cancel your order request at any point during telephone consultation prior to manufacturing customization or parcel dispatch without penalty.
-          </p>
-        </section>
+    <div className="container-content max-w-3xl pb-20 md:pb-28">
+      <PageIntro eyebrow="Help" title="How ordering works" />
+      <OrderDisclaimer className="mt-10" />
+      <div className="mt-12 space-y-10">
+        {SECTIONS.map((s, i) => (
+          <section key={s.title} aria-labelledby={`policy-${i}`}>
+            <h2 id={`policy-${i}`} className="text-[1.75rem] leading-tight">
+              {s.title}
+            </h2>
+            <p className="mt-3 text-lg leading-relaxed text-ink-soft">{s.body}</p>
+          </section>
+        ))}
       </div>
     </div>
   );

@@ -1,14 +1,15 @@
 import { jsonResponse, errorResponse } from '../../_utils.js';
 
 export async function onRequestGet(context) {
-  const { env } = context;
+  const { env, request } = context;
+  const includeDemo = new URL(request.url).searchParams.get('include_demo') === '1';
 
   try {
     const { results } = await env.DB.prepare(`
       SELECT c.id, c.name, c.slug, c.description, c.display_order,
              COUNT(p.id) as product_count
       FROM categories c
-      LEFT JOIN products p ON c.id = p.category_id AND p.status = 'published'
+      LEFT JOIN products p ON c.id = p.category_id AND p.status = 'published' ${includeDemo ? '' : 'AND p.is_demo = 0'}
       WHERE c.is_active = 1
       GROUP BY c.id
       ORDER BY c.display_order ASC, c.name ASC

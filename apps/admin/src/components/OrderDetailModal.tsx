@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { X, Phone, Mail, MapPin, ShieldAlert, FileText, CheckCircle2, Clock, Send, Plus, Trash2 } from 'lucide-react';
-import { Order, formatPrice, formatDate, getStatusMeta, ORDER_STATUSES } from '@swayari/shared';
+import React, { useEffect, useState } from 'react';
+import { Lock, Mail, MapPin, Phone, Plus } from 'lucide-react';
+import { formatDate, formatPrice, ORDER_STATUSES } from '@swayari/shared';
+import { Drawer, ErrorBanner, StatusBadge, Thumb } from './ui';
 
 interface OrderDetailModalProps {
   orderId: string;
@@ -8,454 +9,335 @@ interface OrderDetailModalProps {
   onOrderUpdated: () => void;
 }
 
+interface QuoteLine {
+  productId: string;
+  productName: string;
+  quantity: number;
+  agreedUnitPrice: number;
+}
+
+/** Order detail drawer. Customer-visible information and staff-only notes are kept apart. */
 export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ orderId, onClose, onOrderUpdated }) => {
-  const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [newStatus, setNewStatus] = useState<string>('');
-  const [internalNoteText, setInternalNoteText] = useState<string>('');
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [order, setOrder] = useState<any>(null);
+  const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [note, setNote] = useState('');
+  const [quoting, setQuoting] = useState(false);
+  const [lines, setLines] = useState<QuoteLine[]>([]);
+  const [shipping, setShipping] = useState('0');
+  const [tax, setTax] = useState('0');
+  const [quoteNotes, setQuoteNotes] = useState('');
 
-  // Quotation Editor State
-  const [isCreatingQuotation, setIsCreatingQuotation] = useState(false);
-  const [quotationItems, setQuotationItems] = useState<Array<{ productId: string; productName: string; quantity: number; agreedUnitPrice: number }>>([]);
-  const [shippingCharge, setShippingCharge] = useState<number>(0);
-  const [taxAmount, setTaxAmount] = useState<number>(0);
-  const [quotationNotes, setQuotationNotes] = useState<string>('');
-
-  useEffect(() => {
-    fetchOrderDetails();
-  }, [orderId]);
-
-  async function fetchOrderDetails() {
-    setLoading(true);
+  async function load() {
     try {
       const res = await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}`);
-      if (res.ok) {
-        const data = await res.json();
-        const o: Order = data.order;
-        setOrder(o);
-        setNewStatus(o.status);
-
-        // Pre-populate quotation items with initial requested items
-        if (o.items) {
-          setQuotationItems(
-            o.items.map(it => ({
-              productId: it.productId,
-              productName: it.name,
-              quantity: it.quantity,
-              agreedUnitPrice: it.indicativePrice || 0
-            }))
-          );
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch order details:', err);
-    } finally {
-      setLoading(false);
+      if (!res.ok) throw new Error();
+      const o = (await res.json()).order;
+      setOrder(o);
+      const latest = o.quotations?.[0];
+      setLines(
+        latest
+          ? latest.items.map((q: QuoteLine) => ({ ...q }))
+          : (o.items || []).map((it: any) => ({ productId: it.productId, productName: it.name, quantity: it.quantity, agreedUnitPrice: it.indicativePrice || 0 }))
+      );
+      setState('ready');
+    } catch {
+      setState('error');
     }
   }
 
-  async function handleStatusChange(status: string) {
-    setIsUpdating(true);
+  useEffect(() => {
+    setState('loading');
+    load();
+  }, [orderId]);
+
+  async function patch(body: object, after?: () => void) {
+    setBusy(true);
+    setActionError(null);
     try {
       const res = await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
+        body: JSON.stringify(body)
       });
-      if (res.ok) {
-        setNewStatus(status);
-        await fetchOrderDetails();
-        onOrderUpdated();
-      }
-    } catch (err) {
-      console.error('Failed to update status:', err);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.success === false) throw new Error(data.error || 'The change was not saved.');
+      after?.();
+      await load();
+      onOrderUpdated();
+    } catch (err: any) {
+      setActionError(err.message || 'The change was not saved.');
     } finally {
-      setIsUpdating(false);
+      setBusy(false);
     }
   }
 
-  async function handleAddInternalNote(e: React.FormEvent) {
-    e.preventDefault();
-    if (!internalNoteText.trim()) return;
-
-    setIsUpdating(true);
-    try {
-      const res = await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ internalNote: internalNoteText.trim() })
-      });
-      if (res.ok) {
-        setInternalNoteText('');
-        await fetchOrderDetails();
-      }
-    } catch (err) {
-      console.error('Failed to add internal note:', err);
-    } finally {
-      setIsUpdating(false);
-    }
-  }
-
-  async function handleIssueQuotation(e: React.FormEvent) {
-    e.preventDefault();
-    setIsUpdating(true);
-    try {
-      const res = await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status: 'quoted',
-          quotation: {
-            items: quotationItems,
-            shippingCharge,
-            taxAmount,
-            quotationNotes: quotationNotes.trim() || null
-          }
-        })
-      });
-      if (res.ok) {
-        setIsCreatingQuotation(false);
-        await fetchOrderDetails();
-        onOrderUpdated();
-      }
-    } catch (err) {
-      console.error('Failed to issue quotation:', err);
-    } finally {
-      setIsUpdating(false);
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full text-center text-xs text-charcoal-muted">
-          Loading order details...
-        </div>
-      </div>
-    );
-  }
-
-  if (!order) return null;
+  const quoteSubtotal = lines.reduce((s, l) => s + (Number(l.agreedUnitPrice) || 0) * l.quantity, 0);
+  const quoteTotal = quoteSubtotal + (Number(shipping) || 0) + (Number(tax) || 0);
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-ivory-border shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
-        
-        {/* Modal Top Header */}
-        <div className="p-5 sm:p-6 border-b border-ivory-border flex items-center justify-between bg-ivory/40">
-          <div>
-            <div className="flex items-center space-x-3">
-              <span className="font-mono text-base font-bold text-burgundy">{order.id}</span>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-ivory-muted text-charcoal border border-ivory-border">
-                {getStatusMeta(order.status).label}
-              </span>
-            </div>
-            <p className="text-xs text-charcoal-muted mt-0.5">
-              Submitted on {formatDate(order.createdAt)}
-            </p>
-          </div>
+    <Drawer
+      onClose={onClose}
+      width="max-w-[860px]"
+      title={<span className="font-mono">{orderId}</span>}
+      subtitle={order ? `Received ${formatDate(order.createdAt)}` : 'Loading…'}
+      headerActions={
+        order && (
+          <label className="hidden items-center gap-2 text-sm sm:flex">
+            <span className="text-ink-soft">Status</span>
+            <select className="adm-input h-9 w-auto py-1" value={order.status} disabled={busy} onChange={e => patch({ status: e.target.value })}>
+              {ORDER_STATUSES.map(s => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        )
+      }
+    >
+      {state === 'loading' && <p className="py-12 text-center text-sm text-ink-soft">Loading request…</p>}
+      {state === 'error' && <ErrorBanner message="Could not load this request." onRetry={load} />}
+      {state === 'ready' && order && (
+        <div className="space-y-6">
+          {actionError && <ErrorBanner message={actionError} />}
 
-          <div className="flex items-center space-x-3">
-            {/* Status Workflow Selector */}
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-semibold text-charcoal-muted">Update Status:</span>
-              <select
-                value={newStatus}
-                onChange={e => handleStatusChange(e.target.value)}
-                disabled={isUpdating}
-                className="text-xs font-medium py-1.5 px-3 rounded-lg border border-ivory-border bg-white text-charcoal focus:border-burgundy focus:outline-none"
-              >
-                {ORDER_STATUSES.map(s => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <label className="flex items-center gap-2 text-sm sm:hidden">
+            <span className="text-ink-soft">Status</span>
+            <select className="adm-input" value={order.status} disabled={busy} onChange={e => patch({ status: e.target.value })}>
+              {ORDER_STATUSES.map(s => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </label>
 
-            <button
-              onClick={onClose}
-              className="p-1.5 text-charcoal-muted hover:text-burgundy rounded-full hover:bg-ivory"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Modal Scrollable Body */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6 text-xs">
-          
-          {/* Customer Details Box */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-ivory/60 p-4 sm:p-5 rounded-2xl border border-ivory-border">
-            <div className="space-y-2">
-              <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-charcoal">
-                Customer Information
-              </h4>
-              <p className="text-sm font-semibold text-charcoal">{order.customerName}</p>
-              <p className="flex items-center space-x-1.5 text-charcoal-muted">
-                <Phone className="w-3.5 h-3.5 text-burgundy" />
-                <a href={`tel:+91${order.customerPhone}`} className="hover:underline font-mono">
+          {/* Customer */}
+          <section className="adm-card grid gap-5 p-5 sm:grid-cols-2">
+            <div>
+              <h3 className="adm-section-title">Customer</h3>
+              <p className="mt-2 text-base font-medium">{order.customerName}</p>
+              <p className="mt-2 flex items-center gap-2 text-sm">
+                <Phone className="h-4 w-4 text-ink-faint" aria-hidden />
+                <a className="hover:underline" href={`tel:+91${order.customerPhone}`}>
                   +91 {order.customerPhone}
                 </a>
               </p>
-              <p className="flex items-center space-x-1.5 text-charcoal-muted">
-                <Mail className="w-3.5 h-3.5 text-burgundy" />
-                <span>{order.customerEmail}</span>
+              <p className="mt-1.5 flex items-center gap-2 break-all text-sm">
+                <Mail className="h-4 w-4 flex-shrink-0 text-ink-faint" aria-hidden />
+                <a className="hover:underline" href={`mailto:${order.customerEmail}?subject=${encodeURIComponent(`Your SWAYARI request ${order.id}`)}`}>
+                  {order.customerEmail}
+                </a>
               </p>
             </div>
-
-            <div className="space-y-2">
-              <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-charcoal">
-                Delivery Address
-              </h4>
-              <p className="flex items-start space-x-1.5 text-charcoal-muted font-light leading-relaxed">
-                <MapPin className="w-3.5 h-3.5 text-burgundy flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="adm-section-title">Delivery</h3>
+              <p className="mt-2 flex gap-2 text-sm leading-relaxed">
+                <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-ink-faint" aria-hidden />
                 <span>
-                  {order.deliveryAddress}, {order.deliveryCity}, {order.deliveryState} — <span className="font-mono">{order.deliveryPincode}</span>
+                  {order.deliveryAddress}
+                  <br />
+                  {order.deliveryCity}, {order.deliveryState} {order.deliveryPincode}
                 </span>
               </p>
-              {order.customerNotes && (
-                <div className="p-2.5 rounded bg-white border border-ivory-border text-charcoal-muted italic">
-                  <strong>Customer Note:</strong> {order.customerNotes}
-                </div>
-              )}
+              {order.customerNotes && <p className="mt-3 rounded bg-stone px-3 py-2 text-sm">“{order.customerNotes}”</p>}
             </div>
-          </div>
+          </section>
 
-          {/* Requested Items Snapshot (IMMUTABLE) */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between border-b border-ivory-border pb-2">
-              <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-charcoal">
-                Initial Requested Items (Immutable Snapshot)
-              </h4>
-              <span className="text-[11px] text-charcoal-light">
-                Indicative Subtotal: <strong className="text-burgundy">{order.initialIndicativeSubtotal ? formatPrice(order.initialIndicativeSubtotal) : 'Price on Request'}</strong>
+          {/* Requested items (immutable snapshot) */}
+          <section className="adm-card overflow-hidden">
+            <div className="flex items-center justify-between border-b border-stone-deep px-5 py-3">
+              <h3 className="adm-section-title">Requested — original, read-only</h3>
+              <span className="text-sm text-ink-soft">
+                Estimate: {order.initialIndicativeSubtotal === null ? 'on request' : formatPrice(order.initialIndicativeSubtotal)}
               </span>
             </div>
-
-            <div className="space-y-2">
-              {order.items?.map(it => (
-                <div key={it.id} className="p-3 bg-white rounded-xl border border-ivory-border flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <img
-                      src={it.imageUrl || '/assets/demo/sample_product_1.jpeg'}
-                      alt={it.name}
-                      className="w-12 h-14 object-cover rounded bg-ivory-muted"
-                    />
-                    <div>
-                      <p className="font-semibold text-charcoal">{it.name}</p>
-                      <p className="text-charcoal-muted text-[11px]">
-                        SKU: {it.sku} • Qty: {it.quantity} {it.variant ? `• Option: ${it.variant}` : ''}
-                      </p>
-                      {it.customisationNote && (
-                        <p className="text-burgundy italic text-[11px]">Note: {it.customisationNote}</p>
-                      )}
-                    </div>
+            <ul className="divide-y divide-stone-deep">
+              {(order.items || []).map((it: any) => (
+                <li key={it.id} className="flex items-center gap-4 px-5 py-3">
+                  <Thumb src={it.imageUrl} size="md" />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium">{it.name}</p>
+                    <p className="text-[0.8125rem] text-ink-soft">
+                      {it.productSku || it.sku} · Qty {it.quantity}
+                      {it.variant ? ` · ${it.variant}` : ''}
+                    </p>
+                    {it.customisationNote && <p className="mt-1 text-[0.8125rem]">Customer note: {it.customisationNote}</p>}
                   </div>
-                  <div className="text-right">
-                    <span className="font-serif font-bold text-burgundy">
-                      {it.indicativePrice ? formatPrice(it.indicativePrice * it.quantity) : 'Price on Request'}
-                    </span>
-                  </div>
-                </div>
+                  <span className="whitespace-nowrap text-sm text-ink-soft">{it.indicativePrice ? formatPrice(it.indicativePrice * it.quantity) : 'On request'}</span>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </section>
 
-          {/* Official Quotation History & Creator */}
-          <div className="space-y-3 pt-3 border-t border-ivory-border">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <FileText className="w-4 h-4 text-burgundy" />
-                <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-charcoal">
-                  Studio Quotation Revisions
-                </h4>
-              </div>
-              {!isCreatingQuotation && (
-                <button
-                  onClick={() => setIsCreatingQuotation(true)}
-                  className="px-3 py-1.5 rounded-lg bg-burgundy text-white text-xs font-medium hover:bg-burgundy-hover flex items-center space-x-1"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Issue Quotation Revision</span>
+          {/* Quotations (customer-visible) */}
+          <section className="adm-card">
+            <div className="flex items-center justify-between border-b border-stone-deep px-5 py-3">
+              <h3 className="adm-section-title">Quotations — visible to the customer</h3>
+              {!quoting && (
+                <button type="button" className="adm-btn-secondary h-9" onClick={() => setQuoting(true)}>
+                  <Plus className="h-4 w-4" aria-hidden /> New revision
                 </button>
               )}
             </div>
 
-            {/* Quotation Editor Form */}
-            {isCreatingQuotation && (
-              <form onSubmit={handleIssueQuotation} className="bg-ivory/70 p-4 rounded-2xl border border-burgundy/20 space-y-4">
-                <h5 className="font-semibold text-charcoal">Create Official Quotation Revision</h5>
-
+            {quoting && (
+              <form
+                className="space-y-4 border-b border-stone-deep bg-[#FAF8F5] px-5 py-4"
+                onSubmit={e => {
+                  e.preventDefault();
+                  patch(
+                    {
+                      status: 'quoted',
+                      quotation: {
+                        items: lines.map(l => ({ ...l, agreedUnitPrice: Number(l.agreedUnitPrice) || 0 })),
+                        shippingCharge: Number(shipping) || 0,
+                        taxAmount: Number(tax) || 0,
+                        quotationNotes: quoteNotes.trim() || null
+                      }
+                    },
+                    () => {
+                      setQuoting(false);
+                      setQuoteNotes('');
+                    }
+                  );
+                }}
+              >
+                <p className="text-sm text-ink-soft">Publishing adds a new revision. Earlier revisions and the original request stay unchanged.</p>
                 <div className="space-y-2">
-                  {quotationItems.map((qIt, qIdx) => (
-                    <div key={qIdx} className="grid grid-cols-12 gap-2 items-center bg-white p-2.5 rounded-lg border border-ivory-border">
-                      <div className="col-span-6 font-medium text-charcoal truncate">{qIt.productName}</div>
-                      <div className="col-span-2 text-center text-charcoal-muted">x{qIt.quantity}</div>
-                      <div className="col-span-4 flex items-center space-x-1">
-                        <span className="text-charcoal-light">₹</span>
+                  {lines.map((l, i) => (
+                    <div key={`${l.productId}-${i}`} className="grid grid-cols-[1fr_auto_9rem] items-center gap-3">
+                      <span className="truncate text-sm font-medium">{l.productName}</span>
+                      <span className="text-sm text-ink-soft">× {l.quantity}</span>
+                      <label className="relative">
+                        <span className="sr-only">Agreed unit price for {l.productName}</span>
+                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink-faint">₹</span>
                         <input
                           type="number"
+                          min={0}
                           required
-                          value={qIt.agreedUnitPrice}
-                          onChange={e => {
-                            const val = Number(e.target.value) || 0;
-                            const updated = [...quotationItems];
-                            updated[qIdx].agreedUnitPrice = val;
-                            setQuotationItems(updated);
-                          }}
-                          className="w-full text-xs p-1.5 border border-ivory-border rounded focus:border-burgundy focus:outline-none"
+                          className="adm-input pl-7 text-right"
+                          value={l.agreedUnitPrice}
+                          onChange={e => setLines(prev => prev.map((x, j) => (j === i ? { ...x, agreedUnitPrice: e.target.value as any } : x)))}
                         />
-                      </div>
+                      </label>
                     </div>
                   ))}
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-medium text-charcoal block mb-1">Shipping &amp; Insurance Charge (₹)</label>
-                    <input
-                      type="number"
-                      value={shippingCharge}
-                      onChange={e => setShippingCharge(Number(e.target.value) || 0)}
-                      className="w-full text-xs p-2 border border-ivory-border rounded-lg bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-charcoal block mb-1">Tax Amount (₹)</label>
-                    <input
-                      type="number"
-                      value={taxAmount}
-                      onChange={e => setTaxAmount(Number(e.target.value) || 0)}
-                      className="w-full text-xs p-2 border border-ivory-border rounded-lg bg-white"
-                    />
-                  </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label>
+                    <span className="adm-label">Shipping (₹)</span>
+                    <input type="number" min={0} className="adm-input" value={shipping} onChange={e => setShipping(e.target.value)} />
+                  </label>
+                  <label>
+                    <span className="adm-label">Taxes (₹)</span>
+                    <input type="number" min={0} className="adm-input" value={tax} onChange={e => setTax(e.target.value)} />
+                  </label>
                 </div>
-
-                <div>
-                  <label className="text-xs font-medium text-charcoal block mb-1">Quotation Notes for Customer</label>
-                  <input
-                    type="text"
-                    value={quotationNotes}
-                    onChange={e => setQuotationNotes(e.target.value)}
-                    placeholder="E.g. Express courier included; delivery promised by Oct 24th."
-                    className="w-full text-xs p-2 border border-ivory-border rounded-lg bg-white"
-                  />
-                </div>
-
-                <div className="flex items-center justify-end space-x-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsCreatingQuotation(false)}
-                    className="px-4 py-2 rounded-lg border border-ivory-border text-charcoal hover:bg-white"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isUpdating}
-                    className="px-5 py-2 rounded-lg bg-burgundy text-white font-medium hover:bg-burgundy-hover"
-                  >
-                    Publish Revision to Client Account
-                  </button>
+                <label className="block">
+                  <span className="adm-label">Note to the customer (optional)</span>
+                  <input className="adm-input" value={quoteNotes} onChange={e => setQuoteNotes(e.target.value)} placeholder="Shown in the customer's account with this revision" />
+                </label>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-sm">
+                    Total <span className="font-semibold tabular-nums">{formatPrice(quoteTotal)}</span>
+                  </p>
+                  <div className="flex gap-2">
+                    <button type="button" className="adm-btn-quiet" onClick={() => setQuoting(false)}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="adm-btn-primary" disabled={busy}>
+                      Publish revision
+                    </button>
+                  </div>
                 </div>
               </form>
             )}
 
-            {/* List of Previous Quotations */}
-            {order.quotations && order.quotations.length > 0 ? (
-              <div className="space-y-3">
-                {order.quotations.map(q => (
-                  <div key={q.id} className="p-4 rounded-xl bg-white border border-ivory-border space-y-2">
-                    <div className="flex items-center justify-between pb-2 border-b border-ivory-border/60">
-                      <span className="font-semibold text-charcoal">Revision #{q.revisionNumber}</span>
-                      <span className="text-charcoal-light">Issued on {formatDate(q.createdAt)}</span>
+            {order.quotations?.length ? (
+              <ul className="divide-y divide-stone-deep">
+                {order.quotations.map((q: any) => (
+                  <li key={q.id} className="px-5 py-4">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium">Revision {q.revisionNumber}</span>
+                      <span className="text-ink-soft">{formatDate(q.createdAt)}</span>
                     </div>
-                    <div className="space-y-1">
-                      {q.items.map((it, idx) => (
-                        <div key={idx} className="flex justify-between text-charcoal-muted">
-                          <span>{it.productName} (x{it.quantity})</span>
-                          <span>{formatPrice(it.agreedUnitPrice * it.quantity)}</span>
-                        </div>
+                    <ul className="mt-2 space-y-1 text-sm text-ink-soft">
+                      {q.items.map((it: QuoteLine, i: number) => (
+                        <li key={i} className="flex justify-between gap-4">
+                          <span>
+                            {it.productName} × {it.quantity}
+                          </span>
+                          <span className="tabular-nums">{formatPrice(it.agreedUnitPrice * it.quantity)}</span>
+                        </li>
                       ))}
-                    </div>
-                    <div className="pt-2 border-t border-ivory-border flex justify-between font-bold text-burgundy text-sm">
-                      <span>Total (incl. ₹{q.shippingCharge} shipping):</span>
-                      <span>{formatPrice(q.totalQuotedAmount)}</span>
-                    </div>
-                    {q.notes && (
-                      <p className="text-[11px] text-charcoal-muted italic pt-1">
-                        Note: {q.notes}
-                      </p>
-                    )}
-                  </div>
+                      <li className="flex justify-between gap-4">
+                        <span>Shipping{q.taxAmount ? ' & taxes' : ''}</span>
+                        <span className="tabular-nums">{formatPrice((q.shippingCharge || 0) + (q.taxAmount || 0))}</span>
+                      </li>
+                    </ul>
+                    <p className="mt-2 flex justify-between border-t border-stone-deep pt-2 text-sm font-semibold">
+                      <span>Total</span>
+                      <span className="tabular-nums">{formatPrice(q.totalQuotedAmount)}</span>
+                    </p>
+                    {q.notes && <p className="mt-2 text-sm text-ink-soft">Note: {q.notes}</p>}
+                  </li>
                 ))}
-              </div>
+              </ul>
             ) : (
-              <p className="text-charcoal-muted italic">No official quotation published yet.</p>
+              !quoting && <p className="px-5 py-4 text-sm text-ink-soft">No quotation published yet.</p>
             )}
-          </div>
+          </section>
 
-          {/* CONFIDENTIAL INTERNAL STAFF NOTES */}
-          <div className="space-y-3 pt-3 border-t border-ivory-border">
-            <div className="flex items-center space-x-2 text-amber-800">
-              <ShieldAlert className="w-4 h-4 text-amber-600" />
-              <h4 className="font-serif text-xs font-bold uppercase tracking-wider">
-                Confidential Staff Internal Notes (Never Visible to Customers)
-              </h4>
+          {/* Staff-only internal notes */}
+          <section className="rounded-md border border-amber-300 bg-amber-50/70" aria-labelledby="staff-notes">
+            <div className="flex items-center gap-2 border-b border-amber-200 px-5 py-3 text-amber-900">
+              <Lock className="h-4 w-4" aria-hidden />
+              <h3 id="staff-notes" className="text-[0.75rem] font-semibold uppercase tracking-[0.12em]">
+                Staff only — never shown to the customer
+              </h3>
             </div>
-
-            {/* Add note input */}
-            <form onSubmit={handleAddInternalNote} className="flex space-x-2">
-              <input
-                type="text"
-                value={internalNoteText}
-                onChange={e => setInternalNoteText(e.target.value)}
-                placeholder="Log internal note (e.g. Called customer, agreed to 5% discount, warehouse checking stock)..."
-                className="flex-1 text-xs p-2.5 rounded-lg border border-ivory-border bg-ivory-light focus:outline-none focus:border-burgundy"
-              />
-              <button
-                type="submit"
-                disabled={isUpdating || !internalNoteText.trim()}
-                className="px-4 py-2.5 rounded-lg bg-charcoal hover:bg-black text-white text-xs font-medium flex items-center space-x-1"
+            <div className="space-y-3 px-5 py-4">
+              {order.internalNotes?.length ? (
+                <ul className="space-y-2">
+                  {order.internalNotes.map((n: any) => (
+                    <li key={n.id} className="rounded border border-amber-200 bg-white px-3 py-2 text-sm">
+                      <p className="flex justify-between gap-4 text-[0.8125rem] text-ink-soft">
+                        <span className="font-medium text-ink">{n.adminName}</span>
+                        <span>{formatDate(n.createdAt)}</span>
+                      </p>
+                      <p className="mt-1">{n.note}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-amber-900/80">No internal notes yet.</p>
+              )}
+              <form
+                className="flex gap-2"
+                onSubmit={e => {
+                  e.preventDefault();
+                  if (note.trim()) patch({ internalNote: note.trim() }, () => setNote(''));
+                }}
               >
-                <Send className="w-3 h-3" />
-                <span>Log Note</span>
-              </button>
-            </form>
+                <label htmlFor="internal-note" className="sr-only">
+                  Add an internal note
+                </label>
+                <input id="internal-note" className="adm-input" value={note} onChange={e => setNote(e.target.value)} placeholder="e.g. Called customer, will confirm size tomorrow" />
+                <button type="submit" className="adm-btn-secondary" disabled={busy || !note.trim()}>
+                  Add note
+                </button>
+              </form>
+            </div>
+          </section>
 
-            {/* Internal Notes History Thread */}
-            {order.internalNotes && order.internalNotes.length > 0 ? (
-              <div className="space-y-2 bg-amber-50/50 p-4 rounded-xl border border-amber-200/50">
-                {order.internalNotes.map(n => (
-                  <div key={n.id} className="p-2.5 rounded-lg bg-white border border-ivory-border space-y-1">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-semibold text-charcoal">{n.adminName}</span>
-                      <span className="text-charcoal-light font-mono">{formatDate(n.createdAt)}</span>
-                    </div>
-                    <p className="text-charcoal leading-relaxed">{n.note}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-charcoal-light text-[11px] italic">No internal staff notes recorded yet.</p>
-            )}
-          </div>
-
+          <p className="flex items-center gap-2 text-sm text-ink-soft">
+            Current status: <StatusBadge status={order.status} />
+          </p>
         </div>
-
-        {/* Modal Bottom Footer */}
-        <div className="p-4 border-t border-ivory-border bg-ivory/40 flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 rounded-lg bg-charcoal hover:bg-black text-white text-xs font-medium"
-          >
-            Close Order
-          </button>
-        </div>
-
-      </div>
-    </div>
+      )}
+    </Drawer>
   );
 };

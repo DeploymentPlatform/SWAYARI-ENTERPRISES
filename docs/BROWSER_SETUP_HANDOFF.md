@@ -35,11 +35,22 @@ This applies migrations in sequence:
 ### 1. Cloudflare Pages Project Configuration
 - **Project Name:** `swayari-store` (or existing `swayari-enterprises`)
 - **Production Branch:** `main`
-- **Root Directory:** `/` (Workspace Root)
-- **Framework Preset:** `None` / `Vite`
-- **Build Command:** `npm run build:storefront`
-- **Build Output Directory:** `apps/storefront/dist`
-- **Functions Directory:** `apps/storefront/functions`
+- **Root Directory:** `apps/storefront`  ← required for portal isolation (see note below)
+- **Framework Preset:** `None`
+- **Build Command:** `cd ../.. && npm ci && npm run build:storefront`
+- **Build Output Directory:** `dist` (relative to the root directory, i.e. `apps/storefront/dist`)
+- **Functions:** picked up automatically from `apps/storefront/functions` because it sits in the root directory
+
+> **Portal isolation note (corrected 2026-10-18):** Cloudflare Pages has no separate "functions
+> directory" setting — it always uses `functions/` inside the project's root directory. With the
+> root directory set to `/`, Pages would deploy the legacy single-origin `functions/` folder at the
+> repository root, which contains admin API handlers. Each project must therefore use its own app
+> folder as the root directory.
+>
+> Because the build command installs dependencies from the workspace root (`cd ../.. && npm ci`),
+> also add the plaintext build variable `SKIP_DEPENDENCY_INSTALL = 1` to both projects so Pages does
+> not attempt its own install inside the app folder. Verify the first deployment's build log after
+> configuring this (not yet exercised on Cloudflare — no deployment was made in Milestone 3).
 - **Production URL:** `https://swayari-store.pages.dev` (or configured custom apex domain)
 - **Local Dev Origin:** `http://localhost:8788`
 
@@ -58,8 +69,8 @@ Set in Cloudflare Dashboard under **Settings > Environment variables** (or via W
 
 | Variable Name | Classification | Default / Example Value | Description |
 | :--- | :--- | :--- | :--- |
-| `ENVIRONMENT` | Public (Plaintext) | `production` | Enables strict production security & blocks dev login |
-| `GOOGLE_STOREFRONT_CLIENT_ID` | Public / Plaintext | `<storefront-client-id>.apps.googleusercontent.com` | OAuth Client ID for customer GIS verification |
+| `ENVIRONMENT` | Public (Plaintext) | `production` | Must never be `development` in Cloudflare. Development sign-in only works when this is exactly `development` (local `npm run dev:*` sets it). |
+| `GOOGLE_STOREFRONT_CLIENT_ID` | Public / Plaintext | `<storefront-client-id>.apps.googleusercontent.com` | OAuth Client ID for customer GIS verification. Also served to the browser by `/api/auth/config` to render the Google button. |
 | `GOOGLE_CLIENT_ID` | Fallback | `<storefront-client-id>.apps.googleusercontent.com` | Standard fallback OAuth Client ID |
 | `SESSION_SECRET` | Secret (Encrypted) | `<crypto-random-64-char-hex>` | Cryptographic secret for signing |
 
@@ -81,11 +92,11 @@ In **Settings > Functions > D1 database bindings**:
 ### 1. Cloudflare Pages Project Configuration
 - **Project Name:** `swayari-admin`
 - **Production Branch:** `main`
-- **Root Directory:** `/` (Workspace Root)
-- **Framework Preset:** `None` / `Vite`
-- **Build Command:** `npm run build:admin`
-- **Build Output Directory:** `apps/admin/dist`
-- **Functions Directory:** `apps/admin/functions`
+- **Root Directory:** `apps/admin`
+- **Framework Preset:** `None`
+- **Build Command:** `cd ../.. && npm ci && npm run build:admin`
+- **Build Output Directory:** `dist`
+- **Functions:** picked up automatically from `apps/admin/functions`
 - **Production URL:** `https://swayari-admin.pages.dev`
 - **Local Dev Origin:** `http://localhost:8789`
 
@@ -104,9 +115,9 @@ Set in Cloudflare Dashboard under **Settings > Environment variables** (or via W
 
 | Variable Name | Classification | Default / Example Value | Description |
 | :--- | :--- | :--- | :--- |
-| `ENVIRONMENT` | Public (Plaintext) | `production` | Enables strict production security & blocks dev login |
+| `ENVIRONMENT` | Public (Plaintext) | `production` | Must never be `development` in Cloudflare. Development sign-in only works when this is exactly `development` (local `npm run dev:*` sets it). |
 | `ADMIN_EMAILS` | Secret / Config | `swayarienterprises@gmail.com` | Strict server-side allowlist for staff access |
-| `GOOGLE_ADMIN_CLIENT_ID` | Public / Plaintext | `<admin-client-id>.apps.googleusercontent.com` | OAuth Client ID for staff GIS verification |
+| `GOOGLE_ADMIN_CLIENT_ID` | Public / Plaintext | `<admin-client-id>.apps.googleusercontent.com` | OAuth Client ID for staff GIS verification. Also served to the staff login page by `/api/auth/config`. |
 | `GOOGLE_CLIENT_ID` | Fallback | `<admin-client-id>.apps.googleusercontent.com` | Standard fallback OAuth Client ID |
 | `SESSION_SECRET` | Secret (Encrypted) | `<crypto-random-64-char-hex>` | Cryptographic secret for signing |
 

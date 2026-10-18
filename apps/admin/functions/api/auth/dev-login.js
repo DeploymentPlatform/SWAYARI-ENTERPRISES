@@ -3,9 +3,11 @@ import { jsonResponse, errorResponse, createAdminSessionCookie, generateCryptoId
 export async function onRequestPost(context) {
   const { env } = context;
 
-  // STRICT BLOCK: Dev login must never run in production
-  if (env.ENVIRONMENT === 'production') {
-    return errorResponse('Development login bypass is disabled in production', 403);
+  // STRICT BLOCK: Dev login is deny-by-default. It only runs when the deployment explicitly
+  // declares ENVIRONMENT=development (set by `npm run dev:*`), never when the variable is
+  // missing, misspelled or set to production.
+  if (env.ENVIRONMENT !== 'development') {
+    return errorResponse('Development login bypass is disabled outside local development', 403);
   }
 
   try {

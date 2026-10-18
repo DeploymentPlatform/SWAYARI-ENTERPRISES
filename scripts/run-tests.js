@@ -15,6 +15,7 @@ import * as sfProductSlug from '../apps/storefront/functions/api/products/[slug]
 import * as sfCategoriesList from '../apps/storefront/functions/api/categories/index.js';
 import * as sfOrdersIndex from '../apps/storefront/functions/api/orders/index.js';
 import * as sfOrderDetails from '../apps/storefront/functions/api/orders/[id].js';
+import * as sfAuthConfig from '../apps/storefront/functions/api/auth/config.js';
 
 // Admin backend imports
 import * as admMiddleware from '../apps/admin/functions/_middleware.js';
@@ -28,6 +29,7 @@ import * as admOrderDetails from '../apps/admin/functions/api/admin/orders/[id].
 import * as admProductsList from '../apps/admin/functions/api/admin/products/index.js';
 import * as admProductDetails from '../apps/admin/functions/api/admin/products/[id].js';
 import * as admCategoriesList from '../apps/admin/functions/api/admin/categories/index.js';
+import * as admAuthConfig from '../apps/admin/functions/api/auth/config.js';
 
 let passed = 0;
 let failed = 0;
@@ -377,8 +379,110 @@ await test('16. Admin stats endpoint accurately reports metrics from shared D1 d
   assert.equal(data.stats.totalRevenueQuoted, 9650);
 });
 
+// 11. HARDENING ADDED WITH THE EDITORIAL REDESIGN (Milestone 3)
+await test('17. Dev login is deny-by-default when ENVIRONMENT is missing or not "development"', async () => {
+  for (const value of [undefined, '', 'staging', 'Production']) {
+    const e = { ...env, ENVIRONMENT: value };
+    const sf = await sfDevLogin.onRequestPost(makeContext(makeRequest('http://storefront/api/auth/dev-login', { method: 'POST', body: {} }), e));
+    const adm = await admDevLogin.onRequestPost(makeContext(makeRequest('http://admin/api/auth/dev-login', { method: 'POST', body: {} }), e));
+    assert.equal(sf.status, 403, `Storefront dev login must be refused for ENVIRONMENT=${value}`);
+    assert.equal(adm.status, 403, `Admin dev login must be refused for ENVIRONMENT=${value}`);
+  }
+});
+
+await test('18. Sample items and archived products cannot be requested in production', async () => {
+  const prodEnv = { ...env, ENVIRONMENT: 'production' };
+  const base = {
+    customerName: 'Ananya Sharma', customerPhone: '9876543210', deliveryAddress: 'Flat 402, Royal Palms',
+    deliveryCity: 'Hyderabad', deliveryState: 'Telangana', deliveryPincode: '500034'
+  };
+  const demoReq = makeRequest('http://storefront/api/orders', {
+    method: 'POST', cookie: customerCookie,
+    body: { ...base, idempotencyKey: 'demo-attempt-12345678', items: [{ productId: 'demo-prod-radha-krishna-frame', quantity: 1 }] }
+  });
+  const demoRes = await sfOrdersIndex.onRequestPost(makeContext(demoReq, prodEnv));
+  assert.equal(demoRes.status, 400, 'Preview samples must be rejected outside development');
+
+  const archivedReq = makeRequest('http://storefront/api/orders', {
+    method: 'POST', cookie: customerCookie,
+    body: { ...base, idempotencyKey: 'archived-attempt-1234', items: [{ productId: createdProdId, quantity: 1 }] }
+  });
+  const archivedRes = await sfOrdersIndex.onRequestPost(makeContext(archivedReq, prodEnv));
+  assert.equal(archivedRes.status, 404, 'Archived products must not be requestable');
+});
+
+await test('19. A request reference (idempotency key) cannot be reused by a different customer', async () => {
+  const login = await sfDevLogin.onRequestPost(makeContext(makeRequest('http://storefront/api/auth/dev-login', {
+    method: 'POST', body: { customEmail: 'customer.c@example.com', customName: 'Customer C', customId: 'cust-c-id' }
+  }), env));
+  const cookieC = 'swayari_customer_session=' + login.headers.get('Set-Cookie').match(/swayari_customer_session=([^;]+)/)[1];
+  const res = await sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+    method: 'POST', cookie: cookieC,
+    body: {
+      idempotencyKey: testIdempotencyKey, customerName: 'Customer C', customerPhone: '9123456780',
+      deliveryAddress: 'House 7, MG Road', deliveryCity: 'Pune', deliveryState: 'Maharashtra', deliveryPincode: '411001',
+      items: [{ productId: 'demo-prod-hanuman-frame', quantity: 1 }]
+    }
+  }), env));
+  assert.equal(res.status, 409, 'Another customer must not receive an existing order via its key');
+});
+
+await test('20. Editing a sample product without the isDemo field keeps it hidden from the storefront', async () => {
+  const res = await admProductDetails.onRequestPut(makeContext(makeRequest('http://admin/api/admin/products/demo-prod-hanuman-frame', {
+    method: 'PUT', cookie: adminCookie,
+    body: { sku: 'SWY-DEMO-004', name: 'Hanuman Framed Relief', slug: 'hanuman-framed-relief-sample', description: 'Edited description', status: 'published' }
+  }), env, { id: 'demo-prod-hanuman-frame' }));
+  assert.equal(res.status, 200);
+  const row = await env.DB.prepare('SELECT is_demo FROM products WHERE id = ?').bind('demo-prod-hanuman-frame').first();
+  assert.equal(row.is_demo, 1, 'Sample flag must be preserved');
+  const list = await (await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products'), env))).json();
+  assert.equal(list.products.some(p => p.id === 'demo-prod-hanuman-frame'), false);
+});
+
+await test('21. Sample product pages are only served when the preview dataset is requested', async () => {
+  const slug = 'radha-krishna-embossed-frame-sample';
+  const hidden = await sfProductSlug.onRequestGet(makeContext(makeRequest(`http://storefront/api/products/${slug}`), env, { slug }));
+  assert.equal(hidden.status, 404);
+  const shown = await sfProductSlug.onRequestGet(makeContext(makeRequest(`http://storefront/api/products/${slug}?include_demo=1`), env, { slug }));
+  assert.equal(shown.status, 200);
+  assert.equal((await shown.json()).product.isDemo, true);
+});
+
+await test('22. Each portal exposes only its own OAuth client ID', async () => {
+  const sf = await (await sfAuthConfig.onRequestGet(makeContext(makeRequest('http://storefront/api/auth/config'), env))).json();
+  const adm = await (await admAuthConfig.onRequestGet(makeContext(makeRequest('http://admin/api/auth/config'), env))).json();
+  assert.equal(sf.googleClientId, env.GOOGLE_STOREFRONT_CLIENT_ID);
+  assert.equal(adm.googleClientId, env.GOOGLE_ADMIN_CLIENT_ID);
+  assert.notEqual(sf.googleClientId, adm.googleClientId);
+  const prod = await (await sfAuthConfig.onRequestGet(makeContext(makeRequest('http://storefront/api/auth/config'), { ...env, ENVIRONMENT: 'production' }))).json();
+  assert.equal(prod.devLoginAvailable, false);
+});
+
+await test('23. Customer order history returns the customer-facing shape without internal fields', async () => {
+  const res = await sfOrderDetails.onRequestGet(makeContext(makeRequest('http://storefront/api/orders/my', { cookie: customerCookie }), env, { id: 'my' }));
+  const data = await res.json();
+  assert.equal(res.status, 200);
+  const o = data.orders.find(x => x.id === createdOrderId);
+  assert.ok(o, 'Own order must be listed');
+  assert.ok(o.createdAt && o.deliveryCity && typeof o.itemCount === 'number');
+  assert.equal(JSON.stringify(data).includes('Spoke with Ananya'), false, 'Internal notes must never appear');
+});
+
+await test('24. Storefront deployment contains no admin handlers, routes or admin API calls', async () => {
+  const sfFunctions = path.join(process.cwd(), 'apps', 'storefront', 'functions');
+  const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap(d => (d.isDirectory() ? walk(path.join(dir, d.name)) : [path.join(dir, d.name)]));
+  const files = walk(sfFunctions).map(f => path.relative(sfFunctions, f));
+  assert.equal(files.some(f => f.split(path.sep).includes('admin')), false, 'No admin function files in storefront');
+  const distDir = path.join(process.cwd(), 'apps', 'storefront', 'dist', 'assets');
+  const bundle = fs.readdirSync(distDir).filter(f => f.endsWith('.js')).map(f => fs.readFileSync(path.join(distDir, f), 'utf8')).join('\n');
+  assert.equal(bundle.includes('/api/admin'), false, 'Storefront bundle must not call admin APIs');
+  assert.equal(/Staff portal|Order requests, catalogue and customer follow-up/.test(bundle), false, 'Storefront bundle must not include admin screens');
+  const html = fs.readFileSync(path.join(process.cwd(), 'apps', 'storefront', 'dist', 'index.html'), 'utf8');
+  assert.equal(html.includes('admin'), false);
+});
+
 // 10. PRODUCTION BUILDS VERIFICATION
-await test('17. Production Vite builds exist for both Storefront and Admin', async () => {
+await test('25. Production Vite builds exist for both Storefront and Admin', async () => {
   const sfDist = path.join(process.cwd(), 'apps', 'storefront', 'dist', 'index.html');
   const admDist = path.join(process.cwd(), 'apps', 'admin', 'dist', 'index.html');
   assert.ok(fs.existsSync(sfDist), 'Storefront dist/index.html must exist');

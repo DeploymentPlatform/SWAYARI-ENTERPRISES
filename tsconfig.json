@@ -10,19 +10,18 @@
     "strict": false,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "paths": {
-      "@swayari/shared": ["packages/shared/src/index.ts"],
-      "@swayari/shared/*": ["packages/shared/src/*"],
-      "@swayari/server": ["packages/server/src/index.ts"],
-      "@swayari/server/*": ["packages/server/src/*"],
-      "@swayari/ui": ["packages/ui/src/index.ts"],
-      "@swayari/ui/*": ["packages/ui/src/*"]
+      "@swayari/shared": ["./packages/shared/src/index.ts"],
+      "@swayari/shared/*": ["./packages/shared/src/*"],
+      "@swayari/server": ["./packages/server/src/index.ts"],
+      "@swayari/server/*": ["./packages/server/src/*"],
+      "@swayari/ui": ["./packages/ui/src/index.ts"],
+      "@swayari/ui/*": ["./packages/ui/src/*"]
     }
   },
   "include": ["packages", "apps", "scripts"]

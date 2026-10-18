@@ -1,402 +1,318 @@
-import React, { useState, useEffect } from 'react';
-import { X, Check, Image as ImageIcon, Sparkles, Loader2, AlertCircle } from 'lucide-react';
-import { Product, Category } from '@swayari/shared';
+import React, { useEffect, useState } from 'react';
+import { Check, X } from 'lucide-react';
+import { Category, Product } from '@swayari/shared';
+import { Drawer, ErrorBanner } from './ui';
 
 interface ProductEditorModalProps {
   productId?: string | null;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (name: string) => void;
 }
 
-export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productId, onClose, onSaved }) => {
-  const isEditing = Boolean(productId);
-  const [loading, setLoading] = useState(isEditing);
-  const [saving, setSaving] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [availableAssets, setAvailableAssets] = useState<any[]>([]);
-  const [showAssetPicker, setShowAssetPicker] = useState(false);
+interface Asset {
+  path: string;
+  name: string;
+  category: string;
+}
 
-  // Form Fields
-  const [sku, setSku] = useState('');
-  const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
-  const [description, setDescription] = useState('');
-  const [categoryId, setCategoryId] = useState('');
+const slugify = (v: string) =>
+  v
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+
+const Section: React.FC<{ title: string; hint?: string; children: React.ReactNode }> = ({ title, hint, children }) => (
+  <section className="adm-card p-5">
+    <h3 className="adm-section-title">{title}</h3>
+    {hint && <p className="adm-hint">{hint}</p>}
+    <div className="mt-4 space-y-4">{children}</div>
+  </section>
+);
+
+/** Structured product editor. Only confirmed details belong in material/dimensions/price. */
+export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productId, onClose, onSaved }) => {
+  const editing = Boolean(productId);
+  const [state, setState] = useState<'loading' | 'ready' | 'error'>(editing ? 'loading' : 'ready');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [slugTouched, setSlugTouched] = useState(editing);
+
+  const [f, setF] = useState({
+    sku: '',
+    name: '',
+    slug: '',
+    description: '',
+    categoryId: '',
+    material: '',
+    dimensions: '',
+    indicativePrice: '',
+    minQuantity: '1',
+    customisationInfo: '',
+    availabilityLabel: 'Available on request',
+    status: 'draft' as Product['status'],
+    isDemo: false
+  });
   const [images, setImages] = useState<string[]>([]);
-  const [material, setMaterial] = useState('');
-  const [dimensions, setDimensions] = useState('');
-  const [indicativePrice, setIndicativePrice] = useState<string>('');
-  const [minQuantity, setMinQuantity] = useState<number>(1);
-  const [availabilityLabel, setAvailabilityLabel] = useState('Available on Request');
-  const [customisationInfo, setCustomisationInfo] = useState('');
-  const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('published');
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setF(prev => ({ ...prev, [k]: e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value }));
 
   useEffect(() => {
-    fetchInitialData();
+    (async () => {
+      try {
+        const [c, a] = await Promise.all([fetch('/api/admin/categories'), fetch('/api/admin/assets')]);
+        if (c.ok) setCategories((await c.json()).categories || []);
+        if (a.ok) setAssets((await a.json()).assets || []);
+        if (productId) {
+          const res = await fetch(`/api/admin/products/${encodeURIComponent(productId)}`);
+          if (!res.ok) throw new Error();
+          const p: Product = (await res.json()).product;
+          setF({
+            sku: p.sku,
+            name: p.name,
+            slug: p.slug,
+            description: p.description,
+            categoryId: p.categoryId || '',
+            material: p.material || '',
+            dimensions: p.dimensions || '',
+            indicativePrice: p.indicativePrice === null || p.indicativePrice === undefined ? '' : String(p.indicativePrice),
+            minQuantity: String(p.minQuantity || 1),
+            customisationInfo: p.customisationInfo || '',
+            availabilityLabel: p.availabilityLabel || 'Available on request',
+            status: p.status,
+            isDemo: Boolean(p.isDemo)
+          });
+          setImages(p.images || []);
+        }
+        setState('ready');
+      } catch {
+        setState('error');
+      }
+    })();
   }, [productId]);
 
-  async function fetchInitialData() {
-    try {
-      const [catRes, assetRes] = await Promise.all([
-        fetch('/api/admin/categories'),
-        fetch('/api/admin/assets')
-      ]);
-
-      if (catRes.ok) {
-        const catData = await catRes.json();
-        setCategories(catData.categories || []);
-      }
-      if (assetRes.ok) {
-        const assetData = await assetRes.json();
-        setAvailableAssets(assetData.assets || []);
-      }
-
-      if (productId) {
-        const prodRes = await fetch(`/api/admin/products/${encodeURIComponent(productId)}`);
-        if (prodRes.ok) {
-          const prodData = await prodRes.json();
-          const p: Product = prodData.product;
-          setSku(p.sku);
-          setName(p.name);
-          setSlug(p.slug);
-          setDescription(p.description);
-          setCategoryId(p.categoryId || '');
-          setImages(p.images || []);
-          setMaterial(p.material || '');
-          setDimensions(p.dimensions || '');
-          setIndicativePrice(p.indicativePrice !== null && p.indicativePrice !== undefined ? String(p.indicativePrice) : '');
-          setMinQuantity(p.minQuantity || 1);
-          setAvailabilityLabel(p.availabilityLabel || 'Available on Request');
-          setCustomisationInfo(p.customisationInfo || '');
-          setStatus(p.status || 'published');
-        }
-      }
-    } catch (err) {
-      console.error('Failed to load product editor data:', err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleSave(e: React.FormEvent) {
+  async function save(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+    if (!f.sku.trim() || !f.name.trim() || !f.description.trim()) {
+      setError('SKU, name and description are required.');
+      return;
+    }
     setSaving(true);
-    setErrorMsg(null);
-
-    const payload = {
-      sku,
-      name,
-      slug: slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-      description,
-      categoryId: categoryId || null,
-      images,
-      material: material || null,
-      dimensions: dimensions || null,
-      indicativePrice: indicativePrice ? Number(indicativePrice) : null,
-      minQuantity: Number(minQuantity) || 1,
-      availabilityLabel,
-      customisationInfo: customisationInfo || null,
-      status
-    };
-
     try {
-      const url = isEditing
-        ? `/api/admin/products/${encodeURIComponent(productId!)}`
-        : '/api/admin/products';
-      const method = isEditing ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
+      const res = await fetch(editing ? `/api/admin/products/${encodeURIComponent(productId!)}` : '/api/admin/products', {
+        method: editing ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          sku: f.sku.trim(),
+          name: f.name.trim(),
+          slug: (f.slug || slugify(f.name)).trim(),
+          description: f.description.trim(),
+          categoryId: f.categoryId || null,
+          images,
+          material: f.material.trim() || null,
+          dimensions: f.dimensions.trim() || null,
+          indicativePrice: f.indicativePrice === '' ? null : Number(f.indicativePrice),
+          minQuantity: Number(f.minQuantity) || 1,
+          availabilityLabel: f.availabilityLabel.trim() || 'Available on request',
+          customisationInfo: f.customisationInfo.trim() || null,
+          status: f.status,
+          isDemo: f.isDemo
+        })
       });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to save product');
-      }
-
-      onSaved();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) throw new Error(data.error || 'The product was not saved.');
+      onSaved(f.name.trim());
       onClose();
     } catch (err: any) {
-      setErrorMsg(err.message);
+      setError(err.message);
     } finally {
       setSaving(false);
     }
   }
 
-  function toggleAssetSelection(path: string) {
-    if (images.includes(path)) {
-      setImages(images.filter(p => p !== path));
-    } else {
-      setImages([...images, path]);
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full text-center text-xs text-charcoal-muted">
-          Loading product editor...
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-      <div className="bg-white rounded-3xl border border-ivory-border shadow-2xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden">
-        
-        {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-ivory-border flex items-center justify-between bg-ivory/40">
-          <div>
-            <h3 className="font-serif text-lg font-bold text-charcoal">
-              {isEditing ? `Edit Product: ${sku}` : 'Publish New Catalogue Piece'}
-            </h3>
-            <p className="text-xs text-charcoal-muted mt-0.5">
-              Configured information appears on the customer storefront.
-            </p>
-          </div>
-          <button onClick={onClose} className="p-1.5 text-charcoal-muted hover:text-burgundy rounded-full hover:bg-ivory">
-            <X className="w-5 h-5" />
+    <Drawer
+      onClose={onClose}
+      width="max-w-[760px]"
+      title={editing ? `Edit ${f.name || 'product'}` : 'New product'}
+      subtitle={editing ? f.sku : 'Saved products appear on the customer website once published (unless marked as a sample).'}
+      footer={
+        <div className="flex items-center justify-end gap-2">
+          <button type="button" className="adm-btn-quiet" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="submit" form="product-form" className="adm-btn-primary" disabled={saving || state !== 'ready'}>
+            {saving ? 'Saving…' : editing ? 'Save changes' : 'Create product'}
           </button>
         </div>
+      }
+    >
+      {state === 'loading' && <p className="py-12 text-center text-sm text-ink-soft">Loading product…</p>}
+      {state === 'error' && <ErrorBanner message="Could not load this product." />}
+      {state === 'ready' && (
+        <form id="product-form" onSubmit={save} className="space-y-5" noValidate>
+          {error && <ErrorBanner message={error} />}
 
-        {/* Scrollable Form */}
-        <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5 text-xs">
-          {errorMsg && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          {/* Basic Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="font-semibold text-charcoal block mb-1">SKU / ID *</label>
-              <input
-                type="text"
-                required
-                value={sku}
-                onChange={e => setSku(e.target.value.toUpperCase())}
-                placeholder="E.g. SWY-BR-001"
-                className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light font-mono font-bold"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="font-semibold text-charcoal block mb-1">Product Title *</label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="E.g. Mayur Brass Diya Uruli"
-                className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="font-semibold text-charcoal block mb-1">Category</label>
-              <select
-                value={categoryId}
-                onChange={e => setCategoryId(e.target.value)}
-                className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light"
-              >
-                <option value="">No Category Assigned</option>
-                {categories.map(c => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="font-semibold text-charcoal block mb-1">Status</label>
-              <select
-                value={status}
-                onChange={e => setStatus(e.target.value as any)}
-                className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light font-medium"
-              >
-                <option value="published">Published (Visible on Store)</option>
-                <option value="draft">Draft (Hidden)</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="font-semibold text-charcoal block mb-1">Description *</label>
-            <textarea
-              required
-              rows={3}
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder="Handcrafted iconographic description, alloy details, and traditional significance..."
-              className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light"
-            />
-          </div>
-
-          {/* Material & Dimensions */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="font-semibold text-charcoal block mb-1">Confirmed Material</label>
-              <input
-                type="text"
-                value={material}
-                onChange={e => setMaterial(e.target.value)}
-                placeholder="E.g. Solid Bell Metal Alloy / Cast Brass"
-                className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light"
-              />
-            </div>
-
-            <div>
-              <label className="font-semibold text-charcoal block mb-1">Confirmed Dimensions &amp; Weight</label>
-              <input
-                type="text"
-                value={dimensions}
-                onChange={e => setDimensions(e.target.value)}
-                placeholder="E.g. Height: 12 in, Base: 8 in, Weight: 3.5 kg"
-                className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light"
-              />
-            </div>
-          </div>
-
-          {/* Pricing & Order Quantity */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="font-semibold text-charcoal block mb-1">
-                Indicative Price (₹)
-                <span className="font-normal text-charcoal-muted block text-[10px]">Leave blank for Price on Request</span>
+          <Section title="Basics">
+            <div className="grid gap-4 sm:grid-cols-[10rem_1fr]">
+              <label>
+                <span className="adm-label">SKU</span>
+                <input className="adm-input font-mono uppercase" value={f.sku} onChange={set('sku')} placeholder="SWY-001" required />
               </label>
-              <input
-                type="number"
-                value={indicativePrice}
-                onChange={e => setIndicativePrice(e.target.value)}
-                placeholder="Price on Request"
-                className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light"
-              />
+              <label>
+                <span className="adm-label">Name</span>
+                <input
+                  className="adm-input"
+                  value={f.name}
+                  required
+                  onChange={e => {
+                    const name = e.target.value;
+                    setF(prev => ({ ...prev, name, slug: slugTouched ? prev.slug : slugify(name) }));
+                  }}
+                />
+              </label>
             </div>
-
-            <div>
-              <label className="font-semibold text-charcoal block mb-1">Minimum Order Qty</label>
-              <input
-                type="number"
-                min={1}
-                value={minQuantity}
-                onChange={e => setMinQuantity(Number(e.target.value) || 1)}
-                className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light"
-              />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label>
+                <span className="adm-label">Web address</span>
+                <div className="flex items-center rounded-md border border-stone-shade bg-white focus-within:border-burgundy focus-within:ring-1 focus-within:ring-burgundy">
+                  <span className="pl-3 text-sm text-ink-faint">/product/</span>
+                  <input
+                    className="w-full bg-transparent px-1 py-2 text-[0.9375rem] focus:outline-none"
+                    value={f.slug}
+                    onChange={e => {
+                      setSlugTouched(true);
+                      setF(prev => ({ ...prev, slug: slugify(e.target.value) }));
+                    }}
+                  />
+                </div>
+              </label>
+              <label>
+                <span className="adm-label">Category</span>
+                <select className="adm-input" value={f.categoryId} onChange={set('categoryId')}>
+                  <option value="">No category</option>
+                  {categories.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
+            <label className="block">
+              <span className="adm-label">Description</span>
+              <textarea className="adm-input" rows={4} value={f.description} onChange={set('description')} required placeholder="Describe what the photographs show and anything the team has confirmed." />
+            </label>
+          </Section>
 
-            <div>
-              <label className="font-semibold text-charcoal block mb-1">Availability Label</label>
-              <input
-                type="text"
-                value={availabilityLabel}
-                onChange={e => setAvailabilityLabel(e.target.value)}
-                placeholder="Available on Request"
-                className="w-full p-2.5 rounded-lg border border-ivory-border bg-ivory-light"
-              />
+          <Section title="Confirmed details" hint="Leave blank anything not yet confirmed — blank fields are simply not shown to customers.">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label>
+                <span className="adm-label">Material</span>
+                <input className="adm-input" value={f.material} onChange={set('material')} />
+              </label>
+              <label>
+                <span className="adm-label">Dimensions / weight</span>
+                <input className="adm-input" value={f.dimensions} onChange={set('dimensions')} placeholder="e.g. 30 × 25 cm" />
+              </label>
             </div>
-          </div>
+            <label className="block">
+              <span className="adm-label">Personalisation or packing information</span>
+              <input className="adm-input" value={f.customisationInfo} onChange={set('customisationInfo')} />
+            </label>
+          </Section>
 
-          {/* Visual Asset Selector Section */}
-          <div className="space-y-3 pt-3 border-t border-ivory-border">
-            <div className="flex items-center justify-between">
-              <div>
-                <label className="font-semibold text-charcoal block">Product Photographs (From Deployed Assets)</label>
-                <p className="text-[11px] text-charcoal-muted font-light">
-                  Select high-resolution photos tracked in Git. Selected: {images.length} images.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowAssetPicker(!showAssetPicker)}
-                className="px-3 py-1.5 rounded-lg border border-ivory-border bg-white text-charcoal hover:bg-ivory flex items-center space-x-1"
-              >
-                <ImageIcon className="w-3.5 h-3.5 text-burgundy" />
-                <span>{showAssetPicker ? 'Hide Gallery' : 'Select from Assets'}</span>
-              </button>
+          <Section title="Price and quantity">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <label>
+                <span className="adm-label">Indicative price (₹)</span>
+                <input type="number" min={0} className="adm-input" value={f.indicativePrice} onChange={set('indicativePrice')} placeholder="Blank = on request" />
+              </label>
+              <label>
+                <span className="adm-label">Minimum quantity</span>
+                <input type="number" min={1} className="adm-input" value={f.minQuantity} onChange={set('minQuantity')} />
+              </label>
+              <label>
+                <span className="adm-label">Availability label</span>
+                <input className="adm-input" value={f.availabilityLabel} onChange={set('availabilityLabel')} />
+              </label>
             </div>
+          </Section>
 
-            {/* Selected images preview row */}
+          <Section title="Photographs" hint="Real product photographs only. The first photograph is the main image.">
             {images.length > 0 && (
-              <div className="flex items-center space-x-2 overflow-x-auto p-2 bg-ivory-light rounded-xl border border-ivory-border">
-                {images.map((img, i) => (
-                  <div key={i} className="relative group w-16 h-20 rounded-lg overflow-hidden border border-burgundy flex-shrink-0">
-                    <img src={img} alt="Selected" className="w-full h-full object-cover" />
+              <ol className="flex flex-wrap gap-3">
+                {images.map((src, i) => (
+                  <li key={src} className="relative">
+                    <img src={src} alt="" className="h-28 w-[90px] rounded border border-stone-deep object-cover" />
+                    {i === 0 && <span className="absolute left-1 top-1 rounded bg-white/90 px-1.5 text-[0.6875rem] font-medium">Main</span>}
                     <button
                       type="button"
-                      onClick={() => setImages(images.filter((_, idx) => idx !== i))}
-                      className="absolute inset-0 bg-red-900/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => setImages(prev => prev.filter(p => p !== src))}
+                      className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-white"
+                      aria-label="Remove photograph"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="h-3.5 w-3.5" aria-hidden />
                     </button>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ol>
             )}
-
-            {/* Asset Picker Grid */}
-            {showAssetPicker && (
-              <div className="p-4 bg-ivory/60 rounded-2xl border border-ivory-border space-y-3">
-                <p className="text-[11px] text-charcoal-muted">Click images to toggle them on this product:</p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-56 overflow-y-auto pr-1">
-                  {availableAssets.map((asset, aIdx) => {
-                    const isSelected = images.includes(asset.path);
+            <div>
+              <p className="adm-label">Photo library</p>
+              {assets.length === 0 ? (
+                <p className="text-sm text-ink-soft">No product photographs are deployed yet.</p>
+              ) : (
+                <div className="grid max-h-64 grid-cols-3 gap-2 overflow-y-auto pr-1 sm:grid-cols-5">
+                  {assets.map(a => {
+                    const on = images.includes(a.path);
                     return (
-                      <div
-                        key={aIdx}
-                        onClick={() => toggleAssetSelection(asset.path)}
-                        className={`relative rounded-xl overflow-hidden cursor-pointer border-2 transition-all p-1 bg-white ${
-                          isSelected ? 'border-burgundy ring-2 ring-burgundy/20' : 'border-ivory-border hover:border-gold'
-                        }`}
+                      <button
+                        key={a.path}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => setImages(prev => (on ? prev.filter(p => p !== a.path) : [...prev, a.path]))}
+                        className={`relative overflow-hidden rounded border-2 text-left ${on ? 'border-burgundy' : 'border-transparent hover:border-stone-shade'}`}
+                        title={a.name}
                       >
-                        <div className="aspect-[4/5] bg-ivory-muted rounded-lg overflow-hidden">
-                          <img src={asset.path} alt={asset.name} className="w-full h-full object-cover" />
-                        </div>
-                        <p className="text-[10px] text-charcoal truncate mt-1 px-1">{asset.name}</p>
-                        {isSelected && (
-                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-burgundy text-white flex items-center justify-center shadow">
-                            <Check className="w-3 h-3" />
-                          </div>
+                        <img src={a.path} alt="" loading="lazy" className="aspect-[4/5] w-full bg-stone object-cover" />
+                        <span className="block truncate px-1 py-0.5 text-[0.6875rem] text-ink-soft">{a.name}</span>
+                        {on && (
+                          <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-burgundy text-white">
+                            <Check className="h-3 w-3" aria-hidden />
+                          </span>
                         )}
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </Section>
 
-          {/* Footer Submit Buttons */}
-          <div className="pt-4 border-t border-ivory-border flex items-center justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2.5 rounded-lg border border-ivory-border text-charcoal hover:bg-ivory"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-6 py-2.5 rounded-lg bg-burgundy hover:bg-burgundy-hover text-white font-medium shadow-sm flex items-center space-x-1.5"
-            >
-              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-              <span>{isEditing ? 'Save Product Changes' : 'Publish Product'}</span>
-            </button>
-          </div>
+          <Section title="Visibility">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label>
+                <span className="adm-label">Status</span>
+                <select className="adm-input" value={f.status} onChange={set('status')}>
+                  <option value="draft">Draft — hidden</option>
+                  <option value="published">Published</option>
+                  <option value="archived">Archived — hidden, kept for past requests</option>
+                </select>
+              </label>
+              <label className="flex items-start gap-3 rounded-md border border-stone-deep bg-[#FAF8F5] p-3">
+                <input type="checkbox" className="mt-1 h-4 w-4 accent-burgundy" checked={f.isDemo} onChange={set('isDemo')} />
+                <span>
+                  <span className="block text-sm font-medium">Sample / preview item</span>
+                  <span className="block text-[0.8125rem] text-ink-soft">Never shown on the public website and cannot be requested by customers.</span>
+                </span>
+              </label>
+            </div>
+          </Section>
         </form>
-
-      </div>
-    </div>
+      )}
+    </Drawer>
   );
 };

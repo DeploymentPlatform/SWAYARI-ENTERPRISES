@@ -2,34 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
+/* SWAYARI staff portal — neutral operations variant of the shared tokens (docs/DESIGN_DIRECTION.md §9) */
 @layer base {
   body {
-    background-color: #FAF7F2;
-    color: #2B2625;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    @apply bg-[#F6F4F0] font-sans text-ink antialiased;
+    font-size: 0.9375rem;
+    line-height: 1.55;
   }
-
-  h1, h2, h3, h4, .font-serif {
-    font-family: 'Playfair Display', Georgia, serif;
-  }
-
-  .font-display {
-    font-family: 'Cinzel', serif;
+  :focus-visible {
+    outline: 2px solid #6b1f2a;
+    outline-offset: 2px;
   }
 }
 
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #FAF7F2;
-}
-::-webkit-scrollbar-thumb {
-  background: #D8CEBE;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #C49A45;
+@layer components {
+  .adm-card {
+    @apply rounded-md border border-stone-deep bg-white;
+  }
+  .adm-page-title {
+    @apply font-display text-[2rem] font-semibold leading-tight text-ink;
+  }
+  .adm-section-title {
+    @apply text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-ink-soft;
+  }
+  .adm-btn {
+    @apply inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .adm-btn-primary {
+    @apply adm-btn bg-burgundy text-white hover:bg-burgundy-hover;
+  }
+  .adm-btn-secondary {
+    @apply adm-btn border border-stone-shade bg-white text-ink hover:bg-stone;
+  }
+  .adm-btn-quiet {
+    @apply adm-btn text-ink-soft hover:bg-stone hover:text-ink;
+  }
+  .adm-label {
+    @apply mb-1.5 block text-sm font-medium text-ink;
+  }
+  .adm-hint {
+    @apply mt-1 text-[0.8125rem] text-ink-soft;
+  }
+  .adm-input {
+    @apply block w-full rounded-md border border-stone-shade bg-white px-3 py-2 text-[0.9375rem] text-ink placeholder:text-ink-faint focus:border-burgundy focus:outline-none focus:ring-1 focus:ring-burgundy;
+  }
+  .adm-table {
+    @apply w-full text-left text-sm;
+  }
+  .adm-table thead th {
+    @apply whitespace-nowrap border-b border-stone-deep bg-[#FAF8F5] px-4 py-2.5 text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-ink-soft;
+  }
+  .adm-table tbody td {
+    @apply border-b border-stone-deep/70 px-4 py-3 align-middle;
+  }
+  .adm-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+  .adm-chip {
+    @apply inline-flex h-8 items-center whitespace-nowrap rounded-md border px-3 text-sm transition-colors;
+  }
+  .adm-chip-on {
+    @apply adm-chip border-burgundy bg-burgundy text-white;
+  }
+  .adm-chip-off {
+    @apply adm-chip border-stone-shade bg-white text-ink hover:border-ink-faint;
+  }
 }

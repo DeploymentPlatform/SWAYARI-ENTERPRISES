@@ -1,6 +1,6 @@
 {
   "name": "swayari-enterprises",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "SWAYARI ENTERPRISES - Two-Portal Architecture: Customer Storefront & Admin Portal",
   "private": true,
   "type": "module",
@@ -9,15 +9,17 @@
     "apps/*"
   ],
   "scripts": {
-    "build:storefront": "vite build --config apps/storefront/vite.config.ts apps/storefront",
-    "build:admin": "vite build --config apps/admin/vite.config.ts apps/admin",
+    "assets:sync": "node scripts/sync-assets.js all",
+    "build:storefront": "node scripts/sync-assets.js storefront && vite build --config apps/storefront/vite.config.ts apps/storefront",
+    "build:admin": "node scripts/sync-assets.js admin && vite build --config apps/admin/vite.config.ts apps/admin",
     "build": "node scripts/generate-manifest.js && npm run build:storefront && npm run build:admin",
     "test": "node scripts/run-tests.js",
-    "dev:storefront": "wrangler pages dev apps/storefront/dist --d1 DB --port 8788",
-    "dev:admin": "wrangler pages dev apps/admin/dist --d1 DB --port 8789",
-    "d1:migrate:local": "wrangler d1 migrations apply DB --local",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "dev:storefront": "cd apps/storefront && wrangler pages dev dist --port 8788 --d1 DB=00000000-0000-0000-0000-000000000000 --persist-to ../../.wrangler/state --binding ENVIRONMENT=development --compatibility-date 2024-09-23 --compatibility-flags nodejs_compat",
+    "dev:admin": "cd apps/admin && wrangler pages dev dist --port 8789 --d1 DB=00000000-0000-0000-0000-000000000000 --persist-to ../../.wrangler/state --binding ENVIRONMENT=development --compatibility-date 2024-09-23 --compatibility-flags nodejs_compat",
+    "d1:migrate:local": "wrangler d1 migrations apply DB --local --persist-to .wrangler/state",
     "d1:migrate:remote": "wrangler d1 migrations apply DB --remote",
-    "seed:local": "wrangler d1 execute DB --local --file=./migrations/0002_demo_data.sql",
+    "seed:local": "wrangler d1 execute DB --local --persist-to .wrangler/state --file=./migrations/0002_demo_data.sql",
     "backup:daily": "bash scripts/create-daily-backup.sh",
     "export:bundle": "bash scripts/export-git-bundle.sh"
   },

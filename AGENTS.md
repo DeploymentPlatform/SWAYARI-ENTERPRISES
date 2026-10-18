@@ -63,6 +63,6 @@ Whenever you perform meaningful implementation work:
 Before opening a pull request or merging to `main`, you must execute and verify:
 ```bash
 npm run build      # Regenerates public/assets/manifest.json
-npm test           # Executes the 16-point automated test suite
+npm test           # Executes the automated test suite (25 tests as of Milestone 3)
 ```
 Every single test must pass with 0 errors.

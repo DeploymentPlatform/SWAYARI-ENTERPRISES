@@ -14,6 +14,7 @@ export interface Category {
   description: string | null;
   displayOrder: number;
   isActive: boolean;
+  productCount?: number;
   createdAt: string;
 }
 
@@ -79,6 +80,12 @@ export interface OrderItemSnapshot {
   snapshotIndicativePrice: number | null;
   snapshotImageUrl: string | null;
   customisationNote: string | null;
+  // Aliases for template convenience
+  sku?: string;
+  name?: string;
+  variant?: string | null;
+  imageUrl?: string | null;
+  indicativePrice?: number | null;
 }
 
 export interface QuotedItem {
@@ -99,6 +106,7 @@ export interface OrderQuotation {
   taxAmount: number;
   totalQuotedAmount: number;
   quotationNotes: string | null;
+  notes?: string | null;
   createdByAdmin: string;
   createdAt: string;
 }
@@ -126,6 +134,8 @@ export interface Order {
   customerNotes: string | null;
   status: OrderStatus;
   initialIndicativeSubtotal: number | null;
+  indicativeSubtotal?: number | null;
+  itemCount?: number;
   createdAt: string;
   updatedAt: string;
   items?: OrderItemSnapshot[];

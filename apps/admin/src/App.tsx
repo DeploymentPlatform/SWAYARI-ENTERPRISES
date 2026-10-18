@@ -8,6 +8,7 @@ import { ProductsPage } from './pages/ProductsPage';
 import { CategoriesPage } from './pages/CategoriesPage';
 import { AssetsPage } from './pages/AssetsPage';
 import { Loader2 } from 'lucide-react';
+import { Wordmark } from './components/ui';
 
 const AdminContent: React.FC = () => {
   const { user, isLoading } = useAdminAuth();
@@ -16,12 +17,11 @@ const AdminContent: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-ivory flex flex-col items-center justify-center space-y-4 text-xs text-charcoal-muted">
-        <img src="/assets/brand/swayari-logo.svg" alt="SWAYARI" className="h-10 w-auto" />
-        <div className="flex items-center space-x-2">
-          <Loader2 className="w-4 h-4 animate-spin text-burgundy" />
-          <span>Verifying studio administrator session...</span>
-        </div>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 text-sm text-ink-soft" role="status">
+        <Wordmark />
+        <span className="flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin text-burgundy" aria-hidden /> Checking your staff session…
+        </span>
       </div>
     );
   }

@@ -1,5 +1,10 @@
+# Shared D1 configuration used for migrations (`npm run d1:migrate:*`).
+#
+# This file intentionally has NO `pages_build_output_dir`. The two portals are deployed as two
+# separate Cloudflare Pages projects whose Root directory is `apps/storefront` and `apps/admin`
+# respectively (see docs/BROWSER_SETUP_HANDOFF.md). A root-level Pages config here would make
+# Cloudflare deploy the repository root instead, which is not a valid portal.
 name = "swayari-enterprises"
-pages_build_output_dir = "public"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
@@ -12,6 +17,5 @@ migrations_dir = "migrations"
 [vars]
 ENVIRONMENT = "production"
 ADMIN_EMAILS = "swayarienterprises@gmail.com"
-# GOOGLE_CLIENT_ID and SESSION_SECRET should be set via Cloudflare Pages secrets:
-# wrangler pages secret put GOOGLE_CLIENT_ID
-# wrangler pages secret put SESSION_SECRET
+# GOOGLE_STOREFRONT_CLIENT_ID / GOOGLE_ADMIN_CLIENT_ID and SESSION_SECRET are set per Pages
+# project in the Cloudflare dashboard (never committed).

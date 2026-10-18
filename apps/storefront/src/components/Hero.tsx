@@ -1,116 +1,93 @@
 import React from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Link } from '../lib/router';
 
-interface HeroProps {
-  onExplore: () => void;
-  onAbout: () => void;
-}
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-export const Hero: React.FC<HeroProps> = ({ onExplore, onAbout }) => {
+/**
+ * Wide editorial hero. Desktop: the photograph fills the right ~76% and fades into a deep umber
+ * panel sampled from its own shadows, so the headline sits in true negative space and never
+ * crosses the lamps. Mobile: a dedicated 4:5 crop with the copy on a solid panel beneath it.
+ * The photograph is licensed editorial imagery (see docs/ASSET_SOURCES.md), not a product.
+ */
+export const Hero: React.FC = () => {
+  const reduce = useReducedMotion();
+  const enter = (delay: number) =>
+    reduce ? {} : { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay, ease: EASE } };
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-ivory to-ivory-muted/40 py-12 lg:py-20 border-b border-ivory-border/60">
-      {/* Decorative background subtle glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
+    <section aria-labelledby="hero-title" className="relative overflow-hidden bg-umber text-ivory">
+      <div className="relative md:h-[clamp(540px,43vw,640px)]">
+        <picture>
+          <source
+            media="(min-width: 768px)"
+            type="image/webp"
+            srcSet="/assets/editorial/hero-festive-lamps-1600.webp 1600w, /assets/editorial/hero-festive-lamps-2400.webp 2400w"
+            sizes="76vw"
+          />
+          <source
+            media="(min-width: 768px)"
+            srcSet="/assets/editorial/hero-festive-lamps-1600.jpg 1600w, /assets/editorial/hero-festive-lamps-2400.jpg 2400w"
+            sizes="76vw"
+          />
+          <source
+            type="image/webp"
+            srcSet="/assets/editorial/hero-festive-lamps-mobile-600.webp 600w, /assets/editorial/hero-festive-lamps-mobile-900.webp 900w"
+            sizes="100vw"
+          />
+          <img
+            src="/assets/editorial/hero-festive-lamps-mobile-900.jpg"
+            srcSet="/assets/editorial/hero-festive-lamps-mobile-600.jpg 600w, /assets/editorial/hero-festive-lamps-mobile-900.jpg 900w"
+            sizes="100vw"
+            width={900}
+            height={1125}
+            alt="Brass oil lamps glowing beside a tray of marigolds on a dark table"
+            loading="eager"
+            decoding="sync"
+            {...({ fetchpriority: 'high' } as Record<string, string>)}
+            className="block aspect-square max-h-[60vh] w-full object-cover object-[50%_72%] md:absolute md:inset-y-0 md:right-0 md:aspect-auto md:h-full md:max-h-none md:w-[76%] md:object-[50%_55%] md:hero-image-fade"
+          />
+        </picture>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          
-          {/* Left Editorial Narrative */}
-          <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-burgundy-light/60 border border-burgundy/15 text-burgundy text-xs font-medium tracking-wide">
-              <Sparkles className="w-3.5 h-3.5 text-gold" />
-              <span>Sacred Iconography &amp; Bespoke Gifting</span>
-            </div>
+        {/* Mobile: blend the photo into the copy panel */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-umber md:hidden" aria-hidden />
+        {/* Desktop: a soft extra shade behind the text column only */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-[46%] bg-gradient-to-r from-umber via-umber/70 to-transparent md:block" aria-hidden />
 
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-charcoal leading-[1.15]">
-              Devotional Elegance, <br className="hidden sm:inline" />
-              <span className="italic text-burgundy">Handcrafted with Reverence</span>
-            </h1>
-
-            <p className="text-base sm:text-lg text-charcoal-muted leading-relaxed max-w-xl mx-auto lg:mx-0 font-light">
-              We curate and hand-finish bespoke devotional idols, sacred brassware, and ornate frames designed to evoke serenity and timeless grace in discerning sanctuaries.
-            </p>
-
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <button
-                onClick={onExplore}
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-7 py-3.5 rounded-md bg-burgundy hover:bg-burgundy-hover text-ivory-light text-sm font-medium tracking-wide transition-all shadow-card hover:shadow-card-hover"
+        <div className="relative md:absolute md:inset-0">
+          <div className="container-content -mt-6 flex h-full flex-col justify-center pb-10 md:mt-0 md:py-0">
+            <div className="max-w-[34rem]">
+              <motion.p {...enter(0.05)} className="mb-4 flex md:mb-5 items-center gap-3 font-sans text-label uppercase text-gold-light">
+                <span className="h-px w-8 bg-gold" aria-hidden />
+                Décor &amp; Gifting
+              </motion.p>
+              <motion.h1
+                {...enter(0.12)}
+                id="hero-title"
+                className="font-display text-[2.75rem] font-medium leading-[1.02] tracking-[-0.015em] text-ivory sm:text-[3.5rem] lg:text-display-xl"
               >
-                <span>Explore Curated Collection</span>
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </button>
-
-              <button
-                onClick={onAbout}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-md border border-ivory-border bg-white hover:bg-ivory-muted text-charcoal text-sm font-medium tracking-wide transition-colors"
-              >
-                Our Artisanal Philosophy
-              </button>
-            </div>
-
-            {/* Credibility Highlights */}
-            <div className="pt-6 grid grid-cols-3 gap-4 border-t border-ivory-border/80 text-left">
-              <div>
-                <p className="text-xs uppercase tracking-wider text-charcoal-light font-medium">Craftsmanship</p>
-                <p className="font-serif text-sm text-charcoal font-semibold mt-0.5">Master Metal Artisans</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wider text-charcoal-light font-medium">Bespoke Customisation</p>
-                <p className="font-serif text-sm text-charcoal font-semibold mt-0.5">Tailored Finishes</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wider text-charcoal-light font-medium">Personal Consultation</p>
-                <p className="font-serif text-sm text-charcoal font-semibold mt-0.5">Direct Team Service</p>
-              </div>
+                Meaningful gifts.
+                <br />
+                <em className="font-medium not-italic text-gold-light md:italic">Beautiful spaces.</em>
+              </motion.h1>
+              <motion.p {...enter(0.2)} className="mt-5 max-w-[32rem] text-lg leading-relaxed text-ivory/85 md:text-xl">
+                Explore décor and gifting for the moments that matter.
+              </motion.p>
+              <motion.div {...enter(0.28)} className="mt-7 flex md:mt-8 flex-col gap-3 sm:flex-row sm:items-center">
+                <Link to="/shop" className="btn-light w-full sm:w-auto">
+                  Explore the Collection
+                </Link>
+                <Link to="/contact?topic=gift" className="btn-ghost-light w-full sm:w-auto">
+                  Discuss a Gift
+                </Link>
+              </motion.div>
             </div>
           </div>
-
-          {/* Right Editorial Visual Composition */}
-          <div className="lg:col-span-6 relative">
-            <div className="relative mx-auto max-w-md lg:max-w-none">
-              
-              {/* Main Featured Photo Frame */}
-              <div className="relative rounded-2xl overflow-hidden shadow-card border-4 border-white aspect-[4/5] bg-ivory-muted group">
-                <img
-                  src="/assets/demo/sample_product_1.jpeg"
-                  alt="SWAYARI Devotional Art Masterpiece"
-                  className="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-103"
-                  loading="eager"
-                />
-                
-                {/* Subtle vignette and gold accent border */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-                
-                <div className="absolute bottom-5 left-5 right-5 text-white">
-                  <p className="text-[11px] tracking-widest uppercase font-medium text-gold-light">Devotional Masterpiece</p>
-                  <h3 className="font-serif text-lg font-medium tracking-wide text-white drop-shadow-sm">
-                    Radha Krishna Sacred Embossed Finial Frame
-                  </h3>
-                  <p className="text-xs text-ivory-light/90 mt-1 font-light">
-                    Available for bespoke consultation &amp; custom framing
-                  </p>
-                </div>
-              </div>
-
-              {/* Decorative Brand Accent Card */}
-              <div className="hidden sm:block absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-card border border-ivory-border max-w-xs animate-fadeIn">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-burgundy-light flex items-center justify-center text-burgundy">
-                    <Sparkles className="w-5 h-5 text-gold" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-charcoal">Bespoke Order Process</p>
-                    <p className="text-[11px] text-charcoal-muted leading-tight mt-0.5">
-                      Request custom quotes, sizing, and protective festive packaging.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
         </div>
+
+        <p className="absolute right-4 top-3 text-[0.6875rem] uppercase tracking-[0.14em] text-ivory/60 md:bottom-4 md:right-6 md:top-auto">
+          Styling inspiration
+        </p>
       </div>
     </section>
   );

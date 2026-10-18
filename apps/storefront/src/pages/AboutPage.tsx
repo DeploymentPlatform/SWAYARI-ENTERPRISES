@@ -1,99 +1,110 @@
 import React from 'react';
-import { Sparkles, Shield, Compass, Heart } from 'lucide-react';
+import { Link } from '../lib/router';
+import { editorialSources } from '../lib/media';
+import { usePageMeta } from '../lib/meta';
+import { Picture } from '../components/ui';
 
-interface AboutPageProps {
-  navigate: (path: string) => void;
-}
+const PRINCIPLES = [
+  {
+    title: 'Pieces for living with',
+    text: 'We choose décor and gifts that suit everyday homes and special occasions alike — prayer corners, entrance tables, festive gatherings.'
+  },
+  {
+    title: 'Only what we can confirm',
+    text: 'Each listing shows the details we have confirmed. If something is not stated, ask us — we would rather tell you directly than guess.'
+  },
+  {
+    title: 'A person, not a checkout',
+    text: 'Every request is read and answered by our team. We confirm availability, final price, shipping and delivery with you before anything goes ahead.'
+  }
+];
 
-export const AboutPage: React.FC<AboutPageProps> = ({ navigate }) => {
+export const AboutPage: React.FC = () => {
+  usePageMeta('Our Story', 'SWAYARI brings together décor and gifting for homes and special occasions, with personal assistance for every order request.');
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-16">
-      {/* Editorial Title */}
-      <div className="text-center max-w-2xl mx-auto space-y-4">
-        <div className="inline-flex items-center space-x-1.5 text-xs uppercase tracking-widest text-burgundy font-medium">
-          <Sparkles className="w-3.5 h-3.5 text-gold" />
-          <span>Artisanal Heritage</span>
+    <>
+      <section className="relative bg-umber text-ivory">
+        <div className="container-content grid items-center gap-10 py-14 md:grid-cols-12 md:py-20">
+          <div className="md:col-span-6">
+            <p className="eyebrow mb-4 text-gold-light">Our story</p>
+            <h1 className="text-[2.75rem] leading-[1.02] text-ivory md:text-display-xl">
+              Décor to live with.
+              <br />
+              Gifts to remember.
+            </h1>
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-ivory/85">
+              SWAYARI — Décor &amp; Gifting brings together decorative pieces and gifting ideas for homes and special
+              occasions, from everyday spaces to festivals, housewarmings and celebrations.
+            </p>
+          </div>
+          <div className="md:col-span-5 md:col-start-8">
+            <Picture
+              sources={editorialSources('marigold-garlands', [600, 900])}
+              sizes="(min-width: 768px) 40vw, 100vw"
+              width={900}
+              height={1125}
+              priority
+              alt="Marigold garlands spilling from a turned wooden vase"
+              className="aspect-editorial w-full object-cover"
+            />
+            <p className="mt-2 text-right text-[0.6875rem] uppercase tracking-[0.14em] text-ivory/60">Styling inspiration</p>
+          </div>
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-charcoal tracking-tight">
-          The Craft &amp; Reverence of SWAYARI
-        </h1>
-        <p className="text-sm sm:text-base text-charcoal-muted font-light leading-relaxed">
-          Founded on the principle that sacred iconography deserves the utmost material integrity and aesthetic nobility.
-        </p>
-      </div>
+      </section>
 
-      {/* Hero Visual Card */}
-      <div className="rounded-3xl overflow-hidden border border-ivory-border shadow-card bg-ivory-muted aspect-[21/9]">
-        <img
-          src="/assets/brand/swayari_brand_card.jpeg"
-          alt="SWAYARI Studio Craft"
-          className="w-full h-full object-cover object-center"
-        />
-      </div>
-
-      {/* Narrative Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 sm:gap-14 text-sm sm:text-base text-charcoal-muted leading-relaxed font-light">
-        <div className="space-y-4">
-          <h3 className="font-serif text-2xl text-charcoal font-medium">
-            Sacred Artistry in Solid Form
-          </h3>
-          <p>
-            At SWAYARI ENTERPRISES, we curate and finish fine brass, bronze alloys, and bespoke framed devotional artworks. In a world saturated with ephemeral mass-production, our focus remains steadfastly anchored in generational craftsmanship.
-          </p>
-          <p>
-            Each idol begins with meticulously drafted iconographic geometry. Our artisan partners, based in traditional metalworking communities across India, execute the ancient lost-wax casting technique and sand-mould casting with unparalleled fidelity.
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="font-serif text-2xl text-charcoal font-medium">
-            Personalised Gifting &amp; Heritage
-          </h3>
-          <p>
-            Whether honoring a housewarming, sanctifying a prayer room, or commemorating milestone celebrations, sacred gifts carry emotional permanence.
-          </p>
-          <p>
-            We do not operate as an automated, impersonal shopping cart. Every single order request is treated as a collaborative commission, where our dedicated team discusses custom packaging, auspicious delivery timing, and bespoke finishes directly with you.
-          </p>
-        </div>
-      </div>
-
-      {/* Core Studio Pillars */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-ivory-border">
-        <div className="p-6 rounded-2xl bg-white border border-ivory-border space-y-3">
-          <Shield className="w-6 h-6 text-gold" />
-          <h4 className="font-serif text-lg font-semibold text-charcoal">Authentic Alloys</h4>
-          <p className="text-xs text-charcoal-muted font-light leading-relaxed">
-            Pure brass and bell metal casting that develops a rich, dignified patina over decades of veneration.
-          </p>
+      <section className="container-content py-16 md:py-24">
+        <div className="grid gap-10 md:grid-cols-12">
+          <h2 className="text-display-sm md:col-span-4 md:text-display-md">How we work</h2>
+          <div className="space-y-5 text-lg leading-relaxed text-ink-soft md:col-span-7 md:col-start-6">
+            <p>
+              SWAYARI is run by SWAYARI ENTERPRISES. Rather than an automated checkout, we work on order requests: you choose the
+              pieces you like, send them to us in one short form, and our team contacts you personally.
+            </p>
+            <p>
+              That conversation is where we confirm what matters — whether a piece is available, its final price, how it will be
+              packed and sent, and when it can reach you. No payment is taken on this website.
+            </p>
+          </div>
         </div>
 
-        <div className="p-6 rounded-2xl bg-white border border-ivory-border space-y-3">
-          <Compass className="w-6 h-6 text-gold" />
-          <h4 className="font-serif text-lg font-semibold text-charcoal">Traditional Proportions</h4>
-          <p className="text-xs text-charcoal-muted font-light leading-relaxed">
-            Adhering faithfully to classical shilpa principles to create balanced, spiritually uplifting iconography.
-          </p>
-        </div>
+        <ul className="mt-16 grid gap-10 border-t border-stone-deep pt-12 md:grid-cols-3">
+          {PRINCIPLES.map(p => (
+            <li key={p.title}>
+              <h3 className="text-[1.75rem] leading-tight">{p.title}</h3>
+              <p className="mt-3 text-ink-soft">{p.text}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-        <div className="p-6 rounded-2xl bg-white border border-ivory-border space-y-3">
-          <Heart className="w-6 h-6 text-gold" />
-          <h4 className="font-serif text-lg font-semibold text-charcoal">Bespoke Guidance</h4>
-          <p className="text-xs text-charcoal-muted font-light leading-relaxed">
-            Direct personal service from our studio to recommend ideal sizes, finishes, and protective delivery.
-          </p>
+      <section className="bg-stone">
+        <div className="container-content grid items-center gap-10 py-16 md:grid-cols-12 md:py-20">
+          <div className="md:col-span-7">
+            <Picture
+              sources={editorialSources('assist-brass-diyas', [900, 1600])}
+              sizes="(min-width: 768px) 58vw, 100vw"
+              width={1600}
+              height={1068}
+              alt="Brass diyas among pink and white flowers on a wooden surface"
+              className="aspect-wide w-full object-cover"
+            />
+            <p className="mt-2 text-[0.8125rem] text-ink-soft">Styling inspiration</p>
+          </div>
+          <div className="md:col-span-4 md:col-start-9">
+            <h2 className="text-display-sm">Looking for something particular?</h2>
+            <p className="mt-4 text-ink-soft">Tell us the occasion, the person or the space. We will reply with what we can offer.</p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row md:flex-col lg:flex-row">
+              <Link to="/shop" className="btn-primary">
+                Explore the Collection
+              </Link>
+              <Link to="/contact" className="btn-secondary">
+                Contact us
+              </Link>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* CTA */}
-      <div className="text-center pt-8">
-        <button
-          onClick={() => navigate('/shop')}
-          className="px-8 py-3.5 rounded-md bg-burgundy hover:bg-burgundy-hover text-white text-xs sm:text-sm font-semibold tracking-wide shadow-card transition-all"
-        >
-          Explore Our Catalogue
-        </button>
-      </div>
-    </div>
+      </section>
+    </>
   );
 };

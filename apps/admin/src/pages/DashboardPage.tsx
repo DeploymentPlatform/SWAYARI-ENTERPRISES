@@ -1,259 +1,149 @@
-import React, { useState, useEffect } from 'react';
-import { formatPrice, formatDate, getStatusMeta, Order } from '@swayari/shared';
-import { ShoppingBag, Package, CheckCircle2, Clock, ArrowRight, RefreshCw, AlertCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ArrowRight, RefreshCw } from 'lucide-react';
+import { formatDate } from '@swayari/shared';
+import { ErrorBanner, PageHeader, StatusBadge, Thumb } from '../components/ui';
 
 interface DashboardPageProps {
   onNavigateTab: (tab: string) => void;
   onOpenOrder: (orderId: string) => void;
 }
 
+interface OrderRow {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  deliveryCity: string;
+  status: string;
+  itemCount: number;
+  firstImage: string | null;
+  createdAt: string;
+}
+
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab, onOpenOrder }) => {
   const [stats, setStats] = useState<any>(null);
-  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
+  const [recent, setRecent] = useState<OrderRow[]>([]);
+  const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [refreshedAt, setRefreshedAt] = useState<Date | null>(null);
 
-  useEffect(() => {
-    fetchDashboardData();
-
-    // Polling every 30 seconds, paused when tab is hidden
-    const interval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        fetchDashboardData();
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  async function fetchDashboardData() {
+  async function load() {
     try {
-      const [statsRes, ordersRes] = await Promise.all([
-        fetch('/api/admin/stats'),
-        fetch('/api/admin/orders?limit=6')
-      ]);
-
-      if (statsRes.ok) {
-        const statsData = await statsRes.json();
-        setStats(statsData.stats);
-      }
-      if (ordersRes.ok) {
-        const ordersData = await ordersRes.json();
-        setRecentOrders(ordersData.orders || []);
-      }
-      setLastRefreshed(new Date());
-    } catch (err) {
-      console.error('Failed to load dashboard data:', err);
-    } finally {
-      setLoading(false);
+      const [s, o] = await Promise.all([fetch('/api/admin/stats'), fetch('/api/admin/orders?limit=6')]);
+      if (!s.ok || !o.ok) throw new Error();
+      setStats((await s.json()).stats);
+      setRecent((await o.json()).orders || []);
+      setRefreshedAt(new Date());
+      setState('ready');
+    } catch {
+      setState('error');
     }
   }
 
-  const orderStats = stats?.orders || {
-    total: 0,
-    new_request: 0,
-    contacted: 0,
-    quoted: 0,
-    confirmed: 0,
-    dispatched: 0,
-    completed: 0
-  };
+  useEffect(() => {
+    load();
+    const t = window.setInterval(() => document.visibilityState === 'visible' && load(), 30000);
+    return () => window.clearInterval(t);
+  }, []);
+
+  const o = stats?.orders || {};
+  const p = stats?.products || {};
+  const metrics = [
+    { label: 'New requests', value: o.new_request ?? 0, hint: 'Not yet contacted', tab: 'orders', emphasis: (o.new_request ?? 0) > 0 },
+    { label: 'In discussion', value: (o.contacted ?? 0) + (o.quoted ?? 0), hint: 'Contacted or quoted', tab: 'orders' },
+    { label: 'Confirmed / dispatched', value: (o.confirmed ?? 0) + (o.dispatched ?? 0), hint: 'Being fulfilled', tab: 'orders' },
+    { label: 'Live products', value: p.published ?? 0, hint: `${p.draft ?? 0} draft · ${p.archived ?? 0} archived${p.samples ? ` · ${p.samples} samples` : ''}`, tab: 'products' }
+  ];
 
   return (
     <div className="space-y-8">
-      {/* Top Welcome & Refresh Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-ivory-border shadow-subtle">
-        <div>
-          <h1 className="font-serif text-2xl font-bold text-charcoal">Studio Operations Dashboard</h1>
-          <p className="text-xs text-charcoal-muted mt-1 font-light">
-            Real-time enquiry flow from the customer storefront.
-          </p>
-        </div>
-
-        <div className="flex items-center space-x-3 text-xs">
-          <span className="text-charcoal-light font-mono">
-            Updated: {lastRefreshed.toLocaleTimeString('en-IN')}
-          </span>
-          <button
-            onClick={() => fetchDashboardData()}
-            className="p-2 rounded-lg bg-ivory border border-ivory-border hover:bg-ivory-muted text-charcoal transition-colors"
-            title="Refresh dashboard"
-          >
-            <RefreshCw className="w-4 h-4" />
+      <PageHeader
+        title="Overview"
+        description="Current order requests and catalogue counts from the shared database."
+        actions={
+          <button type="button" className="adm-btn-secondary" onClick={load}>
+            <RefreshCw className="h-4 w-4" aria-hidden /> Refresh
           </button>
-        </div>
-      </div>
+        }
+      />
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        
-        {/* Card 1: New Requests (Actionable) */}
-        <div
-          onClick={() => onNavigateTab('orders')}
-          className="bg-white p-5 rounded-2xl border border-ivory-border shadow-subtle hover:border-burgundy/40 cursor-pointer transition-all space-y-3"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full">
-              Action Required
-            </span>
-            <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
+      {state === 'error' && <ErrorBanner message="Could not load the latest figures." onRetry={load} />}
+
+      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {metrics.map(m => (
+          <button
+            key={m.label}
+            type="button"
+            onClick={() => onNavigateTab(m.tab)}
+            className={`adm-card p-5 text-left transition-colors hover:border-ink-faint ${m.emphasis ? 'border-l-4 border-l-burgundy' : ''}`}
+          >
+            <dt className="text-sm text-ink-soft">{m.label}</dt>
+            <dd className="mt-2 font-sans text-[2rem] font-medium leading-none tabular-nums">{state === 'loading' ? '—' : m.value}</dd>
+            <dd className="mt-2 text-[0.8125rem] text-ink-faint">{m.hint}</dd>
+          </button>
+        ))}
+      </dl>
+
+      <section className="adm-card overflow-hidden" aria-labelledby="recent-title">
+        <div className="flex items-center justify-between border-b border-stone-deep px-5 py-4">
           <div>
-            <span className="text-3xl font-serif font-bold text-charcoal">{orderStats.new_request}</span>
-            <p className="text-xs text-charcoal-muted mt-1">New Uncontacted Requests</p>
-          </div>
-        </div>
-
-        {/* Card 2: Quoted / In Discussion */}
-        <div
-          onClick={() => onNavigateTab('orders')}
-          className="bg-white p-5 rounded-2xl border border-ivory-border shadow-subtle hover:border-burgundy/40 cursor-pointer transition-all space-y-3"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full">
-              In Negotiation
-            </span>
-            <div className="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
-              <ShoppingBag className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <span className="text-3xl font-serif font-bold text-charcoal">
-              {orderStats.contacted + orderStats.quoted}
-            </span>
-            <p className="text-xs text-charcoal-muted mt-1">Contacted &amp; Quoted</p>
-          </div>
-        </div>
-
-        {/* Card 3: Dispatched / Confirmed */}
-        <div
-          onClick={() => onNavigateTab('orders')}
-          className="bg-white p-5 rounded-2xl border border-ivory-border shadow-subtle hover:border-burgundy/40 cursor-pointer transition-all space-y-3"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
-              Fulfillment
-            </span>
-            <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <span className="text-3xl font-serif font-bold text-charcoal">
-              {orderStats.confirmed + orderStats.dispatched}
-            </span>
-            <p className="text-xs text-charcoal-muted mt-1">Confirmed &amp; Dispatched</p>
-          </div>
-        </div>
-
-        {/* Card 4: Total Value Quoted */}
-        <div className="bg-white p-5 rounded-2xl border border-ivory-border shadow-subtle space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-burgundy bg-burgundy-light px-2.5 py-0.5 rounded-full">
-              Quotation Volume
-            </span>
-            <div className="w-8 h-8 rounded-full bg-burgundy-light text-burgundy flex items-center justify-center">
-              <Package className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <span className="text-2xl font-serif font-bold text-burgundy">
-              {formatPrice(stats?.totalRevenueQuoted || 0)}
-            </span>
-            <p className="text-xs text-charcoal-muted mt-1">Official Studio Quotes Issued</p>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Recent Order Requests Table */}
-      <div className="bg-white rounded-2xl border border-ivory-border shadow-subtle overflow-hidden">
-        <div className="p-5 sm:p-6 border-b border-ivory-border flex items-center justify-between">
-          <div>
-            <h3 className="font-serif text-lg font-semibold text-charcoal">Recent Customer Requests</h3>
-            <p className="text-xs text-charcoal-muted font-light mt-0.5">
-              Click any order to review customer address, requested pieces, and manage quotations.
+            <h2 id="recent-title" className="text-base font-semibold">
+              Latest order requests
+            </h2>
+            <p className="text-sm text-ink-soft">
+              {o.total ?? 0} in total{refreshedAt ? ` · updated ${refreshedAt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` : ''}
             </p>
           </div>
-          <button
-            onClick={() => onNavigateTab('orders')}
-            className="inline-flex items-center space-x-1.5 text-xs font-semibold text-burgundy hover:underline"
-          >
-            <span>View All ({orderStats.total})</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+          <button type="button" onClick={() => onNavigateTab('orders')} className="adm-btn-quiet">
+            All requests <ArrowRight className="h-4 w-4" aria-hidden />
           </button>
         </div>
-
-        {loading ? (
-          <div className="p-8 text-center text-xs text-charcoal-muted animate-pulse">
-            Loading recent requests...
-          </div>
-        ) : recentOrders.length === 0 ? (
-          <div className="p-12 text-center text-xs text-charcoal-muted space-y-2">
-            <ShoppingBag className="w-8 h-8 mx-auto text-charcoal-light stroke-[1.5]" />
-            <p className="font-semibold text-charcoal">No customer requests received yet</p>
-            <p className="font-light max-w-sm mx-auto">
-              When visitors submit order requests on the storefront, they will immediately appear here.
-            </p>
+        {state === 'loading' ? (
+          <p className="px-5 py-10 text-center text-sm text-ink-soft">Loading…</p>
+        ) : recent.length === 0 ? (
+          <div className="px-5 py-12 text-center">
+            <p className="font-medium">No order requests yet</p>
+            <p className="mt-1 text-sm text-ink-soft">Requests sent from the customer website appear here as soon as they are saved.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-ivory/60 text-charcoal-muted uppercase tracking-wider text-[10px] border-b border-ivory-border">
+            <table className="adm-table">
+              <thead>
                 <tr>
-                  <th className="py-3 px-4 font-semibold">Reference</th>
-                  <th className="py-3 px-4 font-semibold">Customer</th>
-                  <th className="py-3 px-4 font-semibold">Phone</th>
-                  <th className="py-3 px-4 font-semibold">Destination</th>
-                  <th className="py-3 px-4 font-semibold">Pieces</th>
-                  <th className="py-3 px-4 font-semibold">Status</th>
-                  <th className="py-3 px-4 font-semibold">Submitted</th>
-                  <th className="py-3 px-4 font-semibold text-right">Action</th>
+                  <th>Request</th>
+                  <th>Customer</th>
+                  <th>City</th>
+                  <th>Pieces</th>
+                  <th>Status</th>
+                  <th>Received</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ivory-border/60">
-                {recentOrders.map(order => {
-                  const statusMeta = getStatusMeta(order.status);
-                  return (
-                    <tr
-                      key={order.id}
-                      onClick={() => onOpenOrder(order.id)}
-                      className="hover:bg-ivory-light/60 cursor-pointer transition-colors"
-                    >
-                      <td className="py-3.5 px-4 font-mono font-bold text-burgundy">{order.id}</td>
-                      <td className="py-3.5 px-4 font-medium text-charcoal">{order.customerName}</td>
-                      <td className="py-3.5 px-4 text-charcoal-muted">+91 {order.customerPhone}</td>
-                      <td className="py-3.5 px-4 text-charcoal-muted">{order.deliveryCity}, {order.deliveryState}</td>
-                      <td className="py-3.5 px-4 font-semibold text-charcoal">{order.itemCount} items</td>
-                      <td className="py-3.5 px-4">
-                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-ivory-muted text-charcoal border border-ivory-border">
-                          {statusMeta.label}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-charcoal-light text-[11px]">
-                        {formatDate(order.createdAt)}
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <button
-                          onClick={e => {
-                            e.stopPropagation();
-                            onOpenOrder(order.id);
-                          }}
-                          className="px-3 py-1 rounded bg-burgundy-light text-burgundy hover:bg-burgundy hover:text-white font-medium transition-colors text-[11px]"
-                        >
-                          Review
+              <tbody>
+                {recent.map(r => (
+                  <tr key={r.id} className="cursor-pointer hover:bg-[#FAF8F5]" onClick={() => onOpenOrder(r.id)}>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <Thumb src={r.firstImage} />
+                        <button type="button" className="font-mono text-[0.8125rem] font-medium text-burgundy hover:underline" onClick={() => onOpenOrder(r.id)}>
+                          {r.id}
                         </button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                      </div>
+                    </td>
+                    <td>
+                      <p className="font-medium">{r.customerName}</p>
+                      <p className="text-[0.8125rem] text-ink-soft">+91 {r.customerPhone}</p>
+                    </td>
+                    <td className="text-ink-soft">{r.deliveryCity}</td>
+                    <td className="tabular-nums">{r.itemCount}</td>
+                    <td>
+                      <StatusBadge status={r.status} />
+                    </td>
+                    <td className="whitespace-nowrap text-ink-soft">{formatDate(r.createdAt)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 };

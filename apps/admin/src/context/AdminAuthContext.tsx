@@ -1,8 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@swayari/shared';
 
+interface AdminAuthConfig {
+  googleClientId: string | null;
+  devLoginAvailable: boolean;
+}
+
 interface AdminAuthContextType {
   user: User | null;
+  config: AdminAuthConfig;
   isLoading: boolean;
   authError: string | null;
   handleGoogleCallback: (credential: string) => Promise<boolean>;
@@ -17,9 +23,14 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [config, setConfig] = useState<AdminAuthConfig>({ googleClientId: null, devLoginAvailable: false });
 
   useEffect(() => {
     checkAdminSession();
+    fetch('/api/auth/config')
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => data && setConfig({ googleClientId: data.googleClientId || null, devLoginAvailable: Boolean(data.devLoginAvailable) }))
+      .catch(() => undefined);
   }, []);
 
   async function checkAdminSession() {
@@ -102,6 +113,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     <AdminAuthContext.Provider
       value={{
         user,
+        config,
         isLoading,
         authError,
         handleGoogleCallback,

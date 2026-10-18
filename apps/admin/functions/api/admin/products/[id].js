@@ -84,10 +84,19 @@ export async function onRequestPut(context) {
       isDemo
     } = body;
 
-    const existing = await env.DB.prepare('SELECT id FROM products WHERE id = ?').bind(productId).first();
+    const existing = await env.DB.prepare('SELECT id, is_demo, has_variants, variants_json FROM products WHERE id = ?').bind(productId).first();
     if (!existing) {
       return errorResponse('Product not found', 404);
     }
+    if (!sku || !name || !slug || !description) {
+      return errorResponse('SKU, name, slug and description are required', 400);
+    }
+
+    // Fields the editor does not send are preserved. In particular a preview/sample item must
+    // never become live inventory merely because it was edited.
+    const finalIsDemo = isDemo === undefined ? Number(existing.is_demo) : (isDemo ? 1 : 0);
+    const finalHasVariants = hasVariants === undefined ? Number(existing.has_variants) : (hasVariants ? 1 : 0);
+    const finalVariantsJson = variants === undefined ? (existing.variants_json || '[]') : JSON.stringify(variants || []);
 
     const nowIso = new Date().toISOString();
 
@@ -107,14 +116,14 @@ export async function onRequestPut(context) {
       JSON.stringify(images || []),
       material || null,
       dimensions || null,
-      hasVariants ? 1 : 0,
-      JSON.stringify(variants || []),
+      finalHasVariants,
+      finalVariantsJson,
       indicativePrice !== undefined && indicativePrice !== null && indicativePrice !== '' ? Number(indicativePrice) : null,
       minQuantity ? Number(minQuantity) : 1,
       availabilityLabel || 'Available on Request',
       customisationInfo || null,
       status || 'published',
-      isDemo ? 1 : 0,
+      finalIsDemo,
       nowIso,
       productId
     ).run();

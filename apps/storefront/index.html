@@ -1,29 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SWAYARI — Décor & Gifting | Bespoke Devotional Art</title>
-    <meta name="description" content="Handcrafted devotional idols, cast brassware, sacred frames, and bespoke gifting crafted with timeless Indian artistry." />
+    <title>SWAYARI — Décor &amp; Gifting</title>
+    <meta name="description" content="Décor and gifting for homes and special occasions. Choose your pieces, send a request, and our team will contact you to confirm the details." />
     <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#FBF8F3" />
     <link rel="icon" type="image/svg+xml" href="/assets/brand/favicon.svg" />
-    
-    <!-- Open Graph -->
+
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="SWAYARI — Décor & Gifting" />
-    <meta property="og:description" content="Bespoke devotional art and handcrafted gifting. Enquire for custom curated collections." />
+    <meta property="og:site_name" content="SWAYARI" />
+    <meta property="og:title" content="SWAYARI — Décor &amp; Gifting" />
+    <meta property="og:description" content="Décor and gifting for homes and special occasions, with personal order assistance." />
     <meta property="og:image" content="/assets/brand/swayari_brand_card.jpeg" />
-    
-    <!-- Google Fonts: Playfair Display, Cinzel, Plus Jakarta Sans -->
+
+    <!-- Hero photograph: separate art-directed crops for desktop and mobile (never lazy-loaded) -->
+    <link rel="preload" as="image" type="image/webp" media="(min-width: 768px)"
+      imagesrcset="/assets/editorial/hero-festive-lamps-1600.webp 1600w, /assets/editorial/hero-festive-lamps-2400.webp 2400w"
+      imagesizes="76vw" fetchpriority="high" />
+    <link rel="preload" as="image" type="image/webp" media="(max-width: 767px)"
+      imagesrcset="/assets/editorial/hero-festive-lamps-mobile-600.webp 600w, /assets/editorial/hero-festive-lamps-mobile-900.webp 900w"
+      imagesizes="100vw" fetchpriority="high" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet" />
 
-    <!-- Google Identity Services (GIS) -->
+    <!-- Google Identity Services (customer sign-in only; initialised with the storefront client ID) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
-  <body class="bg-ivory text-charcoal font-sans antialiased selection:bg-burgundy-light selection:text-burgundy">
+  <body>
     <div id="root"></div>
+    <noscript>
+      <p style="padding:24px;font-family:system-ui">SWAYARI — Décor &amp; Gifting. Please enable JavaScript to browse the collection, or email swayarienterprises@gmail.com.</p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,22 +1,45 @@
 {
   "name": "swayari-enterprises",
-  "version": "0.1.0",
-  "description": "SWAYARI ENTERPRISES - Décor & Gifting Catalogue and Order Management Application",
+  "version": "0.2.0",
+  "description": "SWAYARI ENTERPRISES - Two-Portal Architecture: Customer Storefront & Admin Portal",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
-    "dev": "wrangler pages dev public --d1 DB",
-    "build": "node scripts/generate-manifest.js",
+    "build:storefront": "vite build --config apps/storefront/vite.config.ts apps/storefront",
+    "build:admin": "vite build --config apps/admin/vite.config.ts apps/admin",
+    "build": "node scripts/generate-manifest.js && npm run build:storefront && npm run build:admin",
     "test": "node scripts/run-tests.js",
-    "migrate:local": "wrangler d1 migrations apply DB --local",
-    "migrate:prod": "wrangler d1 migrations apply DB --remote",
+    "dev:storefront": "wrangler pages dev apps/storefront/dist --d1 DB --port 8788",
+    "dev:admin": "wrangler pages dev apps/admin/dist --d1 DB --port 8789",
+    "d1:migrate:local": "wrangler d1 migrations apply DB --local",
+    "d1:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "seed:local": "wrangler d1 execute DB --local --file=./migrations/0002_demo_data.sql",
-    "backup:daily": "bash scripts/create-daily-backup.sh"
+    "backup:daily": "bash scripts/create-daily-backup.sh",
+    "export:bundle": "bash scripts/export-git-bundle.sh"
   },
   "dependencies": {
     "jose": "^5.9.6"
   },
   "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.11.11",
+    "lucide-react": "^0.454.0",
+    "postcss": "^8.4.47",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
     "wrangler": "^3.109.2"
   },
   "engines": {

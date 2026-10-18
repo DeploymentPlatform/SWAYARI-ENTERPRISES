@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] - 2026-10-18
+
+### Added
+- **Two-Portal Separated Architecture:**
+  - Separated public customer storefront and internal staff operations into two independently deployable applications:
+    - Customer Storefront: `apps/storefront` deployed to primary domain.
+    - Admin Operations Portal: `apps/admin` deployed to dedicated admin origin.
+  - Complete elimination of admin routes, links, frontend bundles, and API handlers from the customer storefront.
+  - Storefront middleware returns `404 Not Found` for any requests to `/admin` or `/api/admin`.
+- **Database Scope Isolation:**
+  - Added Migration `0003_session_scope.sql` introducing `scope` (`'customer'` or `'admin'`) to `sessions` table.
+  - Host-only scoped cookies: `swayari_customer_session` (14 days) and `swayari_admin_session` (7 days).
+  - Strict scope verification rejecting customer sessions on admin APIs.
+- **Frontend Stack & Monorepo Packages:**
+  - Migrated to React 18, TypeScript, Vite, Tailwind CSS with customized design tokens.
+  - Created shared monorepo packages: `packages/shared` (types, constants, validation, formatters), `packages/server` (edge cookies, session verification, audit logging), and `packages/ui` (design tokens and Tailwind preset).
+- **Substantial Visual Redesign:**
+  - Warm ivory surfaces (`#FAF7F2`), deep burgundy accents (`#5C1D24`), restrained antique gold details (`#C49A45`), and warm charcoal body text (`#2A2624`).
+  - Playfair Display serif display typography and Plus Jakarta Sans body typography.
+  - Refined editorial hero, 4:5 vertical product ratio cards, rich product detail gallery with packaging options and dimension specifications.
+  - Full-featured cart drawer and page, atomic order request submission with the mandatory disclaimer notice, and customer order history.
+  - Admin Operations Portal with branded staff login screen (`swayarienterprises@gmail.com`), dashboard metrics, live order review, quotation revision editor, confidential staff notes thread, and product catalogue management.
+- **Documentation:**
+  - Created `docs/DESIGN_SYSTEM.md` with complete specifications for typography, colors, spacing, ratios, controls, and accessibility.
+  - Created `docs/BROWSER_SETUP_HANDOFF.md` detailing step-by-step configuration for Google Cloud Console and Cloudflare Dashboard for both portals.
+- **Automated Verification:**
+  - Expanded automated test suite from 16 to 17 tests, including session scope isolation and production build validation.
+
+---
+
 ## [0.1.0] - 2026-10-18
 
 ### Added

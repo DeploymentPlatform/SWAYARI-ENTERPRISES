@@ -10,12 +10,16 @@ const projectRoot = path.resolve(__dirname, '..');
 export function createMockD1() {
   const db = new DatabaseSync(':memory:');
 
-  // Apply migrations
-  const schema0001 = fs.readFileSync(path.join(projectRoot, 'migrations', '0001_initial_schema.sql'), 'utf-8');
-  db.exec(schema0001);
+  // Dynamically apply all migrations in sorted numerical order
+  const migrationsDir = path.join(projectRoot, 'migrations');
+  const migrationFiles = fs.readdirSync(migrationsDir)
+    .filter(file => file.endsWith('.sql'))
+    .sort();
 
-  const schema0002 = fs.readFileSync(path.join(projectRoot, 'migrations', '0002_demo_data.sql'), 'utf-8');
-  db.exec(schema0002);
+  for (const file of migrationFiles) {
+    const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf-8');
+    db.exec(sql);
+  }
 
   function wrapStatement(sql, params = []) {
     return {

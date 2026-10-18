@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-10-18T14:25:11.832Z",
+  "totalAssets": 7,
+  "assets": [
+    {
+      "id": "brand_favicon_svg",
+      "filename": "favicon.svg",
+      "path": "/assets/brand/favicon.svg",
+      "category": "brand",
+      "label": "SWAYARI Lotus Crest Favicon",
+      "sizeBytes": 1391,
+      "updatedAt": "2026-10-18T13:58:30.713Z"
+    },
+    {
+      "id": "brand_swayari-logo_svg",
+      "filename": "swayari-logo.svg",
+      "path": "/assets/brand/swayari-logo.svg",
+      "category": "brand",
+      "label": "SWAYARI Scalable Vector Logo Wordmark",
+      "sizeBytes": 2770,
+      "updatedAt": "2026-10-18T13:58:21.629Z"
+    },
+    {
+      "id": "brand_swayari_brand_card_jpeg",
+      "filename": "swayari_brand_card.jpeg",
+      "path": "/assets/brand/swayari_brand_card.jpeg",
+      "category": "brand",
+      "label": "swayari brand card",
+      "sizeBytes": 162991,
+      "updatedAt": "2026-10-18T13:55:07.212Z"
+    },
+    {
+      "id": "demo_sample_product_1_jpeg",
+      "filename": "sample_product_1.jpeg",
+      "path": "/assets/demo/sample_product_1.jpeg",
+      "category": "demo",
+      "label": "Radha Krishna Embossed Silver Plaque Frame (Preview Demo)",
+      "sizeBytes": 335500,
+      "updatedAt": "2026-10-18T13:55:07.218Z"
+    },
+    {
+      "id": "demo_sample_product_2_jpeg",
+      "filename": "sample_product_2.jpeg",
+      "path": "/assets/demo/sample_product_2.jpeg",
+      "category": "demo",
+      "label": "Bala Krishna Makhan Chor Embossed Silver Frame (Preview Demo)",
+      "sizeBytes": 315068,
+      "updatedAt": "2026-10-18T13:55:26.512Z"
+    },
+    {
+      "id": "demo_sample_product_3_jpeg",
+      "filename": "sample_product_3.jpeg",
+      "path": "/assets/demo/sample_product_3.jpeg",
+      "category": "demo",
+      "label": "Sri Venkateswara Balaji Embossed Silver Frame (Preview Demo)",
+      "sizeBytes": 322767,
+      "updatedAt": "2026-10-18T13:55:26.518Z"
+    },
+    {
+      "id": "demo_sample_product_4_jpeg",
+      "filename": "sample_product_4.jpeg",
+      "path": "/assets/demo/sample_product_4.jpeg",
+      "category": "demo",
+      "label": "Sri Hanuman Embossed Silver Frame (Preview Demo)",
+      "sizeBytes": 331098,
+      "updatedAt": "2026-10-18T13:55:26.522Z"
+    }
+  ]
+}

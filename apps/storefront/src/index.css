@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-ivory: #FAF7F2;
+    --color-burgundy: #5C1D24;
+    --color-gold: #C49A45;
+    --color-charcoal: #2B2625;
+  }
+
+  body {
+    background-color: #FAF7F2;
+    color: #2B2625;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  .font-display {
+    font-family: 'Cinzel', serif;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FAF7F2;
+}
+::-webkit-scrollbar-thumb {
+  background: #D8CEBE;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C49A45;
+}
+
+/* Luxury card and border utilities */
+.gold-gradient-border {
+  border-image: linear-gradient(to right, #EED596, #C5A059, #9E782F) 1;
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #A87D2F 0%, #E0BE69 50%, #8E651E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

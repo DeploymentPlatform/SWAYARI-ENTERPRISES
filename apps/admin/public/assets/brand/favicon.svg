@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4A1220"/>
+      <stop offset="100%" stop-color="#24070D"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCEAB3"/>
+      <stop offset="40%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#9A7829"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circular badge -->
+  <rect width="64" height="64" rx="14" fill="url(#bgGrad)"/>
+  <rect x="2" y="2" width="60" height="60" rx="12" fill="none" stroke="url(#goldGrad)" stroke-width="1.2" opacity="0.6"/>
+  
+  <!-- Stylized Lotus Emblem -->
+  <g transform="translate(32, 34) scale(0.95)" stroke="url(#goldGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Center petal -->
+    <path d="M0 -20 C-5 -10 -6 -2 0 6 C6 -2 5 -10 0 -20 Z" fill="url(#goldGrad)" fill-opacity="0.35"/>
+    <!-- Left petals -->
+    <path d="M-5 -2 C-16 -12 -20 4 -4 7"/>
+    <path d="M-8 3 C-23 -3 -24 12 -6 10"/>
+    <!-- Right petals -->
+    <path d="M5 -2 C16 -12 20 4 4 7"/>
+    <path d="M8 3 C23 -3 24 12 6 10"/>
+    <!-- Bottom base diamond -->
+    <polygon points="0,13 4,17 0,21 -4,17" fill="url(#goldGrad)"/>
+  </g>
+</svg>

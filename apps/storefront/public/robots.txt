@@ -1,0 +1,19 @@
+# SWAYARI ENTERPRISES robots.txt
+User-agent: *
+Allow: /
+Allow: /shop/
+Allow: /product/
+Allow: /about/
+Allow: /contact/
+Allow: /ordering-policy/
+Allow: /privacy/
+
+# Disallow authenticated, transaction, and management interfaces
+Disallow: /admin/
+Disallow: /account/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /order-confirmation/
+Disallow: /api/
+
+Sitemap: https://swayari-enterprises.pages.dev/sitemap.xml

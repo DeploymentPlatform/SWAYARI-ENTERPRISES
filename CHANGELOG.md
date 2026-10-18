@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.0] - 2026-10-18
+
+### Changed
+- **Definitive Storefront Redesign:** Replaced oversized editorial layout with high-density, Tanishq-inspired visual refinement and Amazon-style fast shopping layout.
+- **Compact Shopping Header:** Left-aligned SWAYARI logo, prominent central search bar (`Search décor, gifts and more`), debounced instant autocomplete with product thumbnails and category badges, customer account menu, and live shopping cart badge. Compact category navigation strip below.
+- **Multi-Slide Campaign Carousel:** Sleek ~350px desktop / ~260px mobile 4-slide hero banner with touch swipe, keyboard controls, dot indicators, 6s autoplay with automatic pause on hover, keyboard focus, and tab switch.
+- **Category Shortcuts Strip:** Compact row of 5 circular thumbnails highlighting Devotional Frames, Decorative Lamps, Home Accents, Festive Décor, and Gift Sets.
+- **High-Density Product Rows:** 4 cards across on desktop, 3 on tablet, 2 on mobile with 1:1 square product imagery on warm neutral surfaces (`#FAF7F2`), category pills, sample price tags, quick view overlay, and 'Add to Request' feedback.
+- **Admin Campaign Banners Management:** Added dedicated admin interface (`apps/admin/src/pages/BannersPage.tsx`) with interactive desktop/mobile device previews, copy editor, CTA destination links, reordering, and active toggles.
+
+### Added
+- Migration `0005_rich_demo_catalogue.sql`: 5 core categories and 20 sample products with realistic sample prices, dimensions, and materials.
+- Migration `0006_campaign_banners.sql`: Dynamic campaign banners table with 4 default slides.
+- Storefront and Admin Banners APIs (`/api/banners` and `/api/admin/banners`).
+- `scripts/prepare-tanishq-catalogue.py` downloading and formatting 20 licensed stock assets from Pexels into WebP and JPG.
+- Quick View modal (`apps/storefront/src/components/QuickViewModal.tsx`).
+- Definitive design system documentation in `docs/DESIGN_SYSTEM.md` and asset sources in `docs/ASSET_SOURCES.md`.
+
+Implementation commit: `31c9c11`.
+
+---
+
 ## [0.3.0] - 2026-10-18
 
 ### Changed

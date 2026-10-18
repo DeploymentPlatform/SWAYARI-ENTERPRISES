@@ -25,8 +25,11 @@ npm run d1:migrate:remote
 ```
 This applies migrations in sequence:
 1. `migrations/0001_initial_schema.sql` (Tables: `users`, `sessions`, `categories`, `products`, `orders`, `order_items`, `order_quotations`, `order_internal_notes`, `audit_logs`)
-2. `migrations/0002_demo_data.sql` (Preview demo entries with `is_demo = 1`)
+2. `migrations/0002_demo_data.sql` (Initial preview demo entries with `is_demo = 1`)
 3. `migrations/0003_session_scope.sql` (Session scope isolation column and index)
+4. `migrations/0004_preview_catalogue.sql` (Owner frame relief items preview)
+5. `migrations/0005_rich_demo_catalogue.sql` (Tanishq-inspired 20 sample products across 5 categories)
+6. `migrations/0006_campaign_banners.sql` (Dynamic campaign hero banners schema and 4 default slides)
 
 ---
 

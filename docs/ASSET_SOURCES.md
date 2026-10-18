@@ -69,3 +69,52 @@ larger gallery images and detail views.
 | --- | --- | --- |
 | `public/assets/brand/swayari_brand_card.jpeg` | Owner-supplied brand artwork | Brand reference and Open Graph share image only — not used as page content |
 | `public/assets/brand/swayari-logo.svg`, `favicon.svg` | Created in Milestone 1 from the brand card | Favicon; the site header renders the wordmark as live text in Cinzel |
+
+## 5. Tanishq-Inspired 20-Product Sample Catalogue & Campaign Hero Imagery
+
+In accordance with the definitive design direction, an isolated demo catalogue of 20 coherent products across 5 categories was sourced from Pexels under the [Pexels licence](https://www.pexels.com/license/) (free commercial use, modification permitted). All images were downloaded, framed on warm neutral surfaces (`#FAF7F2`) with 1:1 square aspect ratios, and saved locally as high-performance `.webp` and `.jpg` files (`public/assets/products/*-800.{webp,jpg}`).
+
+### A. 20 Sample Products
+
+| Category | Local Files (`public/assets/products/`) | Product Name | Pexels ID | Creator | Source URL |
+| --- | --- | --- | --- | --- | --- |
+| Devotional Frames | `demo-frame-sanctum-gold-800.{webp,jpg}` | Ornate Sanctum Devotional Gold Relief Frame | 10905470 | Eva Bronzini | [Pexels 10905470](https://www.pexels.com/photo/painting-of-flowers-in-decorative-frame-10905470/) |
+| Devotional Frames | `demo-frame-baroque-floral-800.{webp,jpg}` | Royal Heritage Gold Embossed Devotional Frame | 10905473 | Eva Bronzini | [Pexels 10905473](https://www.pexels.com/photo/baroque-style-frame-with-a-vibrant-floral-painting-against-an-elegant-wall-10905473/) |
+| Devotional Frames | `demo-frame-temple-collection-800.{webp,jpg}` | Classic Temple Gold Leaf Framed Collection | 9456729 | Mihai Moisa | [Pexels 9456729](https://www.pexels.com/photo/gold-framed-paintings-hanging-on-wall-9456729/) |
+| Devotional Frames | `demo-frame-vintage-altar-800.{webp,jpg}` | Vintage Hand-Carved Teak & Gold Leaf Frame | 10502844 | Eva Bronzini | [Pexels 10502844](https://www.pexels.com/photo/lilac-flowers-in-a-vase-and-golden-frames-on-vintage-wallpaper-10502844/) |
+| Decorative Lamps | `demo-lamp-traditional-pillar-800.{webp,jpg}` | Traditional Ornate Brass Kuthu Pillar Lamp | 30043135 | Dilip Rathod | [Pexels 30043135](https://www.pexels.com/photo/elegant-traditional-indian-brass-oil-lamp-decor-30043135/) |
+| Decorative Lamps | `demo-lamp-ceremonial-diya-800.{webp,jpg}` | Handcrafted Ceremonial Brass Oil Lamp | 30327092 | Dilip Rathod | [Pexels 30327092](https://www.pexels.com/photo/traditional-diya-lamp-lit-for-celebration-30327092/) |
+| Decorative Lamps | `demo-lamp-sacred-flame-800.{webp,jpg}` | Classic Temple Brass Deepam with Pedestal | 30799797 | Contributor | [Pexels 30799797](https://www.pexels.com/photo/traditional-oil-diya-lamp-with-flame-in-dark-setting-30799797/) |
+| Decorative Lamps | `demo-lamp-serene-glow-800.{webp,jpg}` | Antique Meditative Brass Oil Lamp | 29994970 | Dilip Rathod | [Pexels 29994970](https://www.pexels.com/photo/lit-diya-lamp-creating-a-serene-atmosphere-29994970/) |
+| Home Accents | `demo-accent-krishna-flute-800.{webp,jpg}` | Intricate Brass Lord Krishna Playing Flute | 33289454 | Contributor | [Pexels 33289454](https://www.pexels.com/photo/intricate-brass-sculpture-of-a-hindu-deity-holding-a-flute-33289454/) |
+| Home Accents | `demo-accent-ganesha-statue-800.{webp,jpg}` | Hand-Sculpted Bronze Ganesha on Stone Pedestal | 28206212 | Contributor | [Pexels 28206212](https://www.pexels.com/photo/intricate-bronze-ganesha-statue-on-stone-surface-28206212/) |
+| Home Accents | `demo-accent-ganesh-idol-800.{webp,jpg}` | Regal Auspicious Brass Ganesha Figurine | 33643802 | Contributor | [Pexels 33643802](https://www.pexels.com/photo/intricate-ganesh-idol-with-vibrant-details-33643802/) |
+| Home Accents | `demo-accent-ceremonial-bell-800.{webp,jpg}` | Sacred Brass Temple Bell with Ceremonial Finial | 7536968 | Antoni Shkraba | [Pexels 7536968](https://www.pexels.com/photo/bracelet-among-decoration-on-an-indian-ceremony-7536968/) |
+| Festive Décor | `demo-decor-floral-uruli-800.{webp,jpg}` | Traditional Brass Uruli with Floating Candles & Petals | 8818664 | Yan Krukau | [Pexels 8818664](https://www.pexels.com/photo/flowers-and-candles-floating-in-a-bowl-8818664/) |
+| Festive Décor | `demo-decor-pooja-arrangement-800.{webp,jpg}` | Ceremonial Brass Pooja Display with Marigolds | 8818762 | Yan Krukau | [Pexels 8818762](https://www.pexels.com/photo/person-holding-and-fixing-flower-arrangement-with-traditional-ritual-decorations-8818762/) |
+| Festive Décor | `demo-decor-brass-stand-800.{webp,jpg}` | Multi-Tier Brass Lamp Stand with Festive Garlands | 8887201 | Lara Jameson | [Pexels 8887201](https://www.pexels.com/photo/a-candle-holder-with-candles-8887201/) |
+| Festive Décor | `demo-decor-marigold-diya-800.{webp,jpg}` | Handcrafted Brass Diya with Fresh Blossom Petals | 31723285 | Contributor | [Pexels 31723285](https://www.pexels.com/photo/traditional-diya-lamp-with-flower-petals-31723285/) |
+| Gift Sets | `demo-gift-traditional-hamper-800.{webp,jpg}` | Shubh Aarambh Handcrafted Ritual Gift Hamper | 5313214 | Contributor | [Pexels 5313214](https://www.pexels.com/photo/white-statue-on-a-woven-tray-with-marigolds-and-wrapped-package-5313214/) |
+| Gift Sets | `demo-gift-sweets-presentation-800.{webp,jpg}` | Utsav Celebratory Brass & Sweets Presentation Box | 14275717 | Contributor | [Pexels 14275717](https://www.pexels.com/photo/close-up-of-indian-laddoo-sweets-elegantly-arranged-in-a-box-14275717/) |
+| Gift Sets | `demo-gift-luxury-botanical-800.{webp,jpg}` | Royal Heritage Gift Chest with Floral Adornment | 13930487 | Hilal Yıldız | [Pexels 13930487](https://www.pexels.com/photo/flowers-on-a-gift-13930487/) |
+| Gift Sets | `demo-gift-festive-twin-diya-800.{webp,jpg}` | Twin Auspicious Brass Diya & Dhoop Gift Hamper | 6213685 | Naveen Sahu | [Pexels 6213685](https://www.pexels.com/photo/lighted-diya-beside-the-flowers-6213685/) |
+
+### B. Campaign Carousel Banners
+
+| Slide | Local Files (`public/assets/editorial/`) | Theme | Desktop Composition | Mobile Composition | Source Image |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `hero-slide-1-moments-{desktop,mobile}.{webp,jpg}` | Gifts for Meaningful Moments | 1440×420 wide crop | 640×360 mobile crop | [Pexels 8887201](https://www.pexels.com/photo/a-candle-holder-with-candles-8887201/) |
+| 2 | `hero-slide-2-devotional-{desktop,mobile}.{webp,jpg}` | Devotional Frames Collection | 1440×420 wide crop | 640×360 mobile crop | [Pexels 10905470](https://www.pexels.com/photo/painting-of-flowers-in-decorative-frame-10905470/) |
+| 3 | `hero-slide-3-decor-{desktop,mobile}.{webp,jpg}` | Artisanal Brass & Temple Lighting | 1440×420 wide crop | 640×360 mobile crop | [Pexels 30043135](https://www.pexels.com/photo/elegant-traditional-indian-brass-oil-lamp-decor-30043135/) |
+| 4 | `hero-slide-4-gifting-{desktop,mobile}.{webp,jpg}` | Festive Urulis & Home Accents | 1440×420 wide crop | 640×360 mobile crop | [Pexels 8818664](https://www.pexels.com/photo/flowers-and-candles-floating-in-a-bowl-8818664/) |
+
+### C. Category Shortcuts
+
+| Category | Local Files (`public/assets/categories/`) | Aspect / Shape | Source |
+| --- | --- | --- | --- |
+| Devotional Frames | `cat-devotional-frames.{webp,jpg}` | 1:1 circular thumbnail (240×240) | Pexels 10905470 |
+| Decorative Lamps | `cat-decorative-lamps.{webp,jpg}` | 1:1 circular thumbnail (240×240) | Pexels 30043135 |
+| Home Accents | `cat-home-accents.{webp,jpg}` | 1:1 circular thumbnail (240×240) | Pexels 33289454 |
+| Festive Décor | `cat-festive-decor.{webp,jpg}` | 1:1 circular thumbnail (240×240) | Pexels 8818664 |
+| Gift Sets | `cat-gift-sets.{webp,jpg}` | 1:1 circular thumbnail (240×240) | Pexels 14275717 |
+

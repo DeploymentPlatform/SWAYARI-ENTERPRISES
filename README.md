@@ -26,11 +26,17 @@ SWAYARI is **intentionally NOT an automated online payment checkout**. Because e
 
 ## Technology Stack
 
-- **Frontend:** Semantic HTML5, Modern Vanilla CSS (variables, luxury ivory/burgundy/gold design tokens, responsive grid), JavaScript ES Modules.
-- **Backend / API:** Cloudflare Pages Functions (`/functions/api/*`).
-- **Database:** Cloudflare D1 (Serverless SQLite on Cloudflare's Free tier).
+- **Applications:**
+  - **Storefront (`apps/storefront`):** React 18, TypeScript, Vite, Tailwind CSS, Framer Motion, Lucide icons. High-density, Tanishq-inspired visual elegance with Amazon-grade shopping ergonomics.
+  - **Admin Operations (`apps/admin`):** React 18, TypeScript, Vite, Tailwind CSS. Protected operational control center for orders, quotations, internal notes, catalogue, and campaign hero banners.
+- **Shared Packages:**
+  - `packages/shared`: Shared TypeScript types, validation schemas, formatters, and business constants.
+  - `packages/server`: Edge session verification, cookie management, and audit logging.
+  - `packages/ui`: Shared design tokens and Tailwind configuration preset.
+- **Backend / Edge Functions:** Cloudflare Pages Functions per portal application root.
+- **Database:** Cloudflare D1 (Serverless SQLite on Cloudflare's Free tier) shared across both backends via server-side bindings.
 - **Authentication:** Direct Google Identity Services (GIS) on the frontend; RFC-compliant JWT/JWKS verification using `jose` on the backend edge.
-- **Sessions:** Cryptographically generated tokens stored in `HttpOnly`, `Secure`, `SameSite=Lax` cookies.
+- **Sessions:** Cryptographically generated tokens stored in `HttpOnly`, `Secure`, `SameSite=Lax` cookies with portal scope enforcement (`swayari_customer_session` vs `swayari_admin_session`).
 
 ---
 
@@ -38,49 +44,41 @@ SWAYARI is **intentionally NOT an automated online payment checkout**. Because e
 
 ```text
 SWAYARI-ENTERPRISES/
-├── .github/
-│   └── workflows/
-│       ├── ci.yml                 # Automated continuous integration test suite
-│       └── daily-backup.yml       # Daily Asia/Kolkata code snapshot workflow
-├── functions/                     # Cloudflare Pages Functions (Edge API)
-│   ├── _middleware.js             # Security headers, CSP & CSRF origin guards
-│   ├── _utils.js                  # Auth, session, D1 queries & audit utilities
-│   └── api/
-│       ├── auth/                  # Google ID token verification & session routes
-│       ├── products/              # Storefront catalogue querying & filtering
-│       ├── categories/            # Active categories with product counts
-│       ├── orders/                # Order request submission (atomic D1 batch)
-│       └── admin/                 # Authorized administrator management routes
+├── apps/
+│   ├── storefront/                # Customer shopping portal (React 18 + Vite)
+│   │   ├── functions/             # Storefront Pages Functions (No admin handlers)
+│   │   ├── src/                   # Components, pages, hooks, contexts
+│   │   └── public/assets/         # Synced product and editorial assets
+│   └── admin/                     # Restricted business portal (React 18 + Vite)
+│       ├── functions/             # Protected Admin Pages Functions
+│       ├── src/                   # Order manager, product editor, banner manager
+│       └── public/assets/         # Synced operational assets
+├── packages/
+│   ├── shared/                    # Shared TypeScript interfaces & constants
+│   ├── server/                    # Edge authentication & cookie utilities
+│   └── ui/                        # Design tokens & Tailwind preset
 ├── migrations/
-│   ├── 0001_initial_schema.sql    # D1 production schema
-│   └── 0002_demo_data.sql         # Seed preview demo entries (is_demo = 1)
-├── public/                        # Static assets & storefront pages
-│   ├── assets/
-│   │   ├── brand/                 # SVG logo, favicon, official artwork
-│   │   ├── demo/                  # Authenticated product photography samples
-│   │   └── manifest.json          # Git-tracked image asset manifest
-│   ├── css/                       # Design tokens, typography, components, layouts
-│   ├── js/                        # Client API client, cart, auth & admin modules
-│   ├── shop/                      # Catalogue browse & search
-│   ├── product/                   # Single product details & specifications
-│   ├── cart/                      # Request cart & quantity review
-│   ├── checkout/                  # Contact & delivery request submission
-│   ├── order-confirmation/        # Request reference code & consultation timeline
-│   ├── account/orders/            # Customer request history & quotation breakdown
-│   ├── admin/                     # Full administrator control center
-│   ├── about/                     # Heritage, story & craftsmanship
-│   ├── contact/                   # Business office & bulk gifting enquiry form
-│   ├── ordering-policy/           # Manual confirmation & shipping policy
-│   └── privacy/                   # Data protection & Google auth transparency
+│   ├── 0001_initial_schema.sql    # D1 relational schema
+│   ├── 0002_demo_data.sql         # Seed preview demo entries (is_demo = 1)
+│   ├── 0003_session_scope.sql     # Customer vs admin session scope isolation
+│   ├── 0004_preview_catalogue.sql # Frame relief preview updates
+│   ├── 0005_rich_demo_catalogue.sql # 20 sample products across 5 categories
+│   └── 0006_campaign_banners.sql # Dynamic campaign hero banners
+├── public/assets/                 # Authoritative Git-tracked asset repository
+│   ├── brand/                     # SVG logo, favicon, official artwork
+│   ├── categories/                # 5 circular category shortcuts
+│   ├── editorial/                 # Desktop & mobile campaign hero slides
+│   ├── products/                  # 20 high-res WebP/JPG product photographs
+│   └── manifest.json              # Generated asset manifest
 ├── scripts/
-│   ├── create-daily-backup.sh     # Asia/Kolkata daily branch snapshot script
-│   ├── export-git-bundle.sh       # Offline git bundle disaster recovery exporter
-│   ├── generate-manifest.js       # Auto-generator for deployed photo manifest
+│   ├── prepare-tanishq-catalogue.py # Image download & crop pipeline
+│   ├── sync-assets.js             # Asset synchronization to app roots
+│   ├── generate-manifest.js       # Manifest builder
 │   ├── d1-mock.js                 # In-memory D1 test runner via node:sqlite
 │   └── run-tests.js               # Automated test suite (25 tests)
-├── docs/                          # In-depth architectural & operational docs
+├── docs/                          # Comprehensive architectural documentation
 ├── package.json
-└── wrangler.toml                  # Cloudflare Pages & D1 database configuration
+└── wrangler.toml                  # Cloudflare D1 database configuration
 ```
 
 ---

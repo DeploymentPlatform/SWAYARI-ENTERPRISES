@@ -228,3 +228,68 @@ without changing the working architecture.
 4. Confirm real product details (sizes, materials, prices) and publish real inventory; better
    product photographs on a plain background would allow larger gallery images.
 5. Optional: reduce storefront JS by lazy-loading Motion; consider a contact-form backend.
+
+---
+
+## Milestone 4: Definitive Tanishq-Inspired Storefront Redesign & Dynamic Campaign Management
+
+- **Date & Time (Asia/Kolkata):** `2026-10-18T22:40:00+05:30`
+- **Working Branch:** `feature/swayari-tanishq-storefront`
+- **Completed Implementation Commit:** [`31c9c115b1d8295dcaeef643fd6bee8bea72aa60`](file:///Users/suryateja/Downloads/SWAYARI%20ENTERPRISES/SWAYARI-ENTERPRISES) (`31c9c11`)
+- **Preceding Commit References:** `1bd5ce7` (Milestone 3 implementation), `95ef9a6` (Milestone 3 documentation)
+
+### 1. Context & Architectural Rationale
+The business owner rejected the previous oversized editorial layout with its single static hero and sparse brochure feel. The owner requested the definitive premium shopping experience inspired by **Tanishq** (luxurious visual refinement, warm gold accents, compact hierarchy) and **Amazon** (prominent central search, campaign banners, category shortcuts, browsable product rows). The page flow prioritises:
+**Search → Categories → Campaigns → Products → Cart → Order Request.**
+
+Furthermore, the 4 legacy owner-supplied sample frame photographs were replaced in the active preview with a coherent 20-product demo catalogue across 5 categories, while preserving historical records and migrations intact.
+
+### 2. Architecture & Components Implemented
+1. **Compact Shopping Header (`apps/storefront/src/components/Header.tsx`):**
+   - Left-aligned serif SWAYARI logo and subtitle.
+   - Prominent central search bar with placeholder `"Search décor, gifts and more"`.
+   - Debounced (250ms) autocomplete suggestions with product thumbnails, category badges, sample prices, and keyboard navigation.
+   - Customer account menu and cart button with live item count badge.
+   - Compact category navigation strip below header with active highlights.
+2. **Multi-Slide Campaign Hero Carousel (`apps/storefront/src/components/Hero.tsx`):**
+   - Compact height (~340–380px desktop, ~240–260px mobile), eliminating oversized viewports.
+   - 4 distinct campaign themes: Gifts for Meaningful Moments, Devotional Frames Collection, Artisanal Brass & Temple Lighting, Festive Urulis & Home Accents.
+   - Smooth transitions, mouse drag and touch swipe support, prev/next arrows, clickable pill indicators, 6s autoplay with pause on hover/focus/tab switch, and reduced-motion support.
+   - Connected dynamically to `/api/banners` with fallback to default campaign slides.
+3. **Category Shortcuts Strip (`apps/storefront/src/components/CategoryShortcuts.tsx`):**
+   - 5 circular 1:1 thumbnails (Devotional Frames, Decorative Lamps, Home Accents, Festive Décor, Gift Sets) for immediate visual navigation.
+4. **High-Density Product Rows (`apps/storefront/src/components/ProductCard.tsx`):**
+   - 4 readable cards across on desktop (`grid-cols-4`), 3 on tablet, 2 on mobile.
+   - Strictly square 1:1 product imagery (~180–220px desktop card height) with `object-contain` on `#FAF7F2` warm surfaces.
+   - Category pill badge, 2-line clamped title, formatted indicative price, Quick View overlay, and instant Add to Request action.
+5. **Quick View Modal (`apps/storefront/src/components/QuickViewModal.tsx`):**
+   - Instant modal overlay with gallery selector, dimensions, materials, indicative price, quantity stepper, bespoke note input, and request action.
+6. **Isolated 20-Product Demo Catalogue:**
+   - 20 high-resolution licensed stock photos sourced from Pexels under free commercial licence (`scripts/prepare-tanishq-catalogue.py`).
+   - Prepared into WebP and JPG assets (`public/assets/products/*-800.{webp,jpg}`).
+   - Seeded via `migrations/0005_rich_demo_catalogue.sql` with realistic sample prices, dimensions, and descriptions tagged `is_demo = 1`.
+7. **Dynamic Campaign Banners Table & Admin Management:**
+   - Migration `0006_campaign_banners.sql` providing `campaign_banners` relational table.
+   - Public endpoint `apps/storefront/functions/api/banners/index.js` and protected endpoints `apps/admin/functions/api/admin/banners/`.
+   - Admin Campaign Banners management page (`apps/admin/src/pages/BannersPage.tsx`) with interactive desktop and mobile live preview toggles, copy editor, CTA destination links, reordering, and active/disabled toggles.
+
+### 3. Checks & Verification Actually Run
+- `npm run build`:
+  - Asset manifest generated with 139 items.
+  - Storefront Vite build: 493.08 kB JS (≈147.41 kB gzip), 45.12 kB CSS. ✅
+  - Admin Vite build: 294.87 kB JS (≈87.10 kB gzip), 29.76 kB CSS. ✅
+- `npm run typecheck`:
+  - `tsc --noEmit -p tsconfig.json` executed across both applications and shared packages: **0 errors**. ✅
+- `npm test`:
+  - Executed automated test suite in `scripts/run-tests.js`: **25 passed, 0 failed**. ✅
+- API verification:
+  - `GET http://localhost:8788/api/banners`: 200 OK, returns 4 active campaign banners. ✅
+  - `GET http://localhost:8788/api/products?include_demo=1`: 200 OK, returns 20 rich demo products. ✅
+  - `GET http://localhost:8788/api/products`: 200 OK, count 0 (demo items strictly hidden in production store). ✅
+  - `POST http://localhost:8789/api/auth/dev-login` & `GET /api/admin/banners`: 200 OK, returns all 4 campaign slides with admin authorization. ✅
+
+### 4. Deployment Status & Handoff
+- Main production branch remains untouched; working review branch is `feature/swayari-tanishq-storefront`.
+- No paid Cloudflare services enabled (R2, Cloudflare Images remain disabled).
+- Local preview origins: Storefront on `http://localhost:8788`, Admin on `http://localhost:8789`.
+

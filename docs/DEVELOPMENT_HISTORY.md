@@ -62,3 +62,72 @@ SWAYARI ENTERPRISES required the initial production-ready release of its bespoke
 1. Owner to sign in to Cloudflare with `swayarienterprises@gmail.com` and run `wrangler d1 create swayari-db` and `wrangler pages project create swayari-enterprises`.
 2. Owner to configure Google Cloud OAuth Web Client ID under `swayarienterprises@gmail.com` and set the `GOOGLE_CLIENT_ID` secret on Cloudflare Pages.
 3. Photograph real inventory and run `node scripts/generate-manifest.js` to populate authentic catalogue entries.
+
+---
+
+## Milestone 2: Two-Portal Independent Separation & Premium Redesign
+
+- **Date & Time (Asia/Kolkata):** `2026-10-18T20:25:00+05:30`
+- **Working Branch:** `feature/swayari-premium-portals`
+- **Preceding Implementation Commit:** [`b236a60d92067ca107327d2e239d2046fe1af820`](file:///Users/suryateja/Downloads/SWAYARI%20ENTERPRISES/SWAYARI-ENTERPRISES)
+- **Commit Summary:** `feat(portals): implement two-portal separation and premium redesign`
+
+### 1. Context & Motivation
+The owner rejected the previous single-origin architecture and layout as too basic for a luxury artisanal gifting brand. The requirements called for:
+1. Complete architectural separation into **TWO independently deployable Cloudflare Pages applications**:
+   - Customer Storefront (`apps/storefront`)
+   - Admin Operations Portal (`apps/admin`)
+2. Total elimination of admin routes, links, frontend bundles, and API handlers from the customer storefront.
+3. Upgraded modern frontend stack using React 18, TypeScript, Vite, Tailwind CSS, Lucide icons, and customized design tokens.
+4. Premium editorial design direction inspired by *Ellementry*: warm ivory surfaces (`#FAF7F2`), deep burgundy accents (`#5C1D24`), restrained antique gold highlights (`#C49A45`), warm charcoal text, Playfair Display typography, 4:5 vertical product ratio cards, rich product detail gallery, and cart drawer.
+5. Strict database scope isolation preventing customer tokens from authenticating against admin APIs.
+
+### 2. Architecture & Components Created
+1. **Monorepo Structure:**
+   - `apps/storefront`: Public customer storefront with React 18, Vite, Pages Functions (`api/products`, `api/categories`, `api/orders`, `api/auth`).
+   - `apps/admin`: Staff operations portal at dedicated origin with branded login screen (`swayarienterprises@gmail.com`), dashboard metrics, live order drawer, quotation editor, confidential staff notes thread, and product catalogue management.
+   - `packages/shared`: Shared TypeScript types, constants, validation, formatters.
+   - `packages/server`: Server-side cookie helpers, session verification, and audit logging.
+   - `packages/ui`: Design system tokens and shared Tailwind preset.
+2. **Database Migrations:**
+   - `migrations/0003_session_scope.sql`: Added `scope TEXT NOT NULL DEFAULT 'customer'` to `sessions` table.
+   - Host-only cookies: `swayari_customer_session` (14 days, scope: `customer`) and `swayari_admin_session` (7 days, scope: `admin`).
+3. **Storefront Sanitization:**
+   - Removed all `/admin` routes, buttons, footer links, and API handlers from the storefront application.
+   - Storefront `_middleware.js` returns HTTP `404 Not Found` for any requests to `/admin` or `/api/admin`.
+4. **Documentation:**
+   - Created `docs/DESIGN_SYSTEM.md`: Comprehensive visual specifications covering typography, colors, spacing, ratios, controls, and accessibility.
+   - Created `docs/BROWSER_SETUP_HANDOFF.md`: Step-by-step instructions for Google Cloud Console (OAuth Client IDs) and Cloudflare Dashboard (Pages projects, D1 bindings, environment variables).
+   - Updated `docs/ARCHITECTURE.md`: Complete system architecture and sequence diagrams.
+   - Updated `CHANGELOG.md`: Version 0.2.0 release documentation.
+
+### 3. Checks & Verification Executed
+- **Automated Test Suite (`npm test`):**
+  - Ran `scripts/run-tests.js` against in-memory D1 test database.
+  - **Results: 17 passed, 0 failed.**
+  - Verified: Demo data separation, dev login production isolation, customer session cookie issuance, admin allowlist enforcement, customer session rejection on admin APIs (scope isolation), storefront 404 blocking on `/admin`, signed-out order block (401), genuine product creation/publishing, client price recalculation, duplicate order prevention via idempotency key, cross-customer isolation, internal notes confidentiality, quotation revisions without overwriting request items, product soft-archival, admin stats calculation, and production Vite builds.
+- **Production Builds (`npm run build`):**
+  - Asset manifest generated with 7 items.
+  - `apps/storefront/dist`: index.html (1.77 kB), CSS (31.94 kB), JS (333.67 kB gzip 93.15 kB). Built in 982ms.
+  - `apps/admin/dist`: index.html (1.30 kB), CSS (21.84 kB), JS (293.95 kB gzip 84.71 kB). Built in 698ms.
+- **Local Dev Server Execution (`wrangler pages dev`):**
+  - Storefront running on `http://localhost:8788`.
+  - Admin Portal running on `http://localhost:8789`.
+  - Both successfully binding to local D1 SQLite database (`.wrangler/state`).
+- **Visual Previews:**
+  - Visual preview renders generated and stored in artifact directory:
+    - Customer Storefront: `storefront_redesign_preview_1792335079301.jpg`
+    - Admin Operations Portal: `admin_portal_preview_1792335096615.jpg`
+
+### 4. Deployment Status
+- Both applications are production-build verified and ready for deployment as two independent Cloudflare Pages projects under `swayarienterprises@gmail.com`.
+- Zero paid Cloudflare services enabled (R2 and Cloudflare Images remain unactivated; product photos remain Git-tracked in `public/assets/`).
+
+### 5. Open Issues & Next Steps
+1. Execute Claude in Chrome browser handoff using `docs/BROWSER_SETUP_HANDOFF.md`:
+   - Create two Cloudflare Pages projects: `swayari-store` and `swayari-admin`.
+   - Bind both to the same D1 database (`swayari-db`).
+   - Create two Google OAuth Web Client IDs in Google Cloud Console.
+2. Review visual previews with the owner.
+3. Merge `feature/swayari-premium-portals` into `main` after owner visual sign-off.
+

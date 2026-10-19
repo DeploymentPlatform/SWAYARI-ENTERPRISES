@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Check, X } from 'lucide-react';
-import { Category, Product } from '@swayari/shared';
+import { Category, OCCASIONS, Product } from '@swayari/shared';
 import { Drawer, ErrorBanner } from './ui';
 
 interface ProductEditorModalProps {
@@ -29,6 +29,27 @@ const Section: React.FC<{ title: string; hint?: string; children: React.ReactNod
   </section>
 );
 
+function parseBulkTiers(text: string) {
+  if (!text.trim()) return [];
+  try {
+    if (text.trim().startsWith('[')) return JSON.parse(text);
+  } catch {}
+  return text
+    .split('\n')
+    .map(line => {
+      const parts = line.split(/[:,-]/).map(s => s.trim()).filter(Boolean);
+      if (parts.length >= 2) {
+        const minQty = parseInt(parts[0], 10);
+        const unitPrice = parseFloat(parts[1]);
+        if (minQty && !isNaN(unitPrice)) {
+          return { minQuantity: minQty, unitPrice, label: `${minQty}+ pcs` };
+        }
+      }
+      return null;
+    })
+    .filter(Boolean);
+}
+
 /** Structured product editor. Only confirmed details belong in material/dimensions/price. */
 export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productId, onClose, onSaved }) => {
   const editing = Boolean(productId);
@@ -48,12 +69,21 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
     material: '',
     dimensions: '',
     indicativePrice: '',
+    priceType: 'piece' as 'piece' | 'set',
+    setContents: '',
     minQuantity: '1',
+    orderIncrement: '1',
+    isQuoteOnly: false,
+    shippingInfo: '',
+    supportsIndividual: true,
+    supportsBulk: true,
     customisationInfo: '',
     availabilityLabel: 'Available on request',
     status: 'draft' as Product['status'],
     isDemo: false
   });
+  const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
+  const [bulkTiersText, setBulkTiersText] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setF(prev => ({ ...prev, [k]: e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value }));
@@ -77,12 +107,25 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
             material: p.material || '',
             dimensions: p.dimensions || '',
             indicativePrice: p.indicativePrice === null || p.indicativePrice === undefined ? '' : String(p.indicativePrice),
+            priceType: p.priceType || 'piece',
+            setContents: p.setContents || '',
             minQuantity: String(p.minQuantity || 1),
+            orderIncrement: String(p.orderIncrement || 1),
+            isQuoteOnly: Boolean(p.isQuoteOnly),
+            shippingInfo: p.shippingInfo || '',
+            supportsIndividual: p.supportsIndividual !== false,
+            supportsBulk: p.supportsBulk !== false,
             customisationInfo: p.customisationInfo || '',
             availabilityLabel: p.availabilityLabel || 'Available on request',
             status: p.status,
             isDemo: Boolean(p.isDemo)
           });
+          setSelectedOccasions(p.occasions || []);
+          setBulkTiersText(
+            p.bulkTiers && p.bulkTiers.length > 0
+              ? p.bulkTiers.map(t => `${t.minQuantity}: ${t.unitPrice}`).join('\n')
+              : ''
+          );
           setImages(p.images || []);
         }
         setState('ready');
@@ -114,7 +157,16 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
           material: f.material.trim() || null,
           dimensions: f.dimensions.trim() || null,
           indicativePrice: f.indicativePrice === '' ? null : Number(f.indicativePrice),
+          priceType: f.priceType,
+          setContents: f.setContents.trim() || null,
           minQuantity: Number(f.minQuantity) || 1,
+          orderIncrement: Number(f.orderIncrement) || 1,
+          isQuoteOnly: Boolean(f.isQuoteOnly),
+          bulkTiers: parseBulkTiers(bulkTiersText),
+          shippingInfo: f.shippingInfo.trim() || null,
+          occasions: selectedOccasions,
+          supportsIndividual: f.supportsIndividual,
+          supportsBulk: f.supportsBulk,
           availabilityLabel: f.availabilityLabel.trim() || 'Available on request',
           customisationInfo: f.customisationInfo.trim() || null,
           status: f.status,
@@ -224,20 +276,135 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
             </label>
           </Section>
 
-          <Section title="Price and quantity">
+          <Section title="Price, packaging & quantity">
             <div className="grid gap-4 sm:grid-cols-3">
               <label>
                 <span className="adm-label">Indicative price (₹)</span>
-                <input type="number" min={0} className="adm-input" value={f.indicativePrice} onChange={set('indicativePrice')} placeholder="Blank = on request" />
+                <input
+                  type="number"
+                  min={0}
+                  className="adm-input"
+                  value={f.indicativePrice}
+                  onChange={set('indicativePrice')}
+                  placeholder="Blank = on request"
+                  disabled={f.isQuoteOnly}
+                />
               </label>
               <label>
-                <span className="adm-label">Minimum quantity</span>
-                <input type="number" min={1} className="adm-input" value={f.minQuantity} onChange={set('minQuantity')} />
+                <span className="adm-label">Price unit</span>
+                <select className="adm-input" value={f.priceType} onChange={set('priceType')}>
+                  <option value="piece">Per piece (/ pc)</option>
+                  <option value="set">Per set (/ set)</option>
+                </select>
               </label>
               <label>
                 <span className="adm-label">Availability label</span>
                 <input className="adm-input" value={f.availabilityLabel} onChange={set('availabilityLabel')} />
               </label>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="flex items-center gap-2 pt-2">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-burgundy"
+                  checked={f.isQuoteOnly}
+                  onChange={set('isQuoteOnly')}
+                />
+                <span className="text-sm font-medium">Quote only (never place in a confirmed budget band)</span>
+              </label>
+              <label>
+                <span className="adm-label">Set contents (if applicable)</span>
+                <input
+                  className="adm-input"
+                  value={f.setContents}
+                  onChange={set('setContents')}
+                  placeholder="e.g. 1 Handcrafted Uruli + 4 Diya cups"
+                />
+              </label>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label>
+                <span className="adm-label">Minimum order quantity (MOQ)</span>
+                <input type="number" min={1} className="adm-input" value={f.minQuantity} onChange={set('minQuantity')} />
+              </label>
+              <label>
+                <span className="adm-label">Order increment</span>
+                <input type="number" min={1} className="adm-input" value={f.orderIncrement} onChange={set('orderIncrement')} />
+              </label>
+            </div>
+
+            <div>
+              <span className="adm-label">Volume pricing tiers (one per line: MinQty: UnitPrice)</span>
+              <textarea
+                className="adm-input font-mono text-xs"
+                rows={3}
+                value={bulkTiersText}
+                onChange={e => setBulkTiersText(e.target.value)}
+                placeholder="25: 85&#10;50: 75&#10;100: 65"
+              />
+              <p className="mt-1 text-xs text-ink-soft">
+                Example: <code>25: 85</code> means 25+ pieces cost ₹85 each.
+              </p>
+            </div>
+
+            <div>
+              <span className="adm-label">Shipping & delivery terms</span>
+              <input
+                className="adm-input"
+                value={f.shippingInfo}
+                onChange={set('shippingInfo')}
+                placeholder="e.g. Dispatches in 24–48 hours across India. Insured transit."
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 pt-1">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-burgundy"
+                  checked={f.supportsIndividual}
+                  onChange={set('supportsIndividual')}
+                />
+                <span className="text-sm">Supports individual retail purchase</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-burgundy"
+                  checked={f.supportsBulk}
+                  onChange={set('supportsBulk')}
+                />
+                <span className="text-sm">Supports bulk return gifting requests</span>
+              </label>
+            </div>
+
+            <div className="pt-2">
+              <span className="adm-label">Suitable occasions & events</span>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {OCCASIONS.map(occ => {
+                  const active = selectedOccasions.includes(occ.id);
+                  return (
+                    <button
+                      key={occ.id}
+                      type="button"
+                      onClick={() =>
+                        setSelectedOccasions(prev =>
+                          active ? prev.filter(id => id !== occ.id) : [...prev, occ.id]
+                        )
+                      }
+                      className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                        active
+                          ? 'bg-burgundy text-white'
+                          : 'border border-stone-shade bg-white text-ink hover:border-burgundy'
+                      }`}
+                    >
+                      {occ.name}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </Section>
 

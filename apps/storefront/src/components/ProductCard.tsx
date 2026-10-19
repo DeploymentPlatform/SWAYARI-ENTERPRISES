@@ -89,12 +89,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority }) =
             />
           </Link>
 
-          {/* Category / Sample Badge */}
-          {product.isDemo && (
-            <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-sm border border-[#E7DFD5] text-[#8F7138] text-[10px] font-bold uppercase tracking-wider shadow-xs">
-              Sample
-            </span>
-          )}
+          {/* Category / Sample / MOQ Badges */}
+          <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start z-10">
+            {product.isDemo && (
+              <span className="px-2 py-0.5 rounded-full bg-white/95 backdrop-blur-sm border border-[#E7DFD5] text-[#8F7138] text-[10px] font-bold uppercase tracking-wider shadow-xs">
+                Sample
+              </span>
+            )}
+            {product.isQuoteOnly ? (
+              <span className="px-2 py-0.5 rounded-full bg-[#571C2A]/90 text-white text-[9.5px] font-semibold tracking-wider uppercase shadow-xs">
+                Bespoke Quote
+              </span>
+            ) : product.minQuantity > 1 ? (
+              <span className="px-2 py-0.5 rounded-full bg-[#C49A45]/20 backdrop-blur-sm border border-[#C49A45]/40 text-[#6B5018] text-[9.5px] font-bold uppercase tracking-wide shadow-xs">
+                Min. {product.minQuantity} pcs
+              </span>
+            ) : product.priceType === 'set' ? (
+              <span className="px-2 py-0.5 rounded-full bg-[#FAF7F2]/95 border border-[#E7DFD5] text-[#571C2A] text-[9.5px] font-semibold tracking-wide shadow-xs">
+                Gift Set
+              </span>
+            ) : null}
+          </div>
 
           {/* Quick View Button on Image Hover */}
           <div className="absolute inset-x-3 bottom-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hidden sm:block">
@@ -124,32 +139,51 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority }) =
             </Link>
           </h3>
 
-          {/* Material / Dimensions snippet if available */}
-          <p className="text-[11px] text-[#7A6E66] truncate mt-1">
-            {product.material || product.dimensions || 'Handcrafted solid brass'}
-          </p>
+          {/* Set contents or material */}
+          {product.setContents ? (
+            <p className="text-[11px] text-[#571C2A] font-medium truncate mt-1">
+              ✨ {product.setContents}
+            </p>
+          ) : (
+            <p className="text-[11px] text-[#7A6E66] truncate mt-1">
+              {product.material || product.dimensions || 'Handcrafted solid brass'}
+            </p>
+          )}
 
           {/* Price Row */}
-          <div className="mt-2.5 pt-2 border-t border-[#F4EFEA] flex items-baseline justify-between">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-[14px] sm:text-[15px] font-bold text-[#571C2A]">
-                {formatPrice(product.indicativePrice)}
-              </span>
-              {product.isDemo && (
-                <span className="text-[10px] text-[#7A6E66]">
-                  (Sample)
+          <div className="mt-2.5 pt-2 border-t border-[#F4EFEA] flex flex-col justify-between">
+            <div className="flex items-baseline justify-between gap-1.5">
+              {product.isQuoteOnly ? (
+                <span className="text-[12.5px] sm:text-[13px] font-bold text-[#8F7138]">
+                  Price on Consultation
                 </span>
+              ) : (
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[14px] sm:text-[15.5px] font-bold text-[#571C2A]">
+                    {formatPrice(product.indicativePrice)}
+                  </span>
+                  <span className="text-[11px] text-[#7A6E66] font-normal">
+                    {product.priceType === 'set' ? '/ set' : '/ piece'}
+                  </span>
+                </div>
               )}
+              
+              {/* Mobile Quick View link */}
+              <button
+                type="button"
+                onClick={handleOpenQuickView}
+                className="sm:hidden text-[11px] text-[#571C2A] font-medium underline"
+              >
+                Details
+              </button>
             </div>
-            
-            {/* Mobile Quick View link */}
-            <button
-              type="button"
-              onClick={handleOpenQuickView}
-              className="sm:hidden text-[11px] text-[#571C2A] font-medium underline"
-            >
-              Details
-            </button>
+
+            {/* Bulk MOQ condition note */}
+            {product.minQuantity > 1 && product.indicativePrice !== null && (
+              <div className="text-[10.5px] text-[#8F7138] font-medium mt-0.5">
+                Bulk order only · Min. {product.minQuantity} pcs ({formatPrice(product.indicativePrice * product.minQuantity)} min.)
+              </div>
+            )}
           </div>
 
           {/* 3. Add to Cart / Request Action */}

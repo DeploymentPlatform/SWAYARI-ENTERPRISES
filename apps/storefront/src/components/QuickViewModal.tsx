@@ -16,8 +16,10 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
   const { addItem, openDrawer } = useCart();
   const { user, initiateGoogleSignIn } = useAuth();
   
+  const minQty = product.minQuantity || 1;
+  const incQty = product.orderIncrement || 1;
   const [selectedImgIdx, setSelectedImgIdx] = useState(0);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(minQty);
   const [added, setAdded] = useState(false);
   const [customNote, setCustomNote] = useState('');
 
@@ -42,6 +44,19 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
       openDrawer();
     }, 600);
   }
+
+  // Calculate current applicable unit price based on quantity and bulk tiers
+  let currentUnitPrice = product.indicativePrice;
+  if (product.bulkTiers && product.bulkTiers.length > 0) {
+    const sortedTiers = [...product.bulkTiers].sort((a, b) => b.min_qty - a.min_qty);
+    for (const tier of sortedTiers) {
+      if (quantity >= tier.min_qty) {
+        currentUnitPrice = tier.unit_price;
+        break;
+      }
+    }
+  }
+  const calculatedTotal = currentUnitPrice !== null ? currentUnitPrice * quantity : null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8">
@@ -85,6 +100,11 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                 Sample Piece
               </span>
             )}
+            {product.minQuantity > 1 && (
+              <span className="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-full bg-[#C49A45]/20 text-[#6B5018] text-[10px] font-bold uppercase tracking-wide border border-[#C49A45]/40">
+                Min. {product.minQuantity} pcs
+              </span>
+            )}
           </div>
 
           {/* Thumbnails */}
@@ -120,24 +140,77 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
           </div>
 
           {/* Indicative Price */}
-          <div className="mt-3.5 pb-3.5 border-b border-[#F4EFEA]">
-            <div className="flex items-baseline gap-2">
-              <span className="text-[1.375rem] font-bold text-[#571C2A]">
-                {formatPrice(product.indicativePrice)}
-              </span>
-              {product.isDemo && (
-                <span className="text-[11px] text-[#7A6E66] font-medium">
-                  (Sample indicative price)
+          <div className="mt-3 pb-3 border-b border-[#F4EFEA]">
+            {product.isQuoteOnly ? (
+              <div>
+                <span className="text-[1.25rem] font-bold text-[#8F7138]">
+                  Price on Consultation
                 </span>
-              )}
-            </div>
-            <p className="text-[11px] text-[#544A44] mt-1 leading-relaxed">
-              Final pricing and insured shipping confirmed personally by telephone consultation.
-            </p>
+                <p className="text-[11px] text-[#544A44] mt-1 leading-relaxed">
+                  Bespoke commission crafted to your exact specifications. Final price confirmed upon specification review.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[1.375rem] font-bold text-[#571C2A]">
+                    {formatPrice(currentUnitPrice)}
+                  </span>
+                  <span className="text-[12px] text-[#7A6E66]">
+                    {product.priceType === 'set' ? '/ set' : '/ piece'}
+                  </span>
+                  {product.isDemo && (
+                    <span className="text-[11px] text-[#7A6E66] font-medium">
+                      (Sample)
+                    </span>
+                  )}
+                </div>
+
+                {calculatedTotal !== null && quantity > 1 && (
+                  <p className="text-[12px] font-semibold text-[#571C2A] mt-1">
+                    Indicative Subtotal: {formatPrice(calculatedTotal)} ({quantity} {product.priceType === 'set' ? 'sets' : 'pieces'})
+                  </p>
+                )}
+
+                <p className="text-[11px] text-[#544A44] mt-1 leading-relaxed">
+                  Final pricing and insured shipping confirmed personally by phone consultation.
+                </p>
+              </div>
+            )}
           </div>
+
+          {/* Bulk Tiers if present */}
+          {product.bulkTiers && product.bulkTiers.length > 0 && (
+            <div className="mt-3 p-2.5 bg-[#FAF7F2] rounded-xl border border-[#E7DFD5]/80">
+              <span className="text-[10.5px] font-bold text-[#8F7138] uppercase tracking-wider block mb-1">
+                Volume Pricing Tiers:
+              </span>
+              <div className="grid grid-cols-3 gap-1.5 text-center">
+                {product.bulkTiers.map((tier) => (
+                  <div
+                    key={tier.min_qty}
+                    className={`p-1.5 rounded-lg border text-[11px] ${
+                      quantity >= tier.min_qty
+                        ? 'bg-[#571C2A] text-white border-[#571C2A]'
+                        : 'bg-white text-[#292421] border-[#E7DFD5]'
+                    }`}
+                  >
+                    <div className="font-bold">{formatPrice(tier.unit_price)}</div>
+                    <div className="text-[9.5px] opacity-80">{tier.min_qty}+ pcs</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Specifications Table */}
           <div className="mt-3 text-[12px] space-y-1.5 bg-[#FAF7F2] p-3 rounded-xl border border-[#E7DFD5]/80">
+            {product.setContents && (
+              <div className="flex justify-between">
+                <span className="text-[#7A6E66]">Set Contents:</span>
+                <span className="font-semibold text-[#571C2A]">{product.setContents}</span>
+              </div>
+            )}
             {product.material && (
               <div className="flex justify-between">
                 <span className="text-[#7A6E66]">Material:</span>
@@ -150,30 +223,35 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                 <span className="font-semibold text-[#292421]">{product.dimensions}</span>
               </div>
             )}
-            <div className="flex justify-between">
-              <span className="text-[#7A6E66]">Status:</span>
-              <span className="font-semibold text-[#027A48]">Available for Request</span>
-            </div>
+            {product.shippingInfo && (
+              <div className="flex items-center gap-1.5 text-[11px] text-[#544A44] pt-1 border-t border-[#E7DFD5]/60">
+                <Truck className="w-3.5 h-3.5 text-[#B49155] flex-shrink-0" />
+                <span>{product.shippingInfo}</span>
+              </div>
+            )}
           </div>
 
           {/* Quantity Selector & Add to Request */}
-          <div className="mt-5 space-y-3">
-            <div className="flex items-center gap-3">
-              <label htmlFor="qv-qty" className="text-[12px] font-semibold text-[#292421]">Quantity:</label>
-              <div className="flex items-center border border-[#E7DFD5] rounded-lg bg-white overflow-hidden">
+          <div className="mt-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <label htmlFor="qv-qty" className="text-[12px] font-semibold text-[#292421]">
+                Quantity {product.minQuantity > 1 ? `(Min. ${product.minQuantity}, Step ${incQty}):` : ':'}
+              </label>
+              <div className="flex items-center border border-[#E7DFD5] rounded-lg bg-white overflow-hidden shadow-xs">
                 <button
                   type="button"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-1 text-[#292421] hover:bg-[#FAF7F2] transition-colors"
+                  onClick={() => setQuantity(Math.max(minQty, quantity - incQty))}
+                  disabled={quantity <= minQty}
+                  className="px-3 py-1 text-[#292421] hover:bg-[#FAF7F2] disabled:opacity-30 transition-colors"
                 >
                   -
                 </button>
-                <span id="qv-qty" className="px-3 py-1 text-[13px] font-bold text-[#292421] min-w-[32px] text-center">
+                <span id="qv-qty" className="px-3 py-1 text-[13px] font-bold text-[#292421] min-w-[36px] text-center">
                   {quantity}
                 </span>
                 <button
                   type="button"
-                  onClick={() => setQuantity(quantity + 1)}
+                  onClick={() => setQuantity(quantity + incQty)}
                   className="px-3 py-1 text-[#292421] hover:bg-[#FAF7F2] transition-colors"
                 >
                   +

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { formatPrice, validateOrderSubmission } from '@swayari/shared';
+import { formatPrice, OCCASIONS, validateOrderSubmission } from '@swayari/shared';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Link, useRouter } from '../lib/router';
@@ -41,6 +41,8 @@ export const CheckoutPage: React.FC = () => {
   const { navigate } = useRouter();
   usePageMeta('Send your request', undefined, { noindex: true });
 
+  const isBulkCart = items.some(it => it.quantity >= 10 || (it.minQuantity && it.minQuantity >= 10));
+
   const [values, setValues] = useState<Record<Fields, string>>({
     customerName: user?.name || '',
     customerPhone: '',
@@ -50,6 +52,16 @@ export const CheckoutPage: React.FC = () => {
     deliveryPincode: '',
     customerNotes: ''
   });
+  const [occasion, setOccasion] = useState('');
+  const [requiredDate, setRequiredDate] = useState('');
+  const [isBulkRequest, setIsBulkRequest] = useState(isBulkCart);
+
+  useEffect(() => {
+    if (isBulkCart) {
+      setIsBulkRequest(true);
+    }
+  }, [isBulkCart]);
+
   const [errors, setErrors] = useState<Partial<Record<Fields | 'items', string>>>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -99,6 +111,9 @@ export const CheckoutPage: React.FC = () => {
     const payload = {
       idempotencyKey: requestKey(),
       ...values,
+      occasion: occasion.trim() || undefined,
+      requiredDate: requiredDate.trim() || undefined,
+      isBulkRequest: Boolean(isBulkRequest),
       items: items.map(it => ({
         productId: it.productId,
         productSku: it.sku,
@@ -249,7 +264,67 @@ export const CheckoutPage: React.FC = () => {
               {field('deliveryState', { autoComplete: 'address-level1', maxLength: 80 })}
               {field('deliveryPincode', { autoComplete: 'postal-code', inputMode: 'numeric', maxLength: 6 })}
             </div>
-            {field('customerNotes', { textarea: true, optional: true, maxLength: 1000, hint: 'For example, an occasion date or a gift message' })}
+            {field('customerNotes', { textarea: true, optional: true, maxLength: 1000, hint: 'Special packaging instructions, notes, or gift card message' })}
+          </fieldset>
+
+          <fieldset className="space-y-5">
+            <legend className="mb-2 font-display text-[1.75rem]">Occasion & Celebration details</legend>
+            <p className="text-sm text-ink-soft">
+              Help our team prepare the most accurate quote, dispatch timeline, and bespoke packaging recommendation for your celebration.
+            </p>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label htmlFor="occasion-select" className="field-label">
+                  Occasion or celebration <span className="font-normal text-ink-soft">(optional)</span>
+                </label>
+                <select
+                  id="occasion-select"
+                  value={occasion}
+                  onChange={e => setOccasion(e.target.value)}
+                  className="field-input"
+                >
+                  <option value="">Select an occasion</option>
+                  {OCCASIONS.map(o => (
+                    <option key={o.id} value={o.name}>
+                      {o.name}
+                    </option>
+                  ))}
+                  <option value="Birthday & Milestone">Birthday & Milestone</option>
+                  <option value="Festive Pooja">Festive Pooja</option>
+                  <option value="Personal Gifting">Personal Gifting</option>
+                  <option value="Other">Other celebration</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="required-date" className="field-label">
+                  Required by date <span className="font-normal text-ink-soft">(optional)</span>
+                </label>
+                <input
+                  id="required-date"
+                  type="date"
+                  value={requiredDate}
+                  onChange={e => setRequiredDate(e.target.value)}
+                  className="field-input"
+                />
+                <p className="mt-1.5 text-xs text-ink-soft">
+                  We suggest placing bulk orders at least 5–7 days prior to your celebration.
+                </p>
+              </div>
+            </div>
+            <label className="flex items-start gap-3 rounded border border-stone-deep bg-[#FAF8F5] p-3.5 text-sm">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 accent-burgundy"
+                checked={isBulkRequest}
+                onChange={e => setIsBulkRequest(e.target.checked)}
+              />
+              <span>
+                <span className="font-medium text-ink">This is a bulk or return gifting request</span>
+                <span className="block text-xs text-ink-soft">
+                  Our team will check special volume packaging, customized tags, and tiered pricing for your celebration.
+                </span>
+              </span>
+            </label>
           </fieldset>
 
           <div id="request-disclaimer">

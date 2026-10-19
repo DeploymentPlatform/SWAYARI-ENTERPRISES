@@ -6,7 +6,13 @@ import { previewCountOverride, withPreview } from './preview';
 
 type Status = 'loading' | 'ready' | 'error';
 
-export function useProducts(params: { category?: string; search?: string } = {}) {
+export function useProducts(params: {
+  category?: string;
+  search?: string;
+  budget?: string;
+  occasion?: string;
+  bulk?: boolean;
+} = {}) {
   const [products, setProducts] = useState<Product[]>([]);
   const [status, setStatus] = useState<Status>('loading');
   const [attempt, setAttempt] = useState(0);
@@ -17,6 +23,9 @@ export function useProducts(params: { category?: string; search?: string } = {})
     const query = new URLSearchParams();
     if (params.category) query.set('category', params.category);
     if (params.search) query.set('search', params.search);
+    if (params.budget) query.set('budget', params.budget);
+    if (params.occasion) query.set('occasion', params.occasion);
+    if (params.bulk) query.set('bulk', '1');
     const qs = query.toString();
     fetch(withPreview(`/api/products${qs ? `?${qs}` : ''}`))
       .then(res => {
@@ -35,7 +44,7 @@ export function useProducts(params: { category?: string; search?: string } = {})
     return () => {
       cancelled = true;
     };
-  }, [params.category, params.search, attempt]);
+  }, [params.category, params.search, params.budget, params.occasion, params.bulk, attempt]);
 
   const retry = useCallback(() => setAttempt(a => a + 1), []);
   return { products, status, retry };
@@ -53,6 +62,8 @@ export function useCategories() {
 }
 
 export function toCartItem(product: Product, quantity?: number, extra: Partial<CartItem> = {}): CartItem {
+  const min = product.minQuantity || 1;
+  const initialQty = quantity ? Math.max(min, quantity) : min;
   return {
     productId: product.id,
     sku: product.sku,
@@ -60,8 +71,12 @@ export function toCartItem(product: Product, quantity?: number, extra: Partial<C
     slug: product.slug,
     image: product.images?.[0] || '',
     indicativePrice: product.indicativePrice,
-    minQuantity: product.minQuantity || 1,
-    quantity: Math.max(product.minQuantity || 1, quantity || product.minQuantity || 1),
+    minQuantity: min,
+    quantity: initialQty,
+    priceType: product.priceType || 'piece',
+    orderIncrement: product.orderIncrement || 1,
+    isQuoteOnly: product.isQuoteOnly,
+    setContents: product.setContents,
     ...extra
   };
 }

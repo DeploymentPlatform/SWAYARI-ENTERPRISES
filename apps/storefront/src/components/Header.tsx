@@ -12,11 +12,14 @@ import { formatPrice } from '@swayari/shared';
 
 const CATEGORIES = [
   { slug: 'all', label: 'All Pieces', href: '/shop' },
-  { slug: 'devotional-frames', label: 'Devotional Frames', href: '/shop?category=devotional-frames' },
+  { slug: 'under-999', label: 'Gifts ₹999 & Under', href: '/shop?budget=under-999' },
+  { slug: 'under-99', label: '₹99 & Under', href: '/shop?budget=under-99' },
+  { slug: 'bulk-gifts', label: 'Bulk & Return Favors', href: '/shop?bulk=1' },
+  { slug: 'gift-sets', label: 'Gift Sets', href: '/shop?category=gift-sets' },
+  { slug: 'festive-decor', label: 'Festive Décor', href: '/shop?category=festive-decor' },
   { slug: 'decorative-lamps', label: 'Decorative Lamps', href: '/shop?category=decorative-lamps' },
   { slug: 'home-accents', label: 'Home Accents', href: '/shop?category=home-accents' },
-  { slug: 'festive-decor', label: 'Festive Décor', href: '/shop?category=festive-decor' },
-  { slug: 'gift-sets', label: 'Gift Sets', href: '/shop?category=gift-sets' },
+  { slug: 'devotional-frames', label: 'Devotional Frames', href: '/shop?category=devotional-frames' },
   { slug: 'about', label: 'Our Story', href: '/about' },
   { slug: 'contact', label: 'Contact', href: '/contact' }
 ];
@@ -100,18 +103,18 @@ export const Header: React.FC = () => {
   return (
     <>
       {/* 1. Top Notice Strip */}
-      <aside aria-label="Order request model notice" className="bg-[#571C2A] text-[#F7F4EF] text-[12px] font-medium py-1.5 px-4 tracking-wide shadow-inner">
+      <aside aria-label="Order request proposition" className="bg-[#571C2A] text-[#F7F4EF] text-[12px] font-medium py-1.5 px-4 tracking-wide shadow-inner">
         <div className="max-w-[1360px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#B49155]/20 text-[#B49155] text-[10px]">✨</span>
+            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#B49155]/30 text-[#E8D29E] text-[10px]">✨</span>
             <span>
-              <strong className="font-semibold text-white">Design Preview Store:</strong> Sample prices &amp; pieces for layout evaluation.
+              <strong className="font-semibold text-white">Thoughtful gifts. Beautifully priced.</strong> — Gifts ₹999 &amp; under · Return favors from ₹49
             </span>
           </div>
           <div className="hidden md:flex items-center gap-6 text-[11px] text-[#F7F4EF]/85">
-            <span>No upfront online payment · Personal phone consultation</span>
+            <span>No payment gateway · Handled personally by phone consultation</span>
             <Link to="/contact" className="hover:text-white underline underline-offset-2 transition-colors">
-              Call / WhatsApp Us
+              Gifting Concierge
             </Link>
           </div>
         </div>

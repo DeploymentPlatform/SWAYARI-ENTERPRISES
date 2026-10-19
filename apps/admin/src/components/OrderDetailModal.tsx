@@ -146,6 +146,36 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ orderId, onC
             </div>
           </section>
 
+          {/* Bulk & Occasion info if present */}
+          {(order.isBulkRequest || order.occasion || order.requiredDate) && (
+            <section className="adm-card border-l-4 border-burgundy bg-[#FAF8F5] p-5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="adm-section-title text-burgundy">
+                  {order.isBulkRequest ? 'Bulk / Return Gifting Request' : 'Event & Occasion Details'}
+                </h3>
+                {order.isBulkRequest && (
+                  <span className="rounded bg-burgundy px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-white">
+                    Bulk Request
+                  </span>
+                )}
+              </div>
+              <div className="mt-3 grid gap-4 text-sm sm:grid-cols-2">
+                {order.occasion && (
+                  <div>
+                    <span className="text-ink-soft">Occasion:</span>{' '}
+                    <strong className="text-ink">{order.occasion}</strong>
+                  </div>
+                )}
+                {order.requiredDate && (
+                  <div>
+                    <span className="text-ink-soft">Required by:</span>{' '}
+                    <strong className="text-ink">{order.requiredDate}</strong>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
           {/* Requested items (immutable snapshot) */}
           <section className="adm-card overflow-hidden">
             <div className="flex items-center justify-between border-b border-stone-deep px-5 py-3">

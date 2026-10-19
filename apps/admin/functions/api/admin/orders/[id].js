@@ -15,6 +15,7 @@ export async function onRequestGet(context) {
       SELECT id, idempotency_key, customer_id, customer_name, customer_email,
              customer_phone, delivery_address, delivery_city, delivery_state,
              delivery_pincode, customer_notes, status, initial_indicative_subtotal,
+             occasion, required_date, is_bulk_request,
              created_at, updated_at
       FROM orders
       WHERE id = ?
@@ -65,6 +66,9 @@ export async function onRequestGet(context) {
         deliveryPincode: order.delivery_pincode,
         customerNotes: order.customer_notes,
         status: order.status,
+        occasion: order.occasion || null,
+        requiredDate: order.required_date || null,
+        isBulkRequest: Boolean(order.is_bulk_request),
         indicativeSubtotal: order.initial_indicative_subtotal,
         createdAt: order.created_at,
         updatedAt: order.updated_at,

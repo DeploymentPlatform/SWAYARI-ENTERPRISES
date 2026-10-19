@@ -18,16 +18,40 @@ interface Slide {
 
 const SLIDES: Slide[] = [
   {
-    id: 'moments',
-    badge: 'Artisanal Festive Collection',
-    headline: 'Gifts for Meaningful',
-    emphasis: 'Moments.',
-    supporting: 'Handcrafted bell-metal brass lamps, ritual centerpieces, and celebratory keepsakes.',
-    ctaText: 'Explore Gifting Sets',
-    ctaHref: '/shop?category=gift-sets',
+    id: 'affordable-proposition',
+    badge: 'Thoughtful Gifts · Beautifully Priced',
+    headline: 'Gifts ₹999 & Under',
+    emphasis: 'For Every Moment.',
+    supporting: 'Discover gifts for celebrations, return gifting and everyday moments. Handcrafted brass, silvered bowls and artisan keepsakes.',
+    ctaText: 'Explore Gifts ₹999 & Under',
+    ctaHref: '/shop?budget=under-999',
     desktopImage: '/assets/editorial/hero-slide-1-moments-desktop.webp',
     mobileImage: '/assets/editorial/hero-slide-1-moments-mobile.webp',
     alt: 'Festive brass lamps illuminated beside marigolds and celebration offerings'
+  },
+  {
+    id: 'entry-collection',
+    badge: 'Dedicated Entry-Level Collection',
+    headline: 'Gifts ₹99 & Under',
+    emphasis: 'Bulk Return Favors.',
+    supporting: 'Banarasi raw silk brocade potlis, solid brass kumkum boxes, and handcrafted shola tassels from just ₹49.',
+    ctaText: 'Shop ₹99 & Under',
+    ctaHref: '/shop?budget=under-99',
+    desktopImage: '/assets/editorial/hero-slide-4-gifting-desktop.webp',
+    mobileImage: '/assets/editorial/hero-slide-4-gifting-mobile.webp',
+    alt: 'Handcrafted celebratory gift box and traditional pooja vessel'
+  },
+  {
+    id: 'lighting',
+    badge: 'Heirloom Brassware',
+    headline: 'Artisanal Brass &',
+    emphasis: 'Temple Lighting.',
+    supporting: 'Traditional Akhand deepams, paired peacock diyas, and resonant bell-metal temple prayer bells.',
+    ctaText: 'Discover Lighting',
+    ctaHref: '/shop?category=decorative-lamps',
+    desktopImage: '/assets/editorial/hero-slide-3-decor-desktop.webp',
+    mobileImage: '/assets/editorial/hero-slide-3-decor-mobile.webp',
+    alt: 'Traditional ornate brass kuthu pillar lamp with multi-tiered flame wells'
   },
   {
     id: 'devotional',
@@ -40,30 +64,6 @@ const SLIDES: Slide[] = [
     desktopImage: '/assets/editorial/hero-slide-2-devotional-desktop.webp',
     mobileImage: '/assets/editorial/hero-slide-2-devotional-mobile.webp',
     alt: 'Ornate gold framed devotional sanctum relief panel'
-  },
-  {
-    id: 'lighting',
-    badge: 'Heirloom Brassware',
-    headline: 'Artisanal Brass &',
-    emphasis: 'Temple Lighting.',
-    supporting: 'Traditional Kuthu pillar lamps, tiered deepams, and resonant bell-metal temple bells.',
-    ctaText: 'Discover Lighting',
-    ctaHref: '/shop?category=decorative-lamps',
-    desktopImage: '/assets/editorial/hero-slide-3-decor-desktop.webp',
-    mobileImage: '/assets/editorial/hero-slide-3-decor-mobile.webp',
-    alt: 'Traditional ornate brass kuthu pillar lamp with multi-tiered flame wells'
-  },
-  {
-    id: 'uruli',
-    badge: 'Traditional Living',
-    headline: 'Festive Urulis &',
-    emphasis: 'Home Accents.',
-    supporting: 'Hand-hammered brass vessels, floating blossom arrangements, and sacred altar sculptures.',
-    ctaText: 'Explore Festive Décor',
-    ctaHref: '/shop?category=festive-decor',
-    desktopImage: '/assets/editorial/hero-slide-4-gifting-desktop.webp',
-    mobileImage: '/assets/editorial/hero-slide-4-gifting-mobile.webp',
-    alt: 'Handcrafted celebratory gift box and traditional pooja vessel'
   }
 ];
 
@@ -180,9 +180,9 @@ export const Hero: React.FC = () => {
       aria-label="Highlighted Campaigns"
       className="relative overflow-hidden bg-[#1B1310] text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-[#B49155] select-none touch-pan-y"
     >
-      {/* Carousel Container: Compact height ~340px desktop, ~260px mobile */}
+      {/* Carousel Container: Compact height ~310-330px desktop, ~220px mobile */}
       <div 
-        className="relative h-[260px] sm:h-[300px] md:h-[350px] lg:h-[380px] w-full overflow-hidden"
+        className="relative h-[220px] sm:h-[260px] md:h-[310px] lg:h-[330px] w-full overflow-hidden"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

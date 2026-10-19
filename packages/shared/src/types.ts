@@ -25,6 +25,17 @@ export interface ProductVariant {
   skuSuffix?: string;
 }
 
+export interface BulkPriceTier {
+  min_qty: number;
+  unit_price: number;
+}
+
+export interface PackagingOption {
+  name: string;
+  price: number;
+  included: boolean;
+}
+
 export interface Product {
   id: string;
   sku: string;
@@ -33,6 +44,7 @@ export interface Product {
   description: string;
   categoryId: string | null;
   categoryName?: string | null;
+  categorySlug?: string | null;
   images: string[];
   material: string | null;
   dimensions: string | null;
@@ -44,6 +56,16 @@ export interface Product {
   customisationInfo: string | null;
   status: 'draft' | 'published' | 'archived';
   isDemo: boolean;
+  priceType?: 'piece' | 'set';
+  setContents?: string | null;
+  orderIncrement?: number;
+  isQuoteOnly?: boolean;
+  bulkTiers?: BulkPriceTier[];
+  packagingOptions?: PackagingOption[];
+  shippingInfo?: string;
+  occasions?: string[];
+  supportsIndividual?: boolean;
+  supportsBulk?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -66,6 +88,9 @@ export interface OrderSubmissionPayload {
   deliveryState: string;
   deliveryPincode: string;
   customerNotes?: string;
+  occasion?: string | null;
+  requiredDate?: string | null;
+  isBulkRequest?: boolean;
   items: OrderItemInput[];
 }
 
@@ -132,6 +157,9 @@ export interface Order {
   deliveryState: string;
   deliveryPincode: string;
   customerNotes: string | null;
+  occasion?: string | null;
+  requiredDate?: string | null;
+  isBulkRequest?: boolean;
   status: OrderStatus;
   initialIndicativeSubtotal: number | null;
   indicativeSubtotal?: number | null;
@@ -173,6 +201,11 @@ export interface CartItem {
   quantity: number;
   selectedVariant?: string | null;
   customisationNote?: string;
+  priceType?: 'piece' | 'set';
+  orderIncrement?: number;
+  isQuoteOnly?: boolean;
+  setContents?: string | null;
+  packagingOption?: string | null;
 }
 
 export interface CampaignBanner {

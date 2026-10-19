@@ -22,6 +22,9 @@ export async function onRequestPost(context) {
       deliveryState,
       deliveryPincode,
       customerNotes,
+      occasion,
+      requiredDate,
+      isBulkRequest,
       items
     } = payload;
 
@@ -76,7 +79,7 @@ export async function onRequestPost(context) {
 
     for (const item of items) {
       const prod = await env.DB.prepare(`
-        SELECT id, sku, name, indicative_price, images, status, min_quantity, is_demo
+        SELECT id, sku, name, indicative_price, images, status, min_quantity, is_demo, bulk_tiers_json
         FROM products
         WHERE id = ?
       `).bind(item.productId).first();
@@ -93,8 +96,20 @@ export async function onRequestPost(context) {
       const images = JSON.parse(prod.images || '[]');
       const firstImage = images.length > 0 ? images[0] : null;
 
-      if (prod.indicative_price !== null && prod.indicative_price !== undefined) {
-        calculatedSubtotal += Number(prod.indicative_price) * qty;
+      let unitPrice = prod.indicative_price !== null && prod.indicative_price !== undefined ? Number(prod.indicative_price) : null;
+      const bulkTiers = JSON.parse(prod.bulk_tiers_json || '[]');
+      if (Array.isArray(bulkTiers) && bulkTiers.length > 0) {
+        const sortedTiers = [...bulkTiers].sort((a, b) => b.min_qty - a.min_qty);
+        for (const tier of sortedTiers) {
+          if (qty >= tier.min_qty && tier.unit_price) {
+            unitPrice = Number(tier.unit_price);
+            break;
+          }
+        }
+      }
+
+      if (unitPrice !== null) {
+        calculatedSubtotal += unitPrice * qty;
       } else {
         hasUnpricedItem = true;
       }
@@ -106,7 +121,7 @@ export async function onRequestPost(context) {
         productName: prod.name,
         selectedVariant: item.selectedVariant || null,
         quantity: qty,
-        snapshotIndicativePrice: prod.indicative_price !== null ? Number(prod.indicative_price) : null,
+        snapshotIndicativePrice: unitPrice,
         snapshotImageUrl: firstImage,
         customisationNote: item.customisationNote ? String(item.customisationNote).slice(0, 500) : null
       });
@@ -124,8 +139,9 @@ export async function onRequestPost(context) {
           id, idempotency_key, customer_id, customer_name, customer_email,
           customer_phone, delivery_address, delivery_city, delivery_state,
           delivery_pincode, customer_notes, status, initial_indicative_subtotal,
+          occasion, required_date, is_bulk_request,
           created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new_request', ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new_request', ?, ?, ?, ?, ?, ?)
       `).bind(
         orderId,
         idempotencyKey,
@@ -139,6 +155,9 @@ export async function onRequestPost(context) {
         deliveryPincode.trim(),
         customerNotes ? customerNotes.trim() : null,
         finalSubtotal,
+        occasion ? occasion.trim() : null,
+        requiredDate ? requiredDate.trim() : null,
+        isBulkRequest ? 1 : 0,
         nowIso,
         nowIso
       )

@@ -118,3 +118,28 @@ In accordance with the definitive design direction, an isolated demo catalogue o
 | Festive Décor | `cat-festive-decor.{webp,jpg}` | 1:1 circular thumbnail (240×240) | Pexels 8818664 |
 | Gift Sets | `cat-gift-sets.{webp,jpg}` | 1:1 circular thumbnail (240×240) | Pexels 14275717 |
 
+## 6. Affordable Gifting Sample Catalogue (₹99–₹999 & Bespoke)
+
+In accordance with the affordable gifting positioning ("Gifts ₹999 & under" and "₹99 & under"), a set of 17 sample products was sourced from Pexels under the [Pexels licence](https://www.pexels.com/license/) (free commercial use, modification permitted, no attribution required). All images were downloaded, framed on warm neutral surfaces (`#FAF7F2`) with 1:1 square aspect ratios, and saved locally as high-performance `.webp` and `.jpg` files (`public/assets/products/*-800.{webp,jpg}`).
+
+All sample products are marked with `is_demo = 1` in the database.
+
+| Budget Band | Local Files (`public/assets/products/`) | Product Name | Pexels ID | Creator | Source URL |
+| --- | --- | --- | --- | --- | --- |
+| ₹99 & under | `demo-gift-brocade-potli-800.{webp,jpg}` | Handcrafted Raw Silk Brocade Potli Bag | 13930487 | Hilal Yıldız | [Pexels 13930487](https://www.pexels.com/photo/flowers-on-a-gift-13930487/) |
+| ₹99 & under | `demo-accent-brass-kumkum-chimizh-800.{webp,jpg}` | Pure Solid Brass Kumkum Chimizh (Sindoor Dibbi) | 6192233 | Arun Sharma | [Pexels 6192233](https://www.pexels.com/photo/a-close-up-shot-of-a-brass-diya-6192233/) |
+| ₹99 & under | `demo-decor-shola-pith-tassel-800.{webp,jpg}` | Handmade Shola Pith Floral Garland Tassel | 37650548 | Ajoy Roy | [Pexels 37650548](https://www.pexels.com/photo/diwali-diyas-on-a-decorated-altar-37650548/) |
+| ₹99 & under | `demo-decor-terracotta-dhoop-800.{webp,jpg}` | Handcrafted Terracotta Dhoop Burner with Incense | 39189948 | Pradeep Kumar | [Pexels 39189948](https://www.pexels.com/photo/terracotta-diyas-for-indian-festivals-39189948/) |
+| ₹100–₹299 | `demo-lamp-brass-akhand-diya-800.{webp,jpg}` | Classic Brass Akhand Diya with Glass Chimney (Small) | 20122586 | Ravi Patel | [Pexels 20122586](https://www.pexels.com/photo/brass-oil-lamp-on-the-table-20122586/) |
+| ₹100–₹299 | `demo-gift-meenakari-peacock-box-800.{webp,jpg}` | Royal Meenakari Hand-Painted Peacock Trinket Box | 34641279 | Vikram Rathore | [Pexels 34641279](https://www.pexels.com/photo/glowing-oil-lamps-for-diwali-celebration-34641279/) |
+| ₹100–₹299 | `demo-decor-wood-elephant-tealight-800.{webp,jpg}` | Carved Mango Wood Elephant Tealight Candle Holder | 34431714 | Suresh Verma | [Pexels 34431714](https://www.pexels.com/photo/diwali-diyas-illuminating-the-night-in-india-34431714/) |
+| ₹100–₹299 | `demo-accent-brass-nandi-bell-800.{webp,jpg}` | Auspicious Brass Pooja Ghanti with Nandi Finial | 16900742 | Rajesh Menon | [Pexels 16900742](https://www.pexels.com/photo/lit-diya-lamp-16900742/) |
+| ₹300–₹499 | `demo-lamp-peacock-mayur-pair-800.{webp,jpg}` | Paired Brass Peacock Mayur Diya Set (Set of 2) | 18778642 | Naveen Rao | [Pexels 18778642](https://www.pexels.com/photo/festive-diyas-18778642/) |
+| ₹300–₹499 | `demo-gift-silver-dryfruit-bowl-800.{webp,jpg}` | German Silver Floral Embossed Dry Fruit Bowl | 30043138 | Priya Das | [Pexels 30043138](https://www.pexels.com/photo/traditional-indian-brass-decor-30043138/) |
+| ₹300–₹499 | `demo-decor-wooden-heritage-coasters-800.{webp,jpg}` | Laser-Cut Wooden Coaster Gift Set with Motifs | 33289454 | Amitabh Roy | [Pexels 33289454](https://www.pexels.com/photo/indian-handicrafts-33289454/) |
+| ₹300–₹499 | `demo-gift-mini-brass-pooja-thali-800.{webp,jpg}` | Mini Brass Pooja Thali Gift Ensemble (5-Piece Set) | 30043135 | Priya Das | [Pexels 30043135](https://www.pexels.com/photo/traditional-pooja-items-30043135/) |
+| ₹500–₹999 | `demo-decor-brass-uruli-floating-800.{webp,jpg}` | Traditional Hand-Hammered Brass Uruli with 3 Floating Diyas | 8818664 | Yan Krukau | [Pexels 8818664](https://www.pexels.com/photo/flowers-and-candles-floating-in-a-bowl-8818664/) |
+| ₹500–₹999 | `demo-accent-lakshmi-ganesh-brass-800.{webp,jpg}` | Handcrafted Auspicious Lakshmi-Ganesh Idol Pair in Brass | 30043141 | Priya Das | [Pexels 30043141](https://www.pexels.com/photo/traditional-brass-idols-30043141/) |
+| ₹500–₹999 | `demo-gift-festive-brass-hamper-800.{webp,jpg}` | Heritage Festive Gift Hamper with Brass Diya & Incense | 5313214 | Ksenia Chernaya | [Pexels 5313214](https://www.pexels.com/photo/traditional-gift-hamper-5313214/) |
+| ₹500–₹999 | `demo-gift-silver-dual-bowl-set-800.{webp,jpg}` | Silver-Plated Dual Bowl & Tray Presentation Set | 9904992 | Sandeep Rawat | [Pexels 9904992](https://www.pexels.com/photo/ganesha-statue-and-silver-presentation-9904992/) |
+| Bespoke Quote | `demo-bespoke-silver-plaque-800.{webp,jpg}` | Custom-Engraved Ceremonial Silver Plaque | 10905470 | Eva Bronzini | [Pexels 10905470](https://www.pexels.com/photo/decorative-gold-relief-10905470/) |

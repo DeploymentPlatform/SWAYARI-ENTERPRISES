@@ -18,7 +18,10 @@ export async function onRequestGet(context) {
       SELECT p.id, p.sku, p.name, p.slug, p.description, p.category_id,
              p.images, p.material, p.dimensions, p.has_variants, p.variants_json,
              p.indicative_price, p.min_quantity, p.availability_label,
-             p.customisation_info, p.status, p.is_demo, p.created_at, p.updated_at,
+             p.customisation_info, p.status, p.is_demo, p.price_type, p.set_contents,
+             p.order_increment, p.is_quote_only, p.bulk_tiers_json, p.packaging_options_json,
+             p.shipping_info, p.occasions_json, p.supports_individual, p.supports_bulk,
+             p.created_at, p.updated_at,
              c.name as category_name
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
@@ -62,6 +65,16 @@ export async function onRequestGet(context) {
       customisationInfo: row.customisation_info,
       status: row.status,
       isDemo: Boolean(row.is_demo),
+      priceType: row.price_type || 'piece',
+      setContents: row.set_contents || null,
+      orderIncrement: row.order_increment || 1,
+      isQuoteOnly: Boolean(row.is_quote_only),
+      bulkTiers: JSON.parse(row.bulk_tiers_json || '[]'),
+      packagingOptions: JSON.parse(row.packaging_options_json || '[]'),
+      shippingInfo: row.shipping_info || 'Standard dispatched in 2–4 business days across India',
+      occasions: JSON.parse(row.occasions_json || '[]'),
+      supportsIndividual: row.supports_individual !== null ? Boolean(row.supports_individual) : true,
+      supportsBulk: row.supports_bulk !== null ? Boolean(row.supports_bulk) : true,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     }));
@@ -104,7 +117,17 @@ export async function onRequestPost(context) {
       availabilityLabel,
       customisationInfo,
       status = 'draft',
-      isDemo = false
+      isDemo = false,
+      priceType = 'piece',
+      setContents = null,
+      orderIncrement = 1,
+      isQuoteOnly = false,
+      bulkTiers = [],
+      packagingOptions = [],
+      shippingInfo = 'Standard dispatched in 2–4 business days across India',
+      occasions = [],
+      supportsIndividual = true,
+      supportsBulk = true
     } = body;
 
     if (!sku || !name || !description) {
@@ -125,8 +148,11 @@ export async function onRequestPost(context) {
         id, sku, name, slug, description, category_id,
         images, material, dimensions, has_variants, variants_json,
         indicative_price, min_quantity, availability_label,
-        customisation_info, status, is_demo, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        customisation_info, status, is_demo, price_type, set_contents,
+        order_increment, is_quote_only, bulk_tiers_json, packaging_options_json,
+        shipping_info, occasions_json, supports_individual, supports_bulk,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       id,
       sku.trim().toUpperCase(),
@@ -145,6 +171,16 @@ export async function onRequestPost(context) {
       customisationInfo || null,
       status,
       isDemo ? 1 : 0,
+      priceType || 'piece',
+      setContents || null,
+      orderIncrement ? Number(orderIncrement) : 1,
+      isQuoteOnly ? 1 : 0,
+      JSON.stringify(bulkTiers || []),
+      JSON.stringify(packagingOptions || []),
+      shippingInfo || 'Standard dispatched in 2–4 business days across India',
+      JSON.stringify(occasions || []),
+      supportsIndividual ? 1 : 0,
+      supportsBulk ? 1 : 0,
       nowIso,
       nowIso
     ).run();

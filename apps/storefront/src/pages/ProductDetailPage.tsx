@@ -104,11 +104,27 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
   const images = product.images?.length ? product.images : [];
   const requestable = canRequest(product);
   const specs: [string, string][] = [];
+  if (product.setContents) specs.push(['Set Contents', product.setContents]);
   if (product.categoryName) specs.push(['Category', product.categoryName]);
   if (product.material) specs.push(['Material', product.material]);
   if (product.dimensions) specs.push(['Dimensions', product.dimensions]);
-  if ((product.minQuantity || 1) > 1) specs.push(['Minimum quantity', String(product.minQuantity)]);
-  specs.push(['Reference', product.sku]);
+  if ((product.minQuantity || 1) > 1) specs.push(['Minimum quantity', `${product.minQuantity} ${product.priceType === 'set' ? 'sets' : 'pieces'}`]);
+  if ((product.orderIncrement || 1) > 1) specs.push(['Order increments', `${product.orderIncrement} units`]);
+  if (product.shippingInfo) specs.push(['Shipping', product.shippingInfo]);
+  specs.push(['Reference SKU', product.sku]);
+
+  // Bulk tier pricing calculation
+  let currentUnitPrice = product.indicativePrice;
+  if (product.bulkTiers && product.bulkTiers.length > 0) {
+    const sortedTiers = [...product.bulkTiers].sort((a, b) => b.min_qty - a.min_qty);
+    for (const tier of sortedTiers) {
+      if (quantity >= tier.min_qty) {
+        currentUnitPrice = tier.unit_price;
+        break;
+      }
+    }
+  }
+  const calculatedTotal = currentUnitPrice !== null ? currentUnitPrice * quantity : null;
 
   return (
     <div className="container-content pb-20 md:pb-28">
@@ -183,8 +199,62 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
               </p>
             )}
             <h1 className="text-display-sm md:text-display-md">{product.name}</h1>
-            <PriceText value={product.indicativePrice} className="mt-3 block text-xl" />
-            <p className="mt-1 text-sm text-ink-soft">Final price, shipping and delivery are confirmed by our team.</p>
+            
+            {product.isQuoteOnly ? (
+              <div className="mt-3">
+                <span className="text-xl font-bold text-[#8F7138]">Price on Consultation</span>
+                <p className="mt-1 text-sm text-ink-soft">Bespoke piece prepared on commission. Final price confirmed upon specification review.</p>
+              </div>
+            ) : (
+              <div className="mt-3">
+                <div className="flex items-baseline gap-2">
+                  <PriceText value={currentUnitPrice} className="text-2xl font-bold text-[#571C2A]" />
+                  <span className="text-sm text-ink-soft">
+                    {product.priceType === 'set' ? 'per set' : 'per piece'}
+                  </span>
+                </div>
+
+                {calculatedTotal !== null && quantity > 1 && (
+                  <p className="mt-1 text-sm font-semibold text-[#571C2A]">
+                    Indicative Subtotal: {formatPrice(calculatedTotal)} for {quantity} {product.priceType === 'set' ? 'sets' : 'pieces'}
+                  </p>
+                )}
+
+                <p className="mt-1 text-sm text-ink-soft">Final price, shipping and delivery are confirmed by our team.</p>
+              </div>
+            )}
+
+            {/* Minimum quantity and bulk conditions */}
+            {product.minQuantity > 1 && (
+              <div className="mt-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#C49A45]/15 border border-[#C49A45]/35 text-[#6B5018] text-xs font-semibold">
+                Bulk order item · Minimum order: {product.minQuantity} pieces
+                {product.orderIncrement > 1 ? ` · Multiples of ${product.orderIncrement}` : ''}
+              </div>
+            )}
+
+            {/* Bulk Volume Tiers Table */}
+            {product.bulkTiers && product.bulkTiers.length > 0 && (
+              <div className="mt-4 p-3.5 rounded-xl bg-[#FAF7F2] border border-[#E7DFD5]">
+                <div className="text-xs font-bold uppercase tracking-wider text-[#8F7138] mb-2">
+                  Volume Pricing Tiers:
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                  {product.bulkTiers.map((t) => (
+                    <div
+                      key={t.min_qty}
+                      className={`p-2 rounded-lg border ${
+                        quantity >= t.min_qty
+                          ? 'bg-[#571C2A] text-white border-[#571C2A]'
+                          : 'bg-white text-[#292421] border-[#E7DFD5]'
+                      }`}
+                    >
+                      <div className="font-bold">{formatPrice(t.unit_price)}</div>
+                      <div className="text-[10px] opacity-80">{t.min_qty}+ units</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-ink-soft">{product.description}</p>
 
@@ -233,15 +303,21 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
                     maxLength={300}
                     value={note}
                     onChange={e => setNote(e.target.value)}
-                    placeholder="For example, an occasion or a question about this piece"
+                    placeholder="For example, event occasion, required date or gift packaging preferences"
                     className="field-input"
                   />
                 </div>
 
                 <div className="flex items-stretch gap-3">
-                  <QuantityStepper value={quantity} min={product.minQuantity || 1} onChange={q => setQuantity(Math.max(product.minQuantity || 1, q))} label="Quantity" />
+                  <QuantityStepper
+                    value={quantity}
+                    min={product.minQuantity || 1}
+                    step={product.orderIncrement || 1}
+                    onChange={q => setQuantity(Math.max(product.minQuantity || 1, q))}
+                    label="Quantity"
+                  />
                   <button type="submit" className="btn-primary flex-1">
-                    Add to bag
+                    Add to Request
                   </button>
                 </div>
               </form>

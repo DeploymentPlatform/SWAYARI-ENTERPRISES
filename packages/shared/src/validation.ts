@@ -73,6 +73,9 @@ export function validateOrderSubmission(payload: unknown): { isValid: boolean; e
       deliveryState: String(p.deliveryState).trim(),
       deliveryPincode: pincodeDigits,
       customerNotes: p.customerNotes ? String(p.customerNotes).trim() : undefined,
+      occasion: p.occasion ? String(p.occasion).trim() : undefined,
+      requiredDate: p.requiredDate ? String(p.requiredDate).trim() : undefined,
+      isBulkRequest: Boolean(p.isBulkRequest),
       items: p.items.map((it: any) => ({
         productId: String(it.productId).trim(),
         productSku: it.productSku ? String(it.productSku).trim() : undefined,

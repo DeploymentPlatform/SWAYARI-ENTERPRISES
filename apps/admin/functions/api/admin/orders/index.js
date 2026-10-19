@@ -18,7 +18,8 @@ export async function onRequestGet(context) {
     let query = `
       SELECT o.id, o.customer_id, o.customer_name, o.customer_email,
              o.customer_phone, o.delivery_city, o.delivery_state,
-             o.status, o.initial_indicative_subtotal, o.created_at, o.updated_at,
+             o.status, o.initial_indicative_subtotal, o.occasion, o.required_date, o.is_bulk_request,
+             o.created_at, o.updated_at,
              COUNT(i.id) as item_count,
              (SELECT snapshot_image_url FROM order_items fi WHERE fi.order_id = o.id LIMIT 1) as first_image
       FROM orders o
@@ -53,6 +54,9 @@ export async function onRequestGet(context) {
       deliveryState: row.delivery_state,
       status: row.status,
       indicativeSubtotal: row.initial_indicative_subtotal,
+      occasion: row.occasion || null,
+      requiredDate: row.required_date || null,
+      isBulkRequest: Boolean(row.is_bulk_request),
       itemCount: Number(row.item_count || 0),
       firstImage: row.first_image || null,
       createdAt: row.created_at,

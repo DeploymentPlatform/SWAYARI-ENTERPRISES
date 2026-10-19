@@ -489,6 +489,83 @@ await test('25. Production Vite builds exist for both Storefront and Admin', asy
   assert.ok(fs.existsSync(admDist), 'Admin dist/index.html must exist');
 });
 
+// 11. AFFORDABLE GIFTING & BUDGET NAVIGATION TESTS
+await test('26. Budget boundary queries filter items strictly within bounds and exclude quote-only items', async () => {
+  // Query budget under-99
+  const res99 = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&budget=under-99'), env));
+  const data99 = await res99.json();
+  assert.equal(data99.success, true);
+  assert.ok(data99.products.length > 0, 'Must have items under ₹99');
+  for (const p of data99.products) {
+    assert.ok(p.indicativePrice !== null && p.indicativePrice <= 99, `Product ${p.sku} with price ${p.indicativePrice} must be <= 99`);
+    assert.equal(p.isQuoteOnly, false, 'Quote-only products must never be in numeric budget band');
+  }
+
+  // Query budget 100-299
+  const res100 = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&budget=100-299'), env));
+  const data100 = await res100.json();
+  assert.equal(data100.success, true);
+  assert.ok(data100.products.length > 0, 'Must have items ₹100-₹299');
+  for (const p of data100.products) {
+    assert.ok(p.indicativePrice >= 100 && p.indicativePrice <= 299, `Product ${p.sku} price ${p.indicativePrice} must be between 100 and 299`);
+    assert.equal(p.isQuoteOnly, false);
+  }
+
+  // Query budget 500-999
+  const res500 = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&budget=500-999'), env));
+  const data500 = await res500.json();
+  assert.equal(data500.success, true);
+  assert.ok(data500.products.length > 0, 'Must have items ₹500-₹999');
+  for (const p of data500.products) {
+    assert.ok(p.indicativePrice >= 500 && p.indicativePrice <= 999, `Product ${p.sku} price ${p.indicativePrice} must be between 500 and 999`);
+    assert.equal(p.isQuoteOnly, false);
+  }
+});
+
+await test('27. Bulk order requests capture occasion, requiredDate, and isBulkRequest accurately', async () => {
+  const bulkPayload = {
+    idempotencyKey: 'test-bulk-req-12345',
+    customerName: 'Priya Sharma',
+    customerPhone: '9876543210',
+    deliveryAddress: 'Flat 402, Lotus Residency, MG Road',
+    deliveryCity: 'Bengaluru',
+    deliveryState: 'Karnataka',
+    deliveryPincode: '560001',
+    occasion: 'Wedding & Return Gifting',
+    requiredDate: '2026-11-15',
+    isBulkRequest: true,
+    items: [
+      {
+        productId: 'demo-prod-afford-02',
+        productSku: 'SWY-AFFORD-002',
+        productName: 'Pure Solid Brass Kumkum Chimizh (Sindoor Dibbi)',
+        quantity: 50
+      }
+    ]
+  };
+
+  const req = makeRequest('http://storefront/api/orders', {
+    method: 'POST',
+    cookie: customerCookie,
+    body: bulkPayload
+  });
+  const res = await sfOrdersIndex.onRequestPost(makeContext(req, env));
+  const data = await res.json();
+  assert.equal(res.status, 201);
+  assert.equal(data.success, true);
+  assert.ok(data.orderId);
+
+  // Verify in admin orders API
+  const adminRes = await admOrderDetails.onRequestGet(makeContext(makeRequest(`http://admin/api/admin/orders/${data.orderId}`, { cookie: adminCookie }), env, { id: data.orderId }));
+  const adminData = await adminRes.json();
+  assert.equal(adminRes.status, 200);
+  assert.equal(adminData.order.occasion, 'Wedding & Return Gifting');
+  assert.equal(adminData.order.requiredDate, '2026-11-15');
+  assert.equal(adminData.order.isBulkRequest, true);
+  // Also check bulk tiered pricing applied: 50 pcs tiered price for SWY-AFFORD-002 is 68/pc instead of indicative 85!
+  assert.equal(adminData.order.items[0].indicativePrice, 68);
+});
+
 console.log('====================================================');
 console.log(`Results: ${passed} passed, ${failed} failed`);
 console.log('====================================================');

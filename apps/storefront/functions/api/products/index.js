@@ -6,6 +6,9 @@ export async function onRequestGet(context) {
 
   const categorySlug = url.searchParams.get('category');
   const searchQuery = url.searchParams.get('search');
+  const budgetBand = url.searchParams.get('budget');
+  const occasion = url.searchParams.get('occasion');
+  const bulkOnly = url.searchParams.get('bulk') === '1';
   const includeDemo = url.searchParams.get('include_demo') === '1';
 
   try {
@@ -13,7 +16,10 @@ export async function onRequestGet(context) {
       SELECT p.id, p.sku, p.name, p.slug, p.description, p.category_id,
              p.images, p.material, p.dimensions, p.has_variants, p.variants_json,
              p.indicative_price, p.min_quantity, p.availability_label,
-             p.customisation_info, p.status, p.is_demo, p.created_at, p.updated_at,
+             p.customisation_info, p.status, p.is_demo, p.price_type, p.set_contents,
+             p.order_increment, p.is_quote_only, p.bulk_tiers_json, p.packaging_options_json,
+             p.shipping_info, p.occasions_json, p.supports_individual, p.supports_bulk,
+             p.created_at, p.updated_at,
              c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
@@ -30,6 +36,28 @@ export async function onRequestGet(context) {
     if (categorySlug) {
       query += ' AND c.slug = ?';
       params.push(categorySlug);
+    }
+
+    // Budget Band filtering: strictly exclude quote-only items and verify inclusive bounds
+    if (budgetBand === 'under-99') {
+      query += ' AND p.indicative_price IS NOT NULL AND p.is_quote_only = 0 AND p.indicative_price <= 99';
+    } else if (budgetBand === '100-299') {
+      query += ' AND p.indicative_price IS NOT NULL AND p.is_quote_only = 0 AND p.indicative_price >= 100 AND p.indicative_price <= 299';
+    } else if (budgetBand === '300-499') {
+      query += ' AND p.indicative_price IS NOT NULL AND p.is_quote_only = 0 AND p.indicative_price >= 300 AND p.indicative_price <= 499';
+    } else if (budgetBand === '500-999') {
+      query += ' AND p.indicative_price IS NOT NULL AND p.is_quote_only = 0 AND p.indicative_price >= 500 AND p.indicative_price <= 999';
+    } else if (budgetBand === 'under-999') {
+      query += ' AND p.indicative_price IS NOT NULL AND p.is_quote_only = 0 AND p.indicative_price <= 999';
+    }
+
+    if (occasion && occasion.trim().length > 0) {
+      query += ' AND p.occasions_json LIKE ?';
+      params.push(`%${occasion.trim()}%`);
+    }
+
+    if (bulkOnly) {
+      query += ' AND p.supports_bulk = 1';
     }
 
     if (searchQuery && searchQuery.trim().length > 0) {
@@ -64,6 +92,16 @@ export async function onRequestGet(context) {
       customisationInfo: row.customisation_info,
       status: row.status,
       isDemo: Boolean(row.is_demo),
+      priceType: row.price_type || 'piece',
+      setContents: row.set_contents || null,
+      orderIncrement: row.order_increment || 1,
+      isQuoteOnly: Boolean(row.is_quote_only),
+      bulkTiers: JSON.parse(row.bulk_tiers_json || '[]'),
+      packagingOptions: JSON.parse(row.packaging_options_json || '[]'),
+      shippingInfo: row.shipping_info || 'Standard dispatched in 2–4 business days across India',
+      occasions: JSON.parse(row.occasions_json || '[]'),
+      supportsIndividual: row.supports_individual !== null ? Boolean(row.supports_individual) : true,
+      supportsBulk: row.supports_bulk !== null ? Boolean(row.supports_bulk) : true,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     }));

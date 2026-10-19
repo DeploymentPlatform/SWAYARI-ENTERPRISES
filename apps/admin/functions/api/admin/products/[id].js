@@ -43,6 +43,16 @@ export async function onRequestGet(context) {
         customisationInfo: row.customisation_info,
         status: row.status,
         isDemo: Boolean(row.is_demo),
+        priceType: row.price_type || 'piece',
+        setContents: row.set_contents || null,
+        orderIncrement: row.order_increment || 1,
+        isQuoteOnly: Boolean(row.is_quote_only),
+        bulkTiers: JSON.parse(row.bulk_tiers_json || '[]'),
+        packagingOptions: JSON.parse(row.packaging_options_json || '[]'),
+        shippingInfo: row.shipping_info || 'Standard dispatched in 2–4 business days across India',
+        occasions: JSON.parse(row.occasions_json || '[]'),
+        supportsIndividual: row.supports_individual !== null ? Boolean(row.supports_individual) : true,
+        supportsBulk: row.supports_bulk !== null ? Boolean(row.supports_bulk) : true,
         createdAt: row.created_at,
         updatedAt: row.updated_at
       }
@@ -81,10 +91,20 @@ export async function onRequestPut(context) {
       availabilityLabel,
       customisationInfo,
       status,
-      isDemo
+      isDemo,
+      priceType,
+      setContents,
+      orderIncrement,
+      isQuoteOnly,
+      bulkTiers,
+      packagingOptions,
+      shippingInfo,
+      occasions,
+      supportsIndividual,
+      supportsBulk
     } = body;
 
-    const existing = await env.DB.prepare('SELECT id, is_demo, has_variants, variants_json FROM products WHERE id = ?').bind(productId).first();
+    const existing = await env.DB.prepare('SELECT id, is_demo, has_variants, variants_json, price_type, set_contents, order_increment, is_quote_only, bulk_tiers_json, packaging_options_json, shipping_info, occasions_json, supports_individual, supports_bulk FROM products WHERE id = ?').bind(productId).first();
     if (!existing) {
       return errorResponse('Product not found', 404);
     }
@@ -97,6 +117,16 @@ export async function onRequestPut(context) {
     const finalIsDemo = isDemo === undefined ? Number(existing.is_demo) : (isDemo ? 1 : 0);
     const finalHasVariants = hasVariants === undefined ? Number(existing.has_variants) : (hasVariants ? 1 : 0);
     const finalVariantsJson = variants === undefined ? (existing.variants_json || '[]') : JSON.stringify(variants || []);
+    const finalPriceType = priceType !== undefined ? priceType : (existing.price_type || 'piece');
+    const finalSetContents = setContents !== undefined ? setContents : existing.set_contents;
+    const finalOrderIncrement = orderIncrement !== undefined ? Number(orderIncrement) : (existing.order_increment || 1);
+    const finalIsQuoteOnly = isQuoteOnly !== undefined ? (isQuoteOnly ? 1 : 0) : Number(existing.is_quote_only || 0);
+    const finalBulkTiersJson = bulkTiers !== undefined ? JSON.stringify(bulkTiers || []) : (existing.bulk_tiers_json || '[]');
+    const finalPackagingOptionsJson = packagingOptions !== undefined ? JSON.stringify(packagingOptions || []) : (existing.packaging_options_json || '[]');
+    const finalShippingInfo = shippingInfo !== undefined ? shippingInfo : (existing.shipping_info || 'Standard dispatched in 2–4 business days across India');
+    const finalOccasionsJson = occasions !== undefined ? JSON.stringify(occasions || []) : (existing.occasions_json || '[]');
+    const finalSupportsIndividual = supportsIndividual !== undefined ? (supportsIndividual ? 1 : 0) : (existing.supports_individual !== null ? Number(existing.supports_individual) : 1);
+    const finalSupportsBulk = supportsBulk !== undefined ? (supportsBulk ? 1 : 0) : (existing.supports_bulk !== null ? Number(existing.supports_bulk) : 1);
 
     const nowIso = new Date().toISOString();
 
@@ -105,7 +135,11 @@ export async function onRequestPut(context) {
         sku = ?, name = ?, slug = ?, description = ?, category_id = ?,
         images = ?, material = ?, dimensions = ?, has_variants = ?, variants_json = ?,
         indicative_price = ?, min_quantity = ?, availability_label = ?,
-        customisation_info = ?, status = ?, is_demo = ?, updated_at = ?
+        customisation_info = ?, status = ?, is_demo = ?,
+        price_type = ?, set_contents = ?, order_increment = ?, is_quote_only = ?,
+        bulk_tiers_json = ?, packaging_options_json = ?, shipping_info = ?,
+        occasions_json = ?, supports_individual = ?, supports_bulk = ?,
+        updated_at = ?
       WHERE id = ?
     `).bind(
       sku.trim().toUpperCase(),
@@ -124,6 +158,16 @@ export async function onRequestPut(context) {
       customisationInfo || null,
       status || 'published',
       finalIsDemo,
+      finalPriceType,
+      finalSetContents,
+      finalOrderIncrement,
+      finalIsQuoteOnly,
+      finalBulkTiersJson,
+      finalPackagingOptionsJson,
+      finalShippingInfo,
+      finalOccasionsJson,
+      finalSupportsIndividual,
+      finalSupportsBulk,
       nowIso,
       productId
     ).run();

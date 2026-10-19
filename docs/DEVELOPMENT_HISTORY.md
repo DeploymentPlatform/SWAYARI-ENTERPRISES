@@ -293,3 +293,68 @@ Furthermore, the 4 legacy owner-supplied sample frame photographs were replaced 
 - No paid Cloudflare services enabled (R2, Cloudflare Images remain disabled).
 - Local preview origins: Storefront on `http://localhost:8788`, Admin on `http://localhost:8789`.
 
+---
+
+## Milestone 5: Affordable Gifting Architecture, Budget Navigation & Bulk Concierge
+
+- **Date & Time (Asia/Kolkata):** `2026-10-19T21:30:00+05:30`
+- **Working Branch:** `feature/swayari-affordable-gifting`
+- **Completed Implementation Commit:** [`ddb2d93096d3413cc09dbda61bfaf40bc4fb9e1f`](file:///Users/suryateja/Library/CloudStorage/GoogleDrive-stimpt.team@gmail.com/My%20Drive/SWAYARI%20ENTERPRISES/SWAYARI-ENTERPRISES) (`ddb2d93`)
+- **Preceding Commit References:** `081e3d4` (Milestone 4 documentation), `31c9c11` (Milestone 4 implementation)
+
+### 1. Context & Business Repositioning
+SWAYARI was repositioned to capture the high-demand affordable gifting market while delivering a premium, polished shopping experience inspired by **Wedtree** (budget and return-gift organisation) and **Tanishq** (visual polish, warm gold/burgundy elegance, and sophisticated typography).
+- **Core Proposition:** “Gifts ₹999 & under”
+- **Dedicated Entry-Level Collection:** “₹99 & under”
+- **Brand Headline:** “Thoughtful gifts. Beautifully priced.”
+- **Supporting Copy:** “Discover gifts for celebrations, return gifting and everyday moments.”
+- **Dual Purchase Model:** Supports both individual retail gifting and high-volume return-gift concierge requests without assuming every product supports both.
+- **Inventory Integrity:** Pre-existing 20 higher-priced items (₹1,850 to ₹14,500) are fully preserved without artificial repricing or deletion.
+
+### 2. Architecture & Components Implemented
+1. **Prominent Shop by Budget Navigation:**
+   - 4 non-overlapping, inclusive budget bands:
+     - `under-99`: ₹99 & under (`indicative_price <= 99`)
+     - `100-299`: ₹100–₹299 (`100 <= indicative_price <= 299`)
+     - `300-499`: ₹300–₹499 (`300 <= indicative_price <= 499`)
+     - `500-999`: ₹500–₹999 (`500 <= indicative_price <= 999`)
+   - Band eligibility is derived strictly from confirmed numeric prices; quote-only items (`is_quote_only = 1`) are never placed in confirmed budget bands.
+   - Products with minimum order quantities display transparent condition badges on both cards and detail pages (e.g. `₹49 / pc · Min. 10 pcs`), ensuring low unit prices requiring bulk orders are never misrepresented as single-item costs.
+2. **Prioritised Shopping Homepage Flow:**
+   1. Compact header with branding, search, account, and bag.
+   2. Compact campaign carousel (~310–330px desktop, ~220px mobile) with pause controls and indicators.
+   3. Shop by Budget shortcuts (4 prominent cards).
+   4. Selected gift collections with visible prices (₹99 & Under, ₹100–₹499, ₹500–₹999).
+   5. Bulk & Return Gifts Concierge section highlighting tiered volume pricing, custom packaging, and insured transit.
+   6. Shop by Occasion (Wedding, Housewarming, Festive, Navratri/Haldi, Corporate).
+   7. 3-step order-request process explanation with verbatim mandatory disclaimer.
+   8. Compact footer.
+3. **Database Schema Migration (`migrations/0007_affordable_gifting.sql`):**
+   - Extended `products` table with: `price_type`, `set_contents`, `order_increment`, `is_quote_only`, `bulk_tiers_json`, `packaging_options_json`, `shipping_info`, `occasions_json`, `supports_individual`, `supports_bulk`.
+   - Extended `orders` table with: `occasion`, `required_date`, `is_bulk_request`.
+   - Seeded 17 realistic sample products across all 4 budget bands (`is_demo = 1`) using deterministic timestamps (`2026-10-18T08:00:00.000Z`) to preserve test deterministic sorting expectations.
+4. **Catalogue & Checkout Enhancements:**
+   - `/shop` Catalogue (`apps/storefront/src/pages/ShopPage.tsx`): URL query support (`?budget=`, `?occasion=`, `?bulk=1`), filter pills, active filter chips, and dynamic titles.
+   - `/checkout` Form (`apps/storefront/src/pages/CheckoutPage.tsx`): Captures occasion, required date, bulk request flag, and delivery PIN code for courier timelines; verbatim mandatory disclaimer maintained near cart and submit button.
+   - Server-side price recalculation in `apps/storefront/functions/api/orders/index.js` dynamically applies volume pricing tiers based on requested quantities.
+5. **Staff Admin Portal Hardening:**
+   - `ProductEditorModal.tsx`: Added controls for price type ('piece' | 'set'), set contents, order increments, quote-only toggle, volume tier editor, shipping info, purchase models, and occasion tagging.
+   - `OrderDetailModal.tsx`: Displays event & occasion details card with bulk request badge, occasion name, and required date.
+
+### 3. Checks & Verification Actually Run
+- `npm run build`:
+  - Asset manifest generated with 173 items.
+  - Storefront Vite build: 419.17 kB JS (≈123.42 kB gzip), 52.06 kB CSS. ✅
+  - Admin Vite build: 223.61 kB JS (≈65.35 kB gzip), 31.75 kB CSS. ✅
+- `npm test`:
+  - Executed automated test suite in `scripts/run-tests.js`: **27 passed, 0 failed**. ✅
+  - Added Test 26: Budget boundary queries filter items strictly within bounds and exclude quote-only items. ✅
+  - Added Test 27: Bulk order requests capture occasion, requiredDate, and isBulkRequest accurately with tiered pricing. ✅
+- Local Standalone Dev Server (`scripts/dev-server.js`):
+  - Verified on `http://127.0.0.1:8790` with in-memory D1 SQLite mock and all 7 migrations. ✅
+
+### 4. Deployment Status & Handoff
+- Working branch: `feature/swayari-affordable-gifting`.
+- `main` branch remains untouched; production deployment deliberately withheld as directed.
+- Remote feature branch pushed to GitHub for complete remote backup.
+

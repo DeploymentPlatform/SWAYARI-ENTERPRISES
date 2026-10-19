@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.0] - 2026-10-19
+
+### Changed
+- **Affordable Gifting Positioning:** Repositioned SWAYARI around "Gifts ₹999 & under" with dedicated entry-level "₹99 & under" collection, brand headline *"Thoughtful gifts. Beautifully priced."*, and supporting copy *"Discover gifts for celebrations, return gifting and everyday moments."*
+- **Homepage Structure:** Restructured homepage into strictly prioritised shopping hierarchy:
+  1. Compact header with branding, prominent search, account, and bag.
+  2. Compact campaign carousel (~310–330px desktop, ~220px mobile) with pause controls and indicators.
+  3. Shop by Budget shortcuts (4 prominent cards).
+  4. Selected gift collections with visible prices.
+  5. Bulk & Return Gifts concierge section.
+  6. Shop by Occasion section.
+  7. Order-request process explanation with verbatim mandatory disclaimer.
+  8. Compact footer.
+- **Budget Navigation:** Created 4 inclusive, non-overlapping budget bands (`under-99`, `100-299`, `300-499`, `500-999`). Server-side and client-side filtering strictly excludes quote-only items from numeric bands.
+- **Catalogue & Checkout:** Added budget and occasion filter pills on `/shop`. Enhanced checkout form to capture occasion, required date, and bulk request flag with pincode delivery timeline note.
+- **Product Cards & PDP:** Added unit/set pricing indicators (`/ pc`, `/ set`), MOQ badges (`Min. 10 pcs`), set contents (`✨ ...`), and volume tiered pricing tables.
+- **Admin Management:** Enhanced `ProductEditorModal.tsx` and `OrderDetailModal.tsx` to manage price types, set contents, order increments, volume pricing tiers, shipping info, purchase models, and event details.
+
+### Added
+- Migration `0007_affordable_gifting.sql` extending `products` and `orders` tables, and seeding 17 realistic sample products across 4 budget tiers (`is_demo = 1`).
+- Sourced and converted 17 licensed sample product photographs (Pexels free commercial licence) into 1:1 WebP and JPG assets; regenerated `manifest.json` (173 total assets).
+- Tests 26 & 27 in `scripts/run-tests.js` verifying budget boundary queries and bulk order tiered pricing.
+- Asset license documentation in `docs/ASSET_SOURCES.md` Section 6.
+
+Implementation commit: `ddb2d93`.
+
+---
+
 ## [0.4.0] - 2026-10-18
 
 ### Changed

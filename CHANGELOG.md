@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.0] - 2026-10-20
+
+### Changed
+- **Confirmed Business Direction — Devotional Frames ₹99 & Under:** Repositioned SWAYARI exclusively around devotional and god frames priced at ₹99 or less per frame for bulk wedding and celebratory return gifts.
+- **Brand Messaging:** Main positioning *"Devotional frames ₹99 & under"* and supporting message *"Thoughtful return gifts for your special celebrations."* Shipping charged separately upon team confirmation.
+- **Strict ₹99 Price Ceiling:** Enforced ₹99 ceiling across product publishing, search and collections, product details and variants, request cart, server-side order validation, and admin quotation creation.
+- **Storefront Hierarchy & Aesthetic:**
+  1. Compact Header: SWAYARI logo, search *"Search god frames and return gifts"*, navigation (All Frames, Wedding Return Gifts, How to Order, Contact), customer account, request cart badge (no admin links).
+  2. Compact Campaign Carousel (~300–340px desktop, ~200–240px mobile) with 3 confirmed slides and both "Explore Frames" and "Request a Bulk Quote" CTAs.
+  3. InfoStrip: "₹99 or Less Per Frame", "Bulk Order Enquiries", "Shipping Quoted Separately", "Order-Request Model".
+  4. Early Frame Collection: 4 cards across on desktop, 2 on mobile with deity badge, dimensions, "₹X per frame", MOQ, "Shipping quoted separately", Quick View, and Add to Request.
+  5. Wedding Return-Gifting Section with "Plan Your Return Gifts" action.
+  6. 3-step Order Explanation with exact mandatory verbatim disclaimer.
+  7. Compact contact and footer.
+- **Bulk Quantity Controls:** Interactive numeric input stepper with `+`/`-` controls, configurable MOQ, order increments, unit price × qty = items subtotal breakdown, and separate shipping confirmation notice.
+- **Archival of Incompatible Products:** Soft-archived legacy collections (`> ₹99`, lamps, sculptures, hampers) via `status = 'archived'` in migration `0008` while preserving database records, photographs, and historical orders.
+- **Admin Portal Updates:** Added frame metadata management (deity, frame size, orientation, border finish), soft-delete endpoint (`onRequestDelete`), and quotation ceiling enforcement (`agreedUnitPrice <= 99`).
+
+### Added
+- Migration `0008_devotional_frames_99.sql`: frame schema columns, devotional categories, archival of legacy products, 12 authentic sample devotional frames (`SWY-FRAME-001` through `012`, strictly <= ₹99), and confirmed campaign banners.
+- Tests 28, 29, 30, and 31 in `scripts/run-tests.js`: verifying order rejection over ₹99, admin product creation price capping, quotation revision price capping, and storefront exclusion of items > ₹99. Suite total: 31 passed, 0 failed.
+
+Implementation commit: `837928b`.
+
+---
+
 ## [0.5.0] - 2026-10-19
 
 ### Changed

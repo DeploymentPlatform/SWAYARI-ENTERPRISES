@@ -358,3 +358,72 @@ SWAYARI was repositioned to capture the high-demand affordable gifting market wh
 - `main` branch remains untouched; production deployment deliberately withheld as directed.
 - Remote feature branch pushed to GitHub for complete remote backup.
 
+---
+
+## Milestone 6: Confirmed Business Direction — Devotional Frames ₹99 & Under
+
+- **Date & Time (Asia/Kolkata):** `2026-10-20T11:25:00+05:30`
+- **Working Branch:** `feature/swayari-devotional-frames-under-99`
+- **Completed Implementation Commit:** [`837928b93aba1df25b5582c299b12006caf2822d`](file:///Users/suryateja/Library/CloudStorage/GoogleDrive-stimpt.team@gmail.com/My%20Drive/SWAYARI%20ENTERPRISES/SWAYARI-ENTERPRISES) (`837928b`)
+- **Preceding Commit References:** `ac8c4b0` (dev server concurrent port update), `ddb2d93` (Milestone 5)
+
+### 1. Context & Confirmed Business Model
+SWAYARI has transitioned to a confirmed business direction focusing exclusively on devotional/god frames priced at ₹99 or less per frame. The primary target audience is customers ordering return gifts in bulk for weddings, housewarmings, and related family celebrations.
+- **Core Proposition:** “Devotional frames ₹99 & under”
+- **Supporting Message:** “Thoughtful return gifts for your special celebrations.”
+- **Shipping:** Charged separately and confirmed personally by the team based on quantity and destination.
+- **Order-Request Model:** Pure consultation-based quotation flow with zero online payment gateways, no credit card processing, and no automatic stock reservations.
+- **Mandatory Verbatim Disclaimer:**
+  > *“Our team will contact you to confirm availability, final pricing, shipping charges and delivery details. Submitting this request does not confirm a purchase or reserve stock.”*
+- **Strict Exclusions:** All collections at ₹299, ₹499, or ₹999 and general décor (lamps, sculptures, hampers) have been removed from the public storefront and soft-archived (`status = 'archived'`) in SQLite/D1, preserving original records, photographs, and past customer orders.
+
+### 2. Architecture & Components Implemented
+1. **Database Schema Extension (`migrations/0008_devotional_frames_99.sql`):**
+   - Altered `products` table with frame-specific attributes: `deity`, `frame_size`, `orientation`, and `border_finish`.
+   - Seeded devotional categories: `cat-devotional-frames` ("All Devotional Frames"), `cat-ganesha` ("Lord Ganesha Frames"), `cat-lakshmi` ("Goddess Lakshmi Frames"), `cat-balaji` ("Tirupati Balaji Frames"), `cat-radha-krishna` ("Radha Krishna Frames"), and `cat-mini-favors` ("Mini Return Gift Frames").
+   - Soft-archived legacy non-frame products and items with `indicative_price > 99`.
+   - Seeded 12 authentic sample devotional frames (`SWY-FRAME-001` through `012`) spanning ₹49 to ₹99 with realistic bulk pricing tiers, dimensions, and materials.
+   - Seeded campaign banners with the 3 confirmed marketing messages.
+2. **Strict ₹99 Price Ceiling Enforcement:**
+   - **Storefront Edge APIs:** Added filter `AND (p.indicative_price IS NULL OR p.indicative_price <= 99)`.
+   - **Server-Side Order Submission (`/api/orders`):** Rejects any item priced > ₹99 with HTTP 400.
+   - **Admin Product Management (`/api/admin/products` & `[id]`):** Rejects product creation/update if `indicativePrice > 99`, variant price > 99, or bulk tier price > 99.
+   - **Admin Quotations (`/api/admin/orders/[id]`):** Rejects quotation revision if any item's agreed unit price > ₹99. Original requested item snapshots remain immutable.
+3. **Approachable, Premium Visual Design:**
+   - Palette: Warm ivory backgrounds (`#FBF9F5`), crisp white cards, rich burgundy actions (`#6B1D2F`), and restrained antique gold accents (`#C5A059`).
+   - Header: Left logo, search placeholder *"Search god frames and return gifts"*, navigation links, customer account, cart badge (zero admin links on storefront).
+   - Compact Campaign Carousel: 300–340px desktop / 200–240px mobile with pause controls, indicators, and dual CTAs ("Explore Frames" / "Request a Bulk Quote").
+   - InfoStrip: 4 key assurances: *₹99 or Less Per Frame*, *Bulk Order Enquiries*, *Shipping Quoted Separately*, *Order-Request Model*.
+   - Product Cards & PDP: Devotional imagery, deity tag, dimensions, "₹X per frame", MOQ indicator, "Shipping quoted separately", Quick View, and Add to Request.
+   - Quick View Modal: Editable numeric quantity with `+`/`-` buttons, real-time item subtotal calculation, shipping disclosure, mixed-design notice, and verbatim disclaimer.
+   - Wedding Return Gifts concierge section with "Plan Your Return Gifts" CTA.
+   - 3-step Order Explanation with verbatim disclaimer.
+4. **Admin Portal Enhancements:**
+   - Added `onRequestDelete` in `apps/admin/functions/api/admin/products/[id].js` for safe soft-archival.
+   - Frame attributes displayed in product tables and product editor modal.
+   - Agreed unit price capped at ₹99 with real-time validation banner.
+
+### 3. Checks & Verification Executed
+- **Automated Test Suite (`npm test`):**
+  - Updated test runner: `node scripts/run-tests.js`
+  - **Results: 31 passed, 0 failed.** ✅
+  - Test 26: Devotional frame attributes and budget filters strictly enforce ₹99 ceiling. ✅
+  - Test 27: Bulk order requests capture occasion, requiredDate, and tiered pricing within ₹99 ceiling. ✅
+  - Test 28: Server-side order request rejects items exceeding ₹99 ceiling. ✅
+  - Test 29: Admin product creation rejects indicative price or variants exceeding ₹99. ✅
+  - Test 30: Admin quotation revisions strictly reject agreed unit prices exceeding ₹99. ✅
+  - Test 31: Storefront queries strictly exclude products priced above ₹99 even if published. ✅
+- **Production Bundling (`npm run build`):**
+  - Regenerated asset manifest with 173 items.
+  - Storefront Vite bundle: 417.01 kB JS (122.59 kB gzip), 52.17 kB CSS. ✅
+  - Admin Vite bundle: 220.51 kB JS (64.73 kB gzip), 30.54 kB CSS. ✅
+- **Local Dev Server:**
+  - Running via `scripts/dev-server.js` on Storefront (`http://127.0.0.1:8790`) and Admin (`http://127.0.0.1:8791`).
+  - Verified `/api/products?include_demo=1` and `/api/banners` via HTTP curl.
+
+### 4. Deployment Status & Handoff
+- Working branch: `feature/swayari-devotional-frames-under-99`.
+- Production branch (`main`) remains untouched.
+- Ready for remote GitHub push and owner review.
+
+

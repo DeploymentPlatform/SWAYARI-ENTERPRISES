@@ -92,6 +92,11 @@ export async function onRequestPost(context) {
         return errorResponse(`${prod.name} is a preview sample and cannot be requested`, 400);
       }
 
+      // Strict ₹99 rule: Any frame priced above ₹99 cannot be requested
+      if (prod.indicative_price !== null && Number(prod.indicative_price) > 99) {
+        return errorResponse(`Product ${prod.name} exceeds the maximum frame price limit of ₹99`, 400);
+      }
+
       const qty = Math.max(1, parseInt(item.quantity, 10) || 1);
       const images = JSON.parse(prod.images || '[]');
       const firstImage = images.length > 0 ? images[0] : null;
@@ -106,6 +111,10 @@ export async function onRequestPost(context) {
             break;
           }
         }
+      }
+
+      if (unitPrice !== null && unitPrice > 99) {
+        return errorResponse(`Product ${prod.name} unit price ₹${unitPrice} exceeds the maximum frame price limit of ₹99`, 400);
       }
 
       if (unitPrice !== null) {

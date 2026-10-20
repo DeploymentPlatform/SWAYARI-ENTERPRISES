@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
-import { Product } from '@swayari/shared';
+import { ChevronRight, Truck, ShieldCheck, Sparkles, AlertCircle } from 'lucide-react';
+import { Product, formatPrice } from '@swayari/shared';
 import { Link } from '../lib/router';
 import { productImageSources } from '../lib/media';
 import { usePageMeta, useStructuredData } from '../lib/meta';
@@ -49,7 +49,7 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
     };
   }, [slug, attempt]);
 
-  usePageMeta(product?.name || (status === 'notfound' ? 'Piece not found' : null), product?.description?.slice(0, 155), {
+  usePageMeta(product?.name || (status === 'notfound' ? 'Frame not found' : null), product?.description?.slice(0, 155), {
     noindex: status === 'notfound' || Boolean(product?.isDemo)
   });
   useStructuredData(
@@ -73,7 +73,7 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
   if (status === 'loading') {
     return (
       <div className="container-content grid gap-10 py-10 md:grid-cols-12 md:py-14" aria-busy="true">
-        <div className="skeleton aspect-product md:col-span-7" />
+        <div className="skeleton aspect-square md:col-span-7" />
         <div className="space-y-4 md:col-span-5">
           <div className="skeleton h-10 w-3/4" />
           <div className="skeleton h-5 w-1/3" />
@@ -93,27 +93,28 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
     return (
       <div className="container-content">
         <EmptyState
-          title="This piece is no longer listed"
-          body={<p>It may have been updated or removed. Browse the collection, or ask us about it.</p>}
-          action={{ to: '/shop', label: 'Browse the collection' }}
+          title="This devotional frame is no longer listed"
+          body={<p className="text-[13px] text-[#6B6362]">It may have been updated or archived. Browse our devotional collection, or ask our team about it.</p>}
+          action={{ to: '/shop', label: 'Browse Devotional Frames' }}
         />
       </div>
     );
   }
 
-  const images = product.images?.length ? product.images : [];
-  const requestable = canRequest(product);
-  const specs: [string, string][] = [];
-  if (product.setContents) specs.push(['Set Contents', product.setContents]);
-  if (product.categoryName) specs.push(['Category', product.categoryName]);
-  if (product.material) specs.push(['Material', product.material]);
-  if (product.dimensions) specs.push(['Dimensions', product.dimensions]);
-  if ((product.minQuantity || 1) > 1) specs.push(['Minimum quantity', `${product.minQuantity} ${product.priceType === 'set' ? 'sets' : 'pieces'}`]);
-  if ((product.orderIncrement || 1) > 1) specs.push(['Order increments', `${product.orderIncrement} units`]);
-  if (product.shippingInfo) specs.push(['Shipping', product.shippingInfo]);
-  specs.push(['Reference SKU', product.sku]);
+  const images = product.images && product.images.length > 0 ? product.images : ['/assets/products/venkateswara-frame-960.webp'];
+  const specs = [
+    product.deity ? ['Deity', product.deity] : null,
+    product.dimensions ? ['Dimensions', product.dimensions] : null,
+    product.borderFinish ? ['Border Finish', product.borderFinish] : null,
+    product.orientation ? ['Orientation', product.orientation] : null,
+    product.material ? ['Craft / Materials', product.material] : null,
+    ['Mixed Designs', 'Allowed across complete request'],
+    ['Shipping', 'Quoted separately based on order size and delivery PIN']
+  ].filter((s): s is [string, string] => Boolean(s));
 
-  // Bulk tier pricing calculation
+  const requestable = canRequest(product);
+
+  // Bulk tier pricing calculation (strictly <= 99)
   let currentUnitPrice = product.indicativePrice;
   if (product.bulkTiers && product.bulkTiers.length > 0) {
     const sortedTiers = [...product.bulkTiers].sort((a, b) => b.min_qty - a.min_qty);
@@ -124,21 +125,38 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
       }
     }
   }
-  const calculatedTotal = currentUnitPrice !== null ? currentUnitPrice * quantity : null;
+
+  if (currentUnitPrice !== null && currentUnitPrice > 99) {
+    currentUnitPrice = 99;
+  }
+
+  const calculatedSubtotal = currentUnitPrice !== null ? currentUnitPrice * quantity : null;
 
   return (
     <div className="container-content pb-20 md:pb-28">
-      <nav aria-label="Breadcrumb" className="py-5 text-sm text-ink-soft">
+      <nav aria-label="Breadcrumb" className="py-5 text-sm text-[#6B6362]">
         <ol className="flex flex-wrap items-center gap-1.5">
           <li>
-            <Link to="/shop" className="hover:text-burgundy">
-              The Collection
+            <Link to="/shop" className="hover:text-[#5C1D24]">
+              All Frames
             </Link>
           </li>
           <li aria-hidden>
             <ChevronRight className="h-3.5 w-3.5" />
           </li>
-          <li aria-current="page" className="text-ink">
+          {product.deity && (
+            <>
+              <li>
+                <Link to={`/shop?deity=${encodeURIComponent(product.deity.toLowerCase())}`} className="hover:text-[#5C1D24]">
+                  {product.deity}
+                </Link>
+              </li>
+              <li aria-hidden>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </li>
+            </>
+          )}
+          <li aria-current="page" className="text-[#2B2625] font-medium">
             {product.name}
           </li>
         </ol>
@@ -147,45 +165,32 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
       <div className="grid gap-10 md:grid-cols-12 lg:gap-16">
         {/* Gallery */}
         <div className="md:col-span-7">
-          <div className="relative bg-stone">
+          <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#FAF7F2] border border-[#E6DDD5] p-4 flex items-center justify-center">
             {images.length > 0 ? (
-              <Picture
-                key={images[activeImage]}
-                sources={productImageSources(images[activeImage])!}
-                sizes="(min-width: 768px) 58vw, 100vw"
-                width={960}
-                height={1200}
-                priority
-                alt={`${product.name}${activeImage > 0 ? ' — as photographed' : ''}`}
-                className="aspect-product w-full object-cover"
+              <img
+                src={images[activeImage]}
+                alt={`${product.name}${activeImage > 0 ? ' — view ' + (activeImage + 1) : ''}`}
+                className="w-full h-full object-contain"
               />
             ) : (
-              <div className="flex aspect-product items-center justify-center text-ink-soft">Photograph coming soon</div>
+              <div className="flex aspect-square items-center justify-center text-[#6B6362]">Photograph coming soon</div>
             )}
           </div>
           {images.length > 1 && (
             <div className="mt-3 flex gap-3" role="group" aria-label="Product photographs">
-              {images.map((src, i) => {
-                const sources = productImageSources(src)!;
-                return (
-                  <button
-                    key={src}
-                    type="button"
-                    onClick={() => setActiveImage(i)}
-                    aria-pressed={activeImage === i}
-                    aria-label={i === 0 ? 'Show studio photograph' : `Show photograph ${i + 1}${src.includes('-photo-') ? ' (as photographed)' : ''}`}
-                    className={`w-20 border-2 bg-stone transition-colors sm:w-24 ${activeImage === i ? 'border-ink' : 'border-transparent hover:border-stone-shade'}`}
-                  >
-                    <Picture sources={sources} sizes="96px" width={192} height={240} alt="" className="aspect-product w-full object-cover" />
-                  </button>
-                );
-              })}
+              {images.map((src, i) => (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => setActiveImage(i)}
+                  aria-pressed={activeImage === i}
+                  aria-label={`Show photograph ${i + 1}`}
+                  className={`w-20 h-20 rounded-xl p-1.5 border-2 bg-white transition-colors flex items-center justify-center ${activeImage === i ? 'border-[#5C1D24]' : 'border-[#E6DDD5] hover:border-[#C49A45]'}`}
+                >
+                  <img src={src} alt="" className="w-full h-full object-contain" />
+                </button>
+              ))}
             </div>
-          )}
-          {images.some(src => src.includes('-photo-')) && (
-            <p className="mt-3 text-[0.8125rem] text-ink-soft">
-              The first image shows the piece on a neutral surface; the second is the original photograph.
-            </p>
           )}
         </div>
 
@@ -193,48 +198,65 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
         <div className="md:col-span-5">
           <div className="md:sticky md:top-28">
             {product.isDemo && (
-              <p className="mb-5 flex items-start gap-3 border border-gold/50 bg-white px-4 py-3 text-sm text-ink-soft">
-                <SampleTag className="flex-shrink-0" />
-                <span>Preview sample — shown so you can see how the catalogue will look. Details are still to be confirmed.</span>
+              <p className="mb-4 flex items-start gap-2.5 border border-[#C49A45]/50 bg-[#FAF7F2] p-3 text-xs text-[#8F7138] rounded-xl">
+                <SampleTag className="flex-shrink-0 mt-0.5" />
+                <span>Sample preview item — shown for catalogue verification. Dimensions and frame specifications confirmed upon enquiry.</span>
               </p>
             )}
-            <h1 className="text-display-sm md:text-display-md">{product.name}</h1>
             
-            {product.isQuoteOnly ? (
-              <div className="mt-3">
-                <span className="text-xl font-bold text-[#8F7138]">Price on Consultation</span>
-                <p className="mt-1 text-sm text-ink-soft">Bespoke piece prepared on commission. Final price confirmed upon specification review.</p>
+            <div className="flex items-center gap-2 mb-1 text-xs text-[#C49A45] font-bold uppercase tracking-wider">
+              <span>{product.dimensions || product.frameSize || 'Devotional Frame'}</span>
+              {product.orientation && <span>· {product.orientation}</span>}
+            </div>
+
+            <h1 className="font-display text-[1.65rem] md:text-[2rem] font-bold text-[#2B2625] leading-tight">
+              {product.name}
+            </h1>
+            
+            {/* Price section */}
+            <div className="mt-3 pb-3 border-b border-[#E6DDD5]">
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold text-[#5C1D24]">
+                  {formatPrice(currentUnitPrice)}
+                </span>
+                <span className="text-sm text-[#6B6362]">
+                  per frame
+                </span>
               </div>
-            ) : (
-              <div className="mt-3">
-                <div className="flex items-baseline gap-2">
-                  <PriceText value={currentUnitPrice} className="text-2xl font-bold text-[#571C2A]" />
-                  <span className="text-sm text-ink-soft">
-                    {product.priceType === 'set' ? 'per set' : 'per piece'}
-                  </span>
+
+              {calculatedSubtotal !== null && (
+                <div className="mt-2.5 p-3 rounded-xl bg-[#FAF7F2] border border-[#E6DDD5] space-y-1">
+                  <div className="flex justify-between text-xs text-[#6B6362]">
+                    <span>Unit price × quantity:</span>
+                    <span className="font-medium text-[#2B2625]">{formatPrice(currentUnitPrice)} × {quantity}</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-bold text-[#5C1D24] pt-1 border-t border-[#E6DDD5]/60">
+                    <span>Items subtotal:</span>
+                    <span>{formatPrice(calculatedSubtotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-[#6B6362] pt-0.5">
+                    <span>Shipping:</span>
+                    <span className="font-medium text-[#8F7138] italic">to be confirmed by our team</span>
+                  </div>
                 </div>
+              )}
 
-                {calculatedTotal !== null && quantity > 1 && (
-                  <p className="mt-1 text-sm font-semibold text-[#571C2A]">
-                    Indicative Subtotal: {formatPrice(calculatedTotal)} for {quantity} {product.priceType === 'set' ? 'sets' : 'pieces'}
-                  </p>
-                )}
-
-                <p className="mt-1 text-sm text-ink-soft">Final price, shipping and delivery are confirmed by our team.</p>
-              </div>
-            )}
+              <p className="mt-2 text-xs text-[#6B6362] leading-relaxed">
+                Items subtotal is indicative. Submitting this request does not confirm a purchase or charge payment online.
+              </p>
+            </div>
 
             {/* Minimum quantity and bulk conditions */}
             {product.minQuantity > 1 && (
-              <div className="mt-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#C49A45]/15 border border-[#C49A45]/35 text-[#6B5018] text-xs font-semibold">
-                Bulk order item · Minimum order: {product.minQuantity} pieces
+              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#FAF7F2] border border-[#C49A45]/40 text-[#8F7138] text-xs font-semibold">
+                Bulk order frame · Minimum quantity: {product.minQuantity} frames
                 {product.orderIncrement > 1 ? ` · Multiples of ${product.orderIncrement}` : ''}
               </div>
             )}
 
             {/* Bulk Volume Tiers Table */}
             {product.bulkTiers && product.bulkTiers.length > 0 && (
-              <div className="mt-4 p-3.5 rounded-xl bg-[#FAF7F2] border border-[#E7DFD5]">
+              <div className="mt-4 p-3.5 rounded-xl bg-[#FAF7F2] border border-[#E6DDD5]">
                 <div className="text-xs font-bold uppercase tracking-wider text-[#8F7138] mb-2">
                   Volume Pricing Tiers:
                 </div>
@@ -244,58 +266,41 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
                       key={t.min_qty}
                       className={`p-2 rounded-lg border ${
                         quantity >= t.min_qty
-                          ? 'bg-[#571C2A] text-white border-[#571C2A]'
-                          : 'bg-white text-[#292421] border-[#E7DFD5]'
+                          ? 'bg-[#5C1D24] text-white border-[#5C1D24]'
+                          : 'bg-white text-[#2B2625] border-[#E6DDD5]'
                       }`}
                     >
                       <div className="font-bold">{formatPrice(t.unit_price)}</div>
-                      <div className="text-[10px] opacity-80">{t.min_qty}+ units</div>
+                      <div className="text-[10px] opacity-80">{t.min_qty}+ frames</div>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-ink-soft">{product.description}</p>
+            <p className="mt-5 whitespace-pre-line text-[14px] leading-relaxed text-[#6B6362]">{product.description}</p>
 
-            <dl className="mt-8 divide-y divide-stone-deep border-y border-stone-deep text-[0.9375rem]">
+            <dl className="mt-6 divide-y divide-[#E6DDD5] border-y border-[#E6DDD5] text-xs">
               {specs.map(([k, v]) => (
-                <div key={k} className="grid grid-cols-[9rem_1fr] gap-4 py-3">
-                  <dt className="text-ink-soft">{k}</dt>
-                  <dd>{v}</dd>
+                <div key={k} className="grid grid-cols-[8.5rem_1fr] gap-4 py-2.5">
+                  <dt className="text-[#6B6362] font-medium">{k}</dt>
+                  <dd className="text-[#2B2625] font-semibold">{v}</dd>
                 </div>
               ))}
             </dl>
-            {product.customisationInfo && <p className="mt-4 text-sm text-ink-soft">{product.customisationInfo}</p>}
+            {product.customisationInfo && <p className="mt-3 text-xs text-[#8F7138] font-medium">✨ {product.customisationInfo}</p>}
 
             {requestable ? (
               <form
-                className="mt-8 space-y-6"
+                className="mt-6 space-y-4"
                 onSubmit={e => {
                   e.preventDefault();
                   add(product, quantity, { selectedVariant: variant, customisationNote: note.trim() || undefined });
                 }}
               >
-                {product.hasVariants && product.variants?.length > 0 && (
-                  <fieldset>
-                    <legend className="field-label">Option</legend>
-                    <div className="flex flex-wrap gap-2">
-                      {product.variants.map(v => (
-                        <label
-                          key={v.name}
-                          className={`cursor-pointer border px-4 py-2.5 text-sm transition-colors ${variant === v.name ? 'border-ink bg-ink text-ivory' : 'border-stone-shade hover:border-ink'}`}
-                        >
-                          <input type="radio" name="variant" value={v.name} checked={variant === v.name} onChange={() => setVariant(v.name)} className="sr-only" />
-                          {v.name}
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-                )}
-
                 <div>
-                  <label htmlFor="item-note" className="field-label">
-                    Note for our team <span className="font-normal text-ink-soft">(optional)</span>
+                  <label htmlFor="item-note" className="text-xs font-semibold text-[#2B2625] block mb-1">
+                    Event note or custom tags <span className="font-normal text-[#6B6362]">(optional)</span>
                   </label>
                   <input
                     id="item-note"
@@ -303,38 +308,39 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
                     maxLength={300}
                     value={note}
                     onChange={e => setNote(e.target.value)}
-                    placeholder="For example, event occasion, required date or gift packaging preferences"
-                    className="field-input"
+                    placeholder="For example, wedding date, couple names for sticker, or preferred packaging"
+                    className="w-full h-10 px-3 rounded-lg border border-[#E6DDD5] bg-[#FAF7F2] text-xs text-[#2B2625] placeholder-[#6B6362] focus:outline-none focus:border-[#5C1D24] focus:bg-white"
                   />
                 </div>
 
-                <div className="flex items-stretch gap-3">
+                <div className="flex items-center gap-3">
                   <QuantityStepper
                     value={quantity}
                     min={product.minQuantity || 1}
-                    step={product.orderIncrement || 1}
                     onChange={q => setQuantity(Math.max(product.minQuantity || 1, q))}
-                    label="Quantity"
+                    label="Frame quantity"
                   />
-                  <button type="submit" className="btn-primary flex-1">
+                  <button type="submit" className="btn-primary flex-1 py-3 text-sm font-semibold">
                     Add to Request
                   </button>
                 </div>
               </form>
             ) : (
-              <div className="mt-8 border border-stone-deep bg-white p-5 text-sm text-ink-soft">
-                This preview sample cannot be requested yet. To ask about a similar piece,{' '}
-                <Link to={`/contact?product=${encodeURIComponent(product.name)}`} className="link-underline text-ink">
+              <div className="mt-6 border border-[#E6DDD5] bg-white p-4 text-xs text-[#6B6362] rounded-xl">
+                This preview sample cannot be requested online yet. To ask about a similar frame,{' '}
+                <Link to={`/contact?product=${encodeURIComponent(product.name)}`} className="underline font-semibold text-[#5C1D24]">
                   contact our team
                 </Link>
                 .
               </div>
             )}
 
-            <OrderDisclaimer className="mt-6" compact />
+            <div className="mt-6">
+              <OrderDisclaimer compact />
+            </div>
 
-            <Link to={`/contact?product=${encodeURIComponent(product.name)}`} className="text-link mt-6">
-              Ask about this piece
+            <Link to={`/contact?product=${encodeURIComponent(product.name)}`} className="inline-block mt-4 text-xs font-semibold text-[#5C1D24] hover:underline">
+              Need assistance with this design? Contact our team &rarr;
             </Link>
           </div>
         </div>

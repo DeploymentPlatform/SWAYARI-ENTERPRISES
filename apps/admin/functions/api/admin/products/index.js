@@ -21,6 +21,7 @@ export async function onRequestGet(context) {
              p.customisation_info, p.status, p.is_demo, p.price_type, p.set_contents,
              p.order_increment, p.is_quote_only, p.bulk_tiers_json, p.packaging_options_json,
              p.shipping_info, p.occasions_json, p.supports_individual, p.supports_bulk,
+             p.deity, p.frame_size, p.orientation, p.border_finish,
              p.created_at, p.updated_at,
              c.name as category_name
       FROM products p
@@ -35,9 +36,9 @@ export async function onRequestGet(context) {
     }
 
     if (search && search.trim().length > 0) {
-      query += ' AND (p.name LIKE ? OR p.sku LIKE ? OR p.description LIKE ?)';
+      query += ' AND (p.name LIKE ? OR p.sku LIKE ? OR p.description LIKE ? OR p.deity LIKE ?)';
       const term = `%${search.trim()}%`;
-      params.push(term, term, term);
+      params.push(term, term, term, term);
     }
 
     query += ' ORDER BY p.created_at DESC';
@@ -75,6 +76,10 @@ export async function onRequestGet(context) {
       occasions: JSON.parse(row.occasions_json || '[]'),
       supportsIndividual: row.supports_individual !== null ? Boolean(row.supports_individual) : true,
       supportsBulk: row.supports_bulk !== null ? Boolean(row.supports_bulk) : true,
+      deity: row.deity || null,
+      frameSize: row.frame_size || null,
+      orientation: row.orientation || 'portrait',
+      borderFinish: row.border_finish || null,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     }));
@@ -127,11 +132,43 @@ export async function onRequestPost(context) {
       shippingInfo = 'Standard dispatched in 2–4 business days across India',
       occasions = [],
       supportsIndividual = true,
-      supportsBulk = true
+      supportsBulk = true,
+      deity = null,
+      frameSize = null,
+      orientation = 'portrait',
+      borderFinish = null
     } = body;
 
     if (!sku || !name || !description) {
       return errorResponse('SKU, Name and Description are required', 400);
+    }
+
+    // Strict ₹99 rule: Frame price cannot exceed ₹99
+    if (indicativePrice !== undefined && indicativePrice !== null && indicativePrice !== '') {
+      const pNum = Number(indicativePrice);
+      if (pNum > 99) {
+        return errorResponse('Frame indicative price cannot exceed ₹99 as per business direction', 400);
+      }
+    }
+
+    if (Array.isArray(variants)) {
+      for (const v of variants) {
+        const vPrice = v.indicativePrice !== undefined ? v.indicativePrice : v.indicative_price;
+        if (vPrice !== undefined && vPrice !== null && vPrice !== '') {
+          if (Number(vPrice) > 99) {
+            return errorResponse(`Variant ${v.name || ''} price cannot exceed ₹99`, 400);
+          }
+        }
+      }
+    }
+
+    if (Array.isArray(bulkTiers)) {
+      for (const tier of bulkTiers) {
+        const tierPrice = tier.unit_price !== undefined ? tier.unit_price : tier.unitPrice;
+        if (tierPrice && Number(tierPrice) > 99) {
+          return errorResponse('Bulk tier price cannot exceed ₹99 per frame', 400);
+        }
+      }
     }
 
     // Generate clean slug if missing
@@ -151,8 +188,9 @@ export async function onRequestPost(context) {
         customisation_info, status, is_demo, price_type, set_contents,
         order_increment, is_quote_only, bulk_tiers_json, packaging_options_json,
         shipping_info, occasions_json, supports_individual, supports_bulk,
+        deity, frame_size, orientation, border_finish,
         created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       id,
       sku.trim().toUpperCase(),
@@ -181,6 +219,10 @@ export async function onRequestPost(context) {
       JSON.stringify(occasions || []),
       supportsIndividual ? 1 : 0,
       supportsBulk ? 1 : 0,
+      deity || null,
+      frameSize || null,
+      orientation || 'portrait',
+      borderFinish || null,
       nowIso,
       nowIso
     ).run();

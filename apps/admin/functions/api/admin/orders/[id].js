@@ -157,6 +157,13 @@ export async function onRequestPatch(context) {
         return errorResponse('Quotation must contain priced items', 400);
       }
 
+      // Strict ₹99 rule: Frame quotation unit price cannot exceed ₹99
+      for (const it of items) {
+        if (Number(it.agreedUnitPrice) > 99) {
+          return errorResponse(`Quoted unit price of ₹${it.agreedUnitPrice} exceeds the maximum frame price limit of ₹99`, 400);
+        }
+      }
+
       // Determine next revision number
       const maxRevRow = await env.DB.prepare(`
         SELECT MAX(revision_number) as max_rev FROM order_quotations WHERE order_id = ?

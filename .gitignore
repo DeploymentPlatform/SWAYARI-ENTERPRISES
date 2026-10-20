@@ -1,4 +1,5 @@
 # Dependencies
+node_modules
 node_modules/
 .npm/
 
@@ -19,7 +20,10 @@ node_modules/
 Thumbs.db
 
 # Build & Test outputs
+dist
 dist/
+apps/admin/dist
+apps/storefront/dist
 coverage/
 scratch/
 *.log
@@ -29,10 +33,10 @@ scratch/
 *.tar.gz
 
 # Portal asset copies are generated from public/assets by scripts/sync-assets.js
-apps/*/public/assets/products/
-apps/*/public/assets/editorial/
-apps/*/public/assets/categories/
-apps/admin/public/assets/demo/
+apps/*/public/assets/products
+apps/*/public/assets/editorial
+apps/*/public/assets/categories
+apps/*/public/assets/demo
 apps/*/public/assets/manifest.json
 
 # Temporary downloader cache

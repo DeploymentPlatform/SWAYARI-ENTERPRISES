@@ -21,6 +21,9 @@ export const BRAND = {
   }
 } as const;
 
+export const MAX_FRAME_PRICE = 99;
+export const MAX_FRAME_PRICE_PAISE = 9900;
+
 export const ORDER_DISCLAIMER_TEXT =
   'Our team will contact you to confirm availability, final pricing, shipping charges and delivery details. Submitting this request does not confirm a purchase or reserve stock.';
 
@@ -40,90 +43,113 @@ export const SESSION_COOKIE_NAMES = {
 } as const;
 
 export const BRAND_TAGLINES = {
-  headline: 'Thoughtful gifts. Beautifully priced.',
-  supporting: 'Discover gifts for celebrations, return gifting and everyday moments.',
-  proposition: 'Gifts ₹999 & under',
-  entryLevel: '₹99 & under'
+  headline: 'Devotional frames ₹99 & under',
+  supporting: 'Thoughtful return gifts for your special celebrations.',
+  proposition: 'Devotional frames ₹99 & under',
+  entryLevel: '₹49 & under',
+  shippingNote: 'Shipping is charged separately and confirmed by our team.'
 } as const;
 
-export interface BudgetBandDefinition {
+export interface FramePriceBandDefinition {
   id: string;
   label: string;
   shortLabel: string;
   minPrice: number;
   maxPrice: number;
-  description: string;
+  description?: string;
 }
 
-export const BUDGET_BANDS: BudgetBandDefinition[] = [
+export const FRAME_PRICE_BANDS: FramePriceBandDefinition[] = [
   {
-    id: 'under-99',
-    label: '₹99 & under',
-    shortLabel: 'Under ₹99',
+    id: 'all-99',
+    label: 'All Frames (≤ ₹99)',
+    shortLabel: 'All ≤ ₹99',
     minPrice: 0,
     maxPrice: 99,
-    description: 'Raw silk potlis, solid brass kumkum chimizhs & floral tassels'
+    description: 'Devotional god frames in gold & teak finishes strictly under ₹99'
   },
   {
-    id: '100-299',
-    label: '₹100–₹299',
-    shortLabel: '₹100–₹299',
-    minPrice: 100,
-    maxPrice: 299,
-    description: 'Akhand deepams, meenakari peacock boxes & tuned prayer bells'
+    id: 'under-49',
+    label: 'Pocket & Mini (≤ ₹49)',
+    shortLabel: 'Under ₹49',
+    minPrice: 0,
+    maxPrice: 49,
+    description: 'Pocket prayer frames and mini Ganesha & Balaji favors from ₹49'
   },
   {
-    id: '300-499',
-    label: '₹300–₹499',
-    shortLabel: '₹300–₹499',
-    minPrice: 300,
-    maxPrice: 499,
-    description: 'German silver bowls, paired mayur diyas & mini pooja thali sets'
+    id: '50-79',
+    label: 'Classic 4"×6" (₹50–₹79)',
+    shortLabel: '₹50–₹79',
+    minPrice: 50,
+    maxPrice: 79,
+    description: 'Bala Krishna, Hanuman and Saraswati Devi frames in ornate borders'
   },
   {
-    id: '500-999',
-    label: '₹500–₹999',
-    shortLabel: '₹500–₹999',
-    minPrice: 500,
-    maxPrice: 999,
-    description: 'Hand-hammered brass urulis, deity idol pairs & festive hampers'
+    id: '80-99',
+    label: 'Royal & Sanctum (₹80–₹99)',
+    shortLabel: '₹80–₹99',
+    minPrice: 80,
+    maxPrice: 99,
+    description: 'Sri Venkateswara and Radha Krishna gold-foil sanctum frames'
   }
 ];
+
+// Backwards compatibility alias for components referencing BUDGET_BANDS
+export const BUDGET_BANDS = FRAME_PRICE_BANDS;
+
+export const DEITIES = [
+  { id: 'all', name: 'All Deities' },
+  { id: 'ganesha', name: 'Ganesha' },
+  { id: 'lakshmi', name: 'Lakshmi' },
+  { id: 'balaji', name: 'Balaji (Venkateswara)' },
+  { id: 'radha-krishna', name: 'Radha Krishna' },
+  { id: 'krishna', name: 'Bala Krishna' },
+  { id: 'shiva-parvati', name: 'Shiva Parvati' },
+  { id: 'saraswati', name: 'Saraswati' },
+  { id: 'hanuman', name: 'Hanuman' },
+  { id: 'murugan', name: 'Murugan' },
+  { id: 'sai-baba', name: 'Sai Baba' }
+] as const;
+
+export const FRAME_SIZES = [
+  { id: 'all', name: 'All Sizes' },
+  { id: 'pocket', name: 'Pocket 2.5"×3.5"' },
+  { id: 'mini', name: 'Mini 3"×3"' },
+  { id: 'classic', name: 'Classic 4"×6"' },
+  { id: 'royal', name: 'Royal 5"×7"' },
+  { id: 'wide', name: 'Wide 6"×4"' }
+] as const;
+
+export const ORIENTATIONS = [
+  { id: 'all', name: 'All Orientations' },
+  { id: 'portrait', name: 'Portrait' },
+  { id: 'landscape', name: 'Landscape' },
+  { id: 'square', name: 'Square' }
+] as const;
 
 export const OCCASIONS = [
   {
     id: 'wedding-return',
-    name: 'Wedding & Return Gifting',
+    name: 'Wedding Return Gifts',
     badge: 'Bulk Favors',
-    description: 'Auspicious keepsakes, silver bowls & brocade potlis for your cherished guests',
-    popularBudgets: ['under-99', '100-299', '300-499']
+    description: 'Auspicious devotional god frames for your wedding guests and family ceremonies'
   },
   {
     id: 'housewarming',
     name: 'Griha Pravesh & Housewarming',
     badge: 'New Beginnings',
-    description: 'Sacred brass urulis, akhand deepams & welcoming home accents',
-    popularBudgets: ['100-299', '500-999']
-  },
-  {
-    id: 'festive-celebrations',
-    name: 'Diwali & Festive Celebrations',
-    badge: 'Festive Lights',
-    description: 'Curated brass deepams, fragrant dhoop burners & celebratory hampers',
-    popularBudgets: ['under-99', '300-499', '500-999']
+    description: 'Sacred Ganesha and Balaji sanctum frames for new home blessings'
   },
   {
     id: 'navratri-haldi',
     name: 'Navratri & Haldi Kumkum',
     badge: 'Sacred Blessings',
-    description: 'Solid brass kumkum boxes, shola garlands & festive gift pouches',
-    popularBudgets: ['under-99', '100-299']
+    description: 'Goddess Lakshmi, Saraswati and Radha Krishna mini return favors'
   },
   {
-    id: 'corporate-milestone',
-    name: 'Corporate & Commemorations',
-    badge: 'Executive',
-    description: 'Engraved teak coasters, dual bowl presentation sets & bespoke plaques',
-    popularBudgets: ['300-499', '500-999']
+    id: 'family-celebrations',
+    name: 'Family Celebrations & Poojas',
+    badge: 'Spiritual Keepsakes',
+    description: 'Revered devotional frames for sashtiapthapoorthi, satyanarayan pooja and milestones'
   }
 ] as const;

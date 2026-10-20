@@ -14,6 +14,7 @@ import * as sfAuthMe from '../apps/storefront/functions/api/auth/me.js';
 import * as sfAuthLogout from '../apps/storefront/functions/api/auth/logout.js';
 import * as sfDevLogin from '../apps/storefront/functions/api/auth/dev-login.js';
 import * as sfAuthConfig from '../apps/storefront/functions/api/auth/config.js';
+import * as sfBannersList from '../apps/storefront/functions/api/banners/index.js';
 
 // Admin handlers
 import * as admStats from '../apps/admin/functions/api/admin/stats.js';
@@ -145,6 +146,8 @@ const sfServer = http.createServer(async (req, res) => {
         cfRes = await sfDevLogin.onRequestPost(context);
       } else if (pathname === '/api/auth/config') {
         cfRes = await sfAuthConfig.onRequestGet(context);
+      } else if (pathname === '/api/banners') {
+        cfRes = await sfBannersList.onRequestGet(context);
       } else {
         cfRes = new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: { 'Content-Type': 'application/json' } });
       }

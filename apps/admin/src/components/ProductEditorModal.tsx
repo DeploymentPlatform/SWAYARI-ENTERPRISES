@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Check, X } from 'lucide-react';
-import { Category, OCCASIONS, Product } from '@swayari/shared';
+import { Check, X, AlertCircle } from 'lucide-react';
+import { Category, DEITIES, FRAME_SIZES, ORIENTATIONS, Product } from '@swayari/shared';
 import { Drawer, ErrorBanner } from './ui';
 
 interface ProductEditorModalProps {
@@ -42,7 +42,7 @@ function parseBulkTiers(text: string) {
         const minQty = parseInt(parts[0], 10);
         const unitPrice = parseFloat(parts[1]);
         if (minQty && !isNaN(unitPrice)) {
-          return { minQuantity: minQty, unitPrice, label: `${minQty}+ pcs` };
+          return { min_qty: minQty, unit_price: unitPrice };
         }
       }
       return null;
@@ -50,7 +50,7 @@ function parseBulkTiers(text: string) {
     .filter(Boolean);
 }
 
-/** Structured product editor. Only confirmed details belong in material/dimensions/price. */
+/** Structured devotional frame product editor with strict <= 99 ceiling enforcement. */
 export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productId, onClose, onSaved }) => {
   const editing = Boolean(productId);
   const [state, setState] = useState<'loading' | 'ready' | 'error'>(editing ? 'loading' : 'ready');
@@ -80,11 +80,16 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
     customisationInfo: '',
     availabilityLabel: 'Available on request',
     status: 'draft' as Product['status'],
-    isDemo: false
+    isDemo: false,
+    deity: '',
+    frameSize: '',
+    orientation: 'portrait' as 'portrait' | 'landscape' | 'square',
+    borderFinish: ''
   });
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
   const [bulkTiersText, setBulkTiersText] = useState('');
   const [images, setImages] = useState<string[]>([]);
+  
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setF(prev => ({ ...prev, [k]: e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value }));
 
@@ -118,12 +123,16 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
             customisationInfo: p.customisationInfo || '',
             availabilityLabel: p.availabilityLabel || 'Available on request',
             status: p.status,
-            isDemo: Boolean(p.isDemo)
+            isDemo: Boolean(p.isDemo),
+            deity: p.deity || '',
+            frameSize: p.frameSize || '',
+            orientation: p.orientation || 'portrait',
+            borderFinish: p.borderFinish || ''
           });
           setSelectedOccasions(p.occasions || []);
           setBulkTiersText(
             p.bulkTiers && p.bulkTiers.length > 0
-              ? p.bulkTiers.map(t => `${t.minQuantity}: ${t.unitPrice}`).join('\n')
+              ? p.bulkTiers.map(t => `${t.min_qty}: ${t.unit_price}`).join('\n')
               : ''
           );
           setImages(p.images || []);
@@ -142,6 +151,21 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
       setError('SKU, name and description are required.');
       return;
     }
+
+    // Strict ₹99 rule: Frame price cannot exceed ₹99
+    if (f.indicativePrice !== '' && Number(f.indicativePrice) > 99) {
+      setError('Devotional frames must be priced at ₹99 or less per frame as per confirmed business direction.');
+      return;
+    }
+
+    const tiers = parseBulkTiers(bulkTiersText);
+    for (const t of tiers) {
+      if (t.unit_price > 99) {
+        setError(`Bulk tier unit price ₹${t.unit_price} exceeds the maximum frame price limit of ₹99.`);
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       const res = await fetch(editing ? `/api/admin/products/${encodeURIComponent(productId!)}` : '/api/admin/products', {
@@ -162,7 +186,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
           minQuantity: Number(f.minQuantity) || 1,
           orderIncrement: Number(f.orderIncrement) || 1,
           isQuoteOnly: Boolean(f.isQuoteOnly),
-          bulkTiers: parseBulkTiers(bulkTiersText),
+          bulkTiers: tiers,
           shippingInfo: f.shippingInfo.trim() || null,
           occasions: selectedOccasions,
           supportsIndividual: f.supportsIndividual,
@@ -170,7 +194,11 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
           availabilityLabel: f.availabilityLabel.trim() || 'Available on request',
           customisationInfo: f.customisationInfo.trim() || null,
           status: f.status,
-          isDemo: f.isDemo
+          isDemo: f.isDemo,
+          deity: f.deity.trim() || null,
+          frameSize: f.frameSize.trim() || null,
+          orientation: f.orientation,
+          borderFinish: f.borderFinish.trim() || null
         })
       });
       const data = await res.json().catch(() => ({}));
@@ -188,15 +216,15 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
     <Drawer
       onClose={onClose}
       width="max-w-[760px]"
-      title={editing ? `Edit ${f.name || 'product'}` : 'New product'}
-      subtitle={editing ? f.sku : 'Saved products appear on the customer website once published (unless marked as a sample).'}
+      title={editing ? `Edit ${f.name || 'product'}` : 'New Devotional Frame'}
+      subtitle={editing ? f.sku : 'Devotional frames strictly priced at ₹99 or less per frame. Shipping quoted separately.'}
       footer={
         <div className="flex items-center justify-end gap-2">
           <button type="button" className="adm-btn-quiet" onClick={onClose}>
             Cancel
           </button>
           <button type="submit" form="product-form" className="adm-btn-primary" disabled={saving || state !== 'ready'}>
-            {saving ? 'Saving…' : editing ? 'Save changes' : 'Create product'}
+            {saving ? 'Saving…' : editing ? 'Save changes' : 'Create frame'}
           </button>
         </div>
       }
@@ -211,116 +239,157 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
             <div className="grid gap-4 sm:grid-cols-[10rem_1fr]">
               <label>
                 <span className="adm-label">SKU</span>
-                <input className="adm-input font-mono uppercase" value={f.sku} onChange={set('sku')} placeholder="SWY-001" required />
+                <input className="adm-input font-mono uppercase" value={f.sku} onChange={set('sku')} placeholder="SWY-FRAME-001" required />
               </label>
               <label>
                 <span className="adm-label">Name</span>
                 <input
                   className="adm-input"
                   value={f.name}
-                  required
                   onChange={e => {
-                    const name = e.target.value;
-                    setF(prev => ({ ...prev, name, slug: slugTouched ? prev.slug : slugify(name) }));
+                    set('name')(e);
+                    if (!slugTouched) setF(prev => ({ ...prev, slug: slugify(e.target.value) }));
                   }}
+                  placeholder="e.g. Sri Venkateswara Sanctum Gold Frame"
+                  required
                 />
               </label>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label>
-                <span className="adm-label">Web address</span>
-                <div className="flex items-center rounded-md border border-stone-shade bg-white focus-within:border-burgundy focus-within:ring-1 focus-within:ring-burgundy">
-                  <span className="pl-3 text-sm text-ink-faint">/product/</span>
-                  <input
-                    className="w-full bg-transparent px-1 py-2 text-[0.9375rem] focus:outline-none"
-                    value={f.slug}
-                    onChange={e => {
-                      setSlugTouched(true);
-                      setF(prev => ({ ...prev, slug: slugify(e.target.value) }));
-                    }}
-                  />
-                </div>
-              </label>
-              <label>
-                <span className="adm-label">Category</span>
-                <select className="adm-input" value={f.categoryId} onChange={set('categoryId')}>
-                  <option value="">No category</option>
-                  {categories.map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+            <label className="block">
+              <span className="adm-label">URL Slug</span>
+              <input
+                className="adm-input font-mono text-xs"
+                value={f.slug}
+                onChange={e => {
+                  setSlugTouched(true);
+                  set('slug')(e);
+                }}
+                required
+              />
+            </label>
             <label className="block">
               <span className="adm-label">Description</span>
-              <textarea className="adm-input" rows={4} value={f.description} onChange={set('description')} required placeholder="Describe what the photographs show and anything the team has confirmed." />
+              <textarea className="adm-textarea" rows={3} value={f.description} onChange={set('description')} required />
+            </label>
+            <label className="block">
+              <span className="adm-label">Category</span>
+              <select className="adm-input" value={f.categoryId} onChange={set('categoryId')}>
+                <option value="">(Select a devotional category)</option>
+                {categories.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
             </label>
           </Section>
 
-          <Section title="Confirmed details" hint="Leave blank anything not yet confirmed — blank fields are simply not shown to customers.">
+          {/* Devotional Deity & Frame Specifications */}
+          <Section title="Devotional Attributes & Frame Specs">
             <div className="grid gap-4 sm:grid-cols-2">
               <label>
-                <span className="adm-label">Material</span>
-                <input className="adm-input" value={f.material} onChange={set('material')} />
+                <span className="adm-label">Deity / Holy Figure</span>
+                <input
+                  className="adm-input"
+                  value={f.deity}
+                  onChange={set('deity')}
+                  placeholder="e.g. Balaji, Ganesha, Lakshmi, Radha Krishna"
+                />
               </label>
               <label>
-                <span className="adm-label">Dimensions / weight</span>
-                <input className="adm-input" value={f.dimensions} onChange={set('dimensions')} placeholder="e.g. 30 × 25 cm" />
+                <span className="adm-label">Frame Size Format</span>
+                <input
+                  className="adm-input"
+                  value={f.frameSize}
+                  onChange={set('frameSize')}
+                  placeholder="e.g. Classic 4&quot;×6&quot;, Mini 3&quot;×3&quot;, Royal 5&quot;×7&quot;"
+                />
               </label>
             </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <label>
+                <span className="adm-label">Orientation</span>
+                <select className="adm-input" value={f.orientation} onChange={set('orientation')}>
+                  <option value="portrait">Portrait</option>
+                  <option value="landscape">Landscape</option>
+                  <option value="square">Square</option>
+                </select>
+              </label>
+              <label>
+                <span className="adm-label">Border Finish</span>
+                <input
+                  className="adm-input"
+                  value={f.borderFinish}
+                  onChange={set('borderFinish')}
+                  placeholder="e.g. Antique Gold Foil, Temple Teak"
+                />
+              </label>
+              <label>
+                <span className="adm-label">Dimensions</span>
+                <input
+                  className="adm-input"
+                  value={f.dimensions}
+                  onChange={set('dimensions')}
+                  placeholder="e.g. 4&quot; x 6&quot;"
+                />
+              </label>
+            </div>
+
             <label className="block">
-              <span className="adm-label">Personalisation or packing information</span>
-              <input className="adm-input" value={f.customisationInfo} onChange={set('customisationInfo')} />
+              <span className="adm-label">Material / Crafting Details</span>
+              <input
+                className="adm-input"
+                value={f.material}
+                onChange={set('material')}
+                placeholder="e.g. Gold Foil Relief Plaque in Teak-finish Border"
+              />
+            </label>
+
+            <label className="block">
+              <span className="adm-label">Personalisation or Event Backing Information</span>
+              <input
+                className="adm-input"
+                value={f.customisationInfo}
+                onChange={set('customisationInfo')}
+                placeholder="e.g. Custom event sticker on backing available on bulk requests"
+              />
             </label>
           </Section>
 
-          <Section title="Price, packaging & quantity">
+          {/* Strict <= 99 Pricing Section */}
+          <Section title="Strict ₹99 Price Ceiling & Bulk Tiers">
+            <div className="p-3 bg-[#FFFBF0] border border-[#C49A45]/40 rounded-lg text-xs text-[#6B5018] flex items-center gap-2 mb-2">
+              <AlertCircle className="w-4 h-4 text-[#C49A45] flex-shrink-0" />
+              <span>
+                <strong>Strict Business Rule:</strong> Every purchasable frame and volume tier must be priced at <strong>₹99 or less</strong>. Shipping is quoted separately.
+              </span>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-3">
               <label>
-                <span className="adm-label">Indicative price (₹)</span>
+                <span className="adm-label">Indicative price (₹) · Max ₹99</span>
                 <input
                   type="number"
                   min={0}
-                  className="adm-input"
+                  max={99}
+                  className="adm-input font-bold text-burgundy"
                   value={f.indicativePrice}
                   onChange={set('indicativePrice')}
-                  placeholder="Blank = on request"
+                  placeholder="Max ₹99"
                   disabled={f.isQuoteOnly}
                 />
               </label>
               <label>
                 <span className="adm-label">Price unit</span>
                 <select className="adm-input" value={f.priceType} onChange={set('priceType')}>
-                  <option value="piece">Per piece (/ pc)</option>
+                  <option value="piece">Per frame (/ frame)</option>
                   <option value="set">Per set (/ set)</option>
                 </select>
               </label>
               <label>
                 <span className="adm-label">Availability label</span>
                 <input className="adm-input" value={f.availabilityLabel} onChange={set('availabilityLabel')} />
-              </label>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 accent-burgundy"
-                  checked={f.isQuoteOnly}
-                  onChange={set('isQuoteOnly')}
-                />
-                <span className="text-sm font-medium">Quote only (never place in a confirmed budget band)</span>
-              </label>
-              <label>
-                <span className="adm-label">Set contents (if applicable)</span>
-                <input
-                  className="adm-input"
-                  value={f.setContents}
-                  onChange={set('setContents')}
-                  placeholder="e.g. 1 Handcrafted Uruli + 4 Diya cups"
-                />
               </label>
             </div>
 
@@ -336,145 +405,37 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
             </div>
 
             <div>
-              <span className="adm-label">Volume pricing tiers (one per line: MinQty: UnitPrice)</span>
+              <span className="adm-label">Volume pricing tiers (one per line: MinQty: UnitPrice, e.g. 50: 69)</span>
+              <p className="adm-hint">All tier prices must be ≤ ₹99 per frame.</p>
               <textarea
-                className="adm-input font-mono text-xs"
+                className="adm-textarea font-mono text-xs"
                 rows={3}
                 value={bulkTiersText}
                 onChange={e => setBulkTiersText(e.target.value)}
-                placeholder="25: 85&#10;50: 75&#10;100: 65"
+                placeholder="25: 79&#10;50: 69&#10;100: 59"
               />
-              <p className="mt-1 text-xs text-ink-soft">
-                Example: <code>25: 85</code> means 25+ pieces cost ₹85 each.
-              </p>
-            </div>
-
-            <div>
-              <span className="adm-label">Shipping & delivery terms</span>
-              <input
-                className="adm-input"
-                value={f.shippingInfo}
-                onChange={set('shippingInfo')}
-                placeholder="e.g. Dispatches in 24–48 hours across India. Insured transit."
-              />
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2 pt-1">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 accent-burgundy"
-                  checked={f.supportsIndividual}
-                  onChange={set('supportsIndividual')}
-                />
-                <span className="text-sm">Supports individual retail purchase</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 accent-burgundy"
-                  checked={f.supportsBulk}
-                  onChange={set('supportsBulk')}
-                />
-                <span className="text-sm">Supports bulk return gifting requests</span>
-              </label>
-            </div>
-
-            <div className="pt-2">
-              <span className="adm-label">Suitable occasions & events</span>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {OCCASIONS.map(occ => {
-                  const active = selectedOccasions.includes(occ.id);
-                  return (
-                    <button
-                      key={occ.id}
-                      type="button"
-                      onClick={() =>
-                        setSelectedOccasions(prev =>
-                          active ? prev.filter(id => id !== occ.id) : [...prev, occ.id]
-                        )
-                      }
-                      className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                        active
-                          ? 'bg-burgundy text-white'
-                          : 'border border-stone-shade bg-white text-ink hover:border-burgundy'
-                      }`}
-                    >
-                      {occ.name}
-                    </button>
-                  );
-                })}
-              </div>
             </div>
           </Section>
 
-          <Section title="Photographs" hint="Real product photographs only. The first photograph is the main image.">
-            {images.length > 0 && (
-              <ol className="flex flex-wrap gap-3">
-                {images.map((src, i) => (
-                  <li key={src} className="relative">
-                    <img src={src} alt="" className="h-28 w-[90px] rounded border border-stone-deep object-cover" />
-                    {i === 0 && <span className="absolute left-1 top-1 rounded bg-white/90 px-1.5 text-[0.6875rem] font-medium">Main</span>}
-                    <button
-                      type="button"
-                      onClick={() => setImages(prev => prev.filter(p => p !== src))}
-                      className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-white"
-                      aria-label="Remove photograph"
-                    >
-                      <X className="h-3.5 w-3.5" aria-hidden />
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            )}
-            <div>
-              <p className="adm-label">Photo library</p>
-              {assets.length === 0 ? (
-                <p className="text-sm text-ink-soft">No product photographs are deployed yet.</p>
-              ) : (
-                <div className="grid max-h-64 grid-cols-3 gap-2 overflow-y-auto pr-1 sm:grid-cols-5">
-                  {assets.map(a => {
-                    const on = images.includes(a.path);
-                    return (
-                      <button
-                        key={a.path}
-                        type="button"
-                        aria-pressed={on}
-                        onClick={() => setImages(prev => (on ? prev.filter(p => p !== a.path) : [...prev, a.path]))}
-                        className={`relative overflow-hidden rounded border-2 text-left ${on ? 'border-burgundy' : 'border-transparent hover:border-stone-shade'}`}
-                        title={a.name}
-                      >
-                        <img src={a.path} alt="" loading="lazy" className="aspect-[4/5] w-full bg-stone object-cover" />
-                        <span className="block truncate px-1 py-0.5 text-[0.6875rem] text-ink-soft">{a.name}</span>
-                        {on && (
-                          <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-burgundy text-white">
-                            <Check className="h-3 w-3" aria-hidden />
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </Section>
-
-          <Section title="Visibility">
+          {/* Status & Publication */}
+          <Section title="Publishing Status">
             <div className="grid gap-4 sm:grid-cols-2">
               <label>
-                <span className="adm-label">Status</span>
+                <span className="adm-label">Publication Status</span>
                 <select className="adm-input" value={f.status} onChange={set('status')}>
-                  <option value="draft">Draft — hidden</option>
-                  <option value="published">Published</option>
-                  <option value="archived">Archived — hidden, kept for past requests</option>
+                  <option value="draft">Draft (hidden from public)</option>
+                  <option value="published">Published (live on storefront)</option>
+                  <option value="archived">Archived (soft-hidden, past orders preserved)</option>
                 </select>
               </label>
-              <label className="flex items-start gap-3 rounded-md border border-stone-deep bg-[#FAF8F5] p-3">
-                <input type="checkbox" className="mt-1 h-4 w-4 accent-burgundy" checked={f.isDemo} onChange={set('isDemo')} />
-                <span>
-                  <span className="block text-sm font-medium">Sample / preview item</span>
-                  <span className="block text-[0.8125rem] text-ink-soft">Never shown on the public website and cannot be requested by customers.</span>
-                </span>
+              <label className="flex items-center gap-2 pt-5">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-burgundy"
+                  checked={f.isDemo}
+                  onChange={set('isDemo')}
+                />
+                <span className="text-sm font-medium">Sample preview item (hidden from live production store)</span>
               </label>
             </div>
           </Section>

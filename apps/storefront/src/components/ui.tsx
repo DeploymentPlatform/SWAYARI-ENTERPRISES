@@ -74,29 +74,39 @@ export const Picture: React.FC<PictureProps> = ({ sources, sizes, width, height,
 export const QuantityStepper: React.FC<{
   value: number;
   min?: number;
+  step?: number;
   onChange: (value: number) => void;
   label: string;
   size?: 'sm' | 'md';
-}> = ({ value, min = 1, onChange, label, size = 'md' }) => {
+}> = ({ value, min = 1, step = 1, onChange, label, size = 'md' }) => {
   const box = size === 'sm' ? 'h-9 w-9' : 'h-12 w-12';
   return (
-    <div className="inline-flex items-center border border-stone-shade bg-white" role="group" aria-label={label}>
+    <div className="inline-flex items-center border border-[#E6DDD5] bg-white rounded-lg overflow-hidden shadow-xs" role="group" aria-label={label}>
       <button
         type="button"
-        className={`${box} inline-flex items-center justify-center text-ink transition-colors hover:bg-stone disabled:cursor-not-allowed disabled:text-ink-faint/50`}
-        onClick={() => onChange(value - 1)}
+        className={`${box} inline-flex items-center justify-center text-[#2B2625] transition-colors hover:bg-[#FAF7F2] disabled:cursor-not-allowed disabled:text-[#9E9493]/50 font-bold`}
+        onClick={() => onChange(Math.max(min, value - step))}
         disabled={value <= min}
         aria-label={`Decrease quantity${min > 1 ? ` (minimum ${min})` : ''}`}
       >
         <Minus className="h-4 w-4" aria-hidden />
       </button>
-      <span className={`${size === 'sm' ? 'w-8 text-sm' : 'w-12 text-base'} text-center font-medium tabular-nums`} aria-live="polite">
-        {value}
-      </span>
+      <input
+        type="number"
+        min={min}
+        step={step}
+        value={value}
+        onChange={e => {
+          const parsed = parseInt(e.target.value, 10);
+          onChange(isNaN(parsed) ? min : Math.max(min, parsed));
+        }}
+        className={`${size === 'sm' ? 'w-12 text-sm' : 'w-16 text-base'} text-center font-bold tabular-nums text-[#2B2625] focus:outline-none focus:bg-[#FAF7F2]`}
+        aria-label={label}
+      />
       <button
         type="button"
-        className={`${box} inline-flex items-center justify-center text-ink transition-colors hover:bg-stone`}
-        onClick={() => onChange(value + 1)}
+        className={`${box} inline-flex items-center justify-center text-[#2B2625] transition-colors hover:bg-[#FAF7F2] font-bold`}
+        onClick={() => onChange(value + step)}
         aria-label="Increase quantity"
       >
         <Plus className="h-4 w-4" aria-hidden />

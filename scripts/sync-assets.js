@@ -28,11 +28,35 @@ function copyFolder(from, to) {
     if (entry.isDirectory()) {
       count += copyFolder(src, dest);
     } else {
+      if (fs.existsSync(dest)) {
+        try {
+          const s = fs.statSync(src);
+          const d = fs.statSync(dest);
+          if (s.size === d.size && s.size > 0) {
+            count++;
+            continue;
+          }
+          if (d.size === 0 && s.size > 0) {
+            fs.unlinkSync(dest);
+          }
+        } catch {}
+      }
       fs.copyFileSync(src, dest);
       count++;
     }
   }
   return count;
+}
+
+function syncFolder(srcDir, destDir) {
+  if (!fs.existsSync(srcDir)) return 0;
+  return copyFolder(srcDir, destDir);
+}
+
+function syncFile(srcFile, destFile) {
+  if (!fs.existsSync(srcFile)) return;
+  fs.mkdirSync(path.dirname(destFile), { recursive: true });
+  fs.copyFileSync(srcFile, destFile);
 }
 
 const requested = process.argv[2] || 'all';
@@ -47,9 +71,8 @@ for (const name of names) {
   const destRoot = path.join(projectRoot, target.dir);
   let total = 0;
   for (const folder of target.folders) {
-    total += copyFolder(path.join(source, folder), path.join(destRoot, folder));
+    total += syncFolder(path.join(source, folder), path.join(destRoot, folder));
   }
-  const manifest = path.join(source, 'manifest.json');
-  if (fs.existsSync(manifest)) fs.copyFileSync(manifest, path.join(destRoot, 'manifest.json'));
-  console.log(`✅ Synced ${total} asset files into ${target.dir}`);
+  syncFile(path.join(source, 'manifest.json'), path.join(destRoot, 'manifest.json'));
+  console.log(`✅ Synced asset folders into ${target.dir}`);
 }

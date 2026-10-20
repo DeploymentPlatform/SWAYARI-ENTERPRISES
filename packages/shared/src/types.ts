@@ -66,6 +66,10 @@ export interface Product {
   occasions?: string[];
   supportsIndividual?: boolean;
   supportsBulk?: boolean;
+  deity?: string | null;
+  frameSize?: string | null;
+  orientation?: 'portrait' | 'landscape' | 'square';
+  borderFinish?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -206,6 +210,9 @@ export interface CartItem {
   isQuoteOnly?: boolean;
   setContents?: string | null;
   packagingOption?: string | null;
+  deity?: string | null;
+  frameSize?: string | null;
+  orientation?: 'portrait' | 'landscape' | 'square';
 }
 
 export interface CampaignBanner {

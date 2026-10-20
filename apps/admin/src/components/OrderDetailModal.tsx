@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Lock, Mail, MapPin, Phone, Plus } from 'lucide-react';
-import { formatDate, formatPrice, ORDER_STATUSES } from '@swayari/shared';
+import { formatDate, formatPrice, ORDER_STATUSES, MAX_FRAME_PRICE } from '@swayari/shared';
 import { Drawer, ErrorBanner, StatusBadge, Thumb } from './ui';
 
 interface OrderDetailModalProps {
@@ -218,6 +218,11 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ orderId, onC
                 className="space-y-4 border-b border-stone-deep bg-[#FAF8F5] px-5 py-4"
                 onSubmit={e => {
                   e.preventDefault();
+                  const invalidLine = lines.find(l => (Number(l.agreedUnitPrice) || 0) > MAX_FRAME_PRICE);
+                  if (invalidLine) {
+                    setActionError(`Agreed unit price for "${invalidLine.productName}" cannot exceed ₹${MAX_FRAME_PRICE} per frame.`);
+                    return;
+                  }
                   patch(
                     {
                       status: 'quoted',
@@ -235,7 +240,9 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ orderId, onC
                   );
                 }}
               >
-                <p className="text-sm text-ink-soft">Publishing adds a new revision. Earlier revisions and the original request stay unchanged.</p>
+                <p className="text-sm text-ink-soft">
+                  Publishing adds a new revision. Earlier revisions and the original request stay unchanged. Price ceiling is ₹{MAX_FRAME_PRICE} per frame.
+                </p>
                 <div className="space-y-2">
                   {lines.map((l, i) => (
                     <div key={`${l.productId}-${i}`} className="grid grid-cols-[1fr_auto_9rem] items-center gap-3">
@@ -247,6 +254,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ orderId, onC
                         <input
                           type="number"
                           min={0}
+                          max={MAX_FRAME_PRICE}
                           required
                           className="adm-input pl-7 text-right"
                           value={l.agreedUnitPrice}

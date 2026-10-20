@@ -89,15 +89,15 @@ export const CartPage: React.FC = () => {
                 <dd>{itemCount}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-ink-soft">Estimated total</dt>
-                <dd className="text-right">
+                <dt className="text-ink font-medium">Items subtotal</dt>
+                <dd className="text-right font-bold text-burgundy">
                   {subtotal === null ? 'Price on request' : formatPrice(subtotal)}
                   {subtotal !== null && hasUnpricedItems && <span className="block text-sm text-ink-soft">+ items priced on request</span>}
                 </dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-ink-soft">Shipping</dt>
-                <dd className="text-right">Confirmed by our team</dd>
+                <dd className="text-right italic text-gold font-medium">To be confirmed by our team</dd>
               </div>
             </dl>
             <OrderDisclaimer className="mt-6 bg-ivory" compact />

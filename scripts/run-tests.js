@@ -176,17 +176,21 @@ await test('9. Admin creates and publishes a genuine product', async () => {
     method: 'POST',
     cookie: adminCookie,
     body: {
-      sku: 'SWY-BR-001',
-      name: 'Mayur Brass Diya Uruli',
-      slug: 'mayur-brass-diya-uruli',
-      description: 'Handcrafted bell metal brass uruli with peacock finial and ornate oil lamps.',
-      material: 'Pure Cast Brass',
-      dimensions: 'Diameter: 12 in, Height: 8 in, Weight: 3.2 kg',
-      indicativePrice: 4850,
+      sku: 'SWY-FRAME-DEV-01',
+      name: 'Mayur Sri Ganesha Devotional Frame',
+      slug: 'mayur-sri-ganesha-devotional-frame',
+      description: 'Handcrafted gold foil devotional frame with intricate arch border.',
+      material: 'Gold Foil & Synthetic Moulding Frame',
+      dimensions: '4 x 6 inches',
+      indicativePrice: 89,
       minQuantity: 1,
       status: 'published',
       isDemo: false,
-      images: ['/assets/demo/sample_product_2.jpeg']
+      images: ['/assets/demo/sample_product_2.jpeg'],
+      deity: 'Ganesha',
+      frameSize: '4x6 in',
+      orientation: 'portrait',
+      borderFinish: 'Antique Gold'
     }
   });
   const res = await admProductsList.onRequestPost(makeContext(req, env));
@@ -200,7 +204,7 @@ await test('9. Admin creates and publishes a genuine product', async () => {
   const sfRes = await sfProductsList.onRequestGet(makeContext(sfReq, env));
   const sfData = await sfRes.json();
   assert.equal(sfData.count, 1);
-  assert.equal(sfData.products[0].sku, 'SWY-BR-001');
+  assert.equal(sfData.products[0].sku, 'SWY-FRAME-DEV-01');
 });
 
 // 5. ATOMIC ORDER SUBMISSION, IDEMPOTENCY & FORGED PRICE REJECTION
@@ -234,8 +238,8 @@ await test('10. Order submission recalculates real database price and rejects fo
   const data = await res.json();
   assert.ok(data.orderId);
   createdOrderId = data.orderId;
-  // Database price is 4850 * 2 = 9700, NOT 20!
-  assert.equal(data.indicativeSubtotal, 9700, 'Server must calculate price from D1 database');
+  // Database price is 89 * 2 = 178, NOT 20!
+  assert.equal(data.indicativeSubtotal, 178, 'Server must calculate price from D1 database');
 });
 
 await test('11. Idempotent re-submission returns existing order without creating duplicates', async () => {
@@ -320,12 +324,12 @@ await test('14. Admin quotation revisions do not overwrite original request item
         items: [
           {
             productId: createdProdId,
-            productName: 'Mayur Brass Diya Uruli',
+            productName: 'Mayur Sri Ganesha Devotional Frame',
             quantity: 2,
-            agreedUnitPrice: 4650
+            agreedUnitPrice: 85
           }
         ],
-        shippingCharge: 350,
+        shippingCharge: 50,
         taxAmount: 0,
         quotationNotes: 'Multi-layer bubble wrap & wooden box included.'
       }
@@ -336,13 +340,13 @@ await test('14. Admin quotation revisions do not overwrite original request item
 
   // Verify original snapshot price remains immutable
   const items = await env.DB.prepare('SELECT * FROM order_items WHERE order_id = ?').bind(createdOrderId).all();
-  assert.equal(items.results[0].snapshot_indicative_price, 4850, 'Original snapshot price must remain intact');
+  assert.equal(items.results[0].snapshot_indicative_price, 89, 'Original snapshot price must remain intact');
 
   // Verify quotation table has Revision #1
   const quotes = await env.DB.prepare('SELECT * FROM order_quotations WHERE order_id = ?').bind(createdOrderId).all();
   assert.equal(quotes.results.length, 1);
   assert.equal(quotes.results[0].revision_number, 1);
-  assert.equal(quotes.results[0].total_quoted_amount, 4650 * 2 + 350); // 9650
+  assert.equal(quotes.results[0].total_quoted_amount, 85 * 2 + 50); // 220
 });
 
 // 8. PRODUCT ARCHIVAL PRESERVES HISTORICAL ORDERS
@@ -364,8 +368,8 @@ await test('15. Soft-archiving a product hides it from storefront while preservi
   const reqCust = makeRequest(`http://storefront/api/orders/${createdOrderId}`, { cookie: customerCookie });
   const resCust = await sfOrderDetails.onRequestGet(makeContext(reqCust, env, { id: createdOrderId }));
   const dataCust = await resCust.json();
-  assert.equal(dataCust.order.items[0].sku, 'SWY-BR-001');
-  assert.equal(dataCust.order.items[0].name, 'Mayur Brass Diya Uruli');
+  assert.equal(dataCust.order.items[0].sku, 'SWY-FRAME-DEV-01');
+  assert.equal(dataCust.order.items[0].name, 'Mayur Sri Ganesha Devotional Frame');
 });
 
 // 9. DASHBOARD STATS
@@ -376,7 +380,7 @@ await test('16. Admin stats endpoint accurately reports metrics from shared D1 d
   const data = await res.json();
   assert.equal(data.stats.orders.total, 1);
   assert.equal(data.stats.orders.quoted, 1);
-  assert.equal(data.stats.totalRevenueQuoted, 9650);
+  assert.equal(data.stats.totalRevenueQuoted, 220);
 });
 
 // 11. HARDENING ADDED WITH THE EDITORIAL REDESIGN (Milestone 3)
@@ -489,40 +493,59 @@ await test('25. Production Vite builds exist for both Storefront and Admin', asy
   assert.ok(fs.existsSync(admDist), 'Admin dist/index.html must exist');
 });
 
-// 11. AFFORDABLE GIFTING & BUDGET NAVIGATION TESTS
-await test('26. Budget boundary queries filter items strictly within bounds and exclude quote-only items', async () => {
-  // Query budget under-99
-  const res99 = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&budget=under-99'), env));
-  const data99 = await res99.json();
-  assert.equal(data99.success, true);
-  assert.ok(data99.products.length > 0, 'Must have items under ₹99');
-  for (const p of data99.products) {
-    assert.ok(p.indicativePrice !== null && p.indicativePrice <= 99, `Product ${p.sku} with price ${p.indicativePrice} must be <= 99`);
-    assert.equal(p.isQuoteOnly, false, 'Quote-only products must never be in numeric budget band');
-  }
-
-  // Query budget 100-299
-  const res100 = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&budget=100-299'), env));
-  const data100 = await res100.json();
-  assert.equal(data100.success, true);
-  assert.ok(data100.products.length > 0, 'Must have items ₹100-₹299');
-  for (const p of data100.products) {
-    assert.ok(p.indicativePrice >= 100 && p.indicativePrice <= 299, `Product ${p.sku} price ${p.indicativePrice} must be between 100 and 299`);
+// 11. DEVOTIONAL FRAMES & FILTER TESTS (Strictly <= ₹99)
+await test('26. Devotional frame attributes and budget filters strictly enforce ₹99 ceiling', async () => {
+  // Query budget under-49
+  const resUnder49 = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&budget=under-49'), env));
+  const dataUnder49 = await resUnder49.json();
+  assert.equal(dataUnder49.success, true);
+  assert.ok(dataUnder49.products.length > 0, 'Must have devotional frames under ₹49');
+  for (const p of dataUnder49.products) {
+    assert.ok(p.indicativePrice !== null && p.indicativePrice <= 49, `Product ${p.sku} with price ${p.indicativePrice} must be <= 49`);
     assert.equal(p.isQuoteOnly, false);
   }
 
-  // Query budget 500-999
-  const res500 = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&budget=500-999'), env));
-  const data500 = await res500.json();
-  assert.equal(data500.success, true);
-  assert.ok(data500.products.length > 0, 'Must have items ₹500-₹999');
-  for (const p of data500.products) {
-    assert.ok(p.indicativePrice >= 500 && p.indicativePrice <= 999, `Product ${p.sku} price ${p.indicativePrice} must be between 500 and 999`);
+  // Query budget 50-79
+  const res5079 = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&budget=50-79'), env));
+  const data5079 = await res5079.json();
+  assert.equal(data5079.success, true);
+  assert.ok(data5079.products.length > 0, 'Must have devotional frames ₹50-₹79');
+  for (const p of data5079.products) {
+    assert.ok(p.indicativePrice >= 50 && p.indicativePrice <= 79, `Product ${p.sku} price ${p.indicativePrice} must be between 50 and 79`);
     assert.equal(p.isQuoteOnly, false);
+  }
+
+  // Query budget 80-99
+  const res8099 = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&budget=80-99'), env));
+  const data8099 = await res8099.json();
+  assert.equal(data8099.success, true);
+  assert.ok(data8099.products.length > 0, 'Must have devotional frames ₹80-₹99');
+  for (const p of data8099.products) {
+    assert.ok(p.indicativePrice >= 80 && p.indicativePrice <= 99, `Product ${p.sku} price ${p.indicativePrice} must be between 80 and 99`);
+    assert.equal(p.isQuoteOnly, false);
+  }
+
+  // Query deity filter (e.g., Ganesha)
+  const resGanesha = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&deity=Ganesha'), env));
+  const dataGanesha = await resGanesha.json();
+  assert.equal(dataGanesha.success, true);
+  assert.ok(dataGanesha.products.length > 0, 'Must have Ganesha frames');
+  for (const p of dataGanesha.products) {
+    assert.equal(p.deity, 'Ganesha');
+    assert.ok(p.indicativePrice <= 99);
+  }
+
+  // Query frame size filter
+  const resSize = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&frame_size=Classic%204%22%C3%976%22'), env));
+  const dataSize = await resSize.json();
+  assert.equal(dataSize.success, true);
+  assert.ok(dataSize.products.length > 0, 'Must have Classic 4"×6" frames');
+  for (const p of dataSize.products) {
+    assert.equal(p.frameSize, 'Classic 4"×6"');
   }
 });
 
-await test('27. Bulk order requests capture occasion, requiredDate, and isBulkRequest accurately', async () => {
+await test('27. Bulk order requests capture occasion, requiredDate, and tiered pricing within ₹99 ceiling', async () => {
   const bulkPayload = {
     idempotencyKey: 'test-bulk-req-12345',
     customerName: 'Priya Sharma',
@@ -536,9 +559,9 @@ await test('27. Bulk order requests capture occasion, requiredDate, and isBulkRe
     isBulkRequest: true,
     items: [
       {
-        productId: 'demo-prod-afford-02',
-        productSku: 'SWY-AFFORD-002',
-        productName: 'Pure Solid Brass Kumkum Chimizh (Sindoor Dibbi)',
+        productId: 'demo-prod-godframe-01',
+        productSku: 'SWY-FRAME-001',
+        productName: 'Sri Venkateswara Sanctum Gold Frame',
         quantity: 50
       }
     ]
@@ -562,8 +585,112 @@ await test('27. Bulk order requests capture occasion, requiredDate, and isBulkRe
   assert.equal(adminData.order.occasion, 'Wedding & Return Gifting');
   assert.equal(adminData.order.requiredDate, '2026-11-15');
   assert.equal(adminData.order.isBulkRequest, true);
-  // Also check bulk tiered pricing applied: 50 pcs tiered price for SWY-AFFORD-002 is 68/pc instead of indicative 85!
-  assert.equal(adminData.order.items[0].indicativePrice, 68);
+  // Tiered pricing applied: 50 pcs tiered price for SWY-FRAME-001 is 69/pc instead of indicative 89!
+  assert.equal(adminData.order.items[0].indicativePrice, 69);
+});
+
+// 12. STRICT ₹99 PRICE RULE ENFORCEMENT
+await test('28. Server-side order request rejects items exceeding ₹99 ceiling', async () => {
+  // Directly insert an expensive item into DB for testing rejection
+  await env.DB.prepare(`
+    INSERT OR REPLACE INTO products (id, sku, name, slug, description, indicative_price, min_quantity, status, is_demo, created_at, updated_at)
+    VALUES ('test-expensive-frame', 'SWY-TEST-EXP', 'Overpriced Frame', 'overpriced-frame', 'Test frame', 150, 1, 'published', 0, '2026-10-18T10:00:00.000Z', '2026-10-18T10:00:00.000Z')
+  `).run();
+
+  const req = makeRequest('http://storefront/api/orders', {
+    method: 'POST',
+    cookie: customerCookie,
+    body: {
+      idempotencyKey: 'test-expensive-reject-' + Date.now(),
+      customerName: 'Ananya Sharma',
+      customerPhone: '9876543210',
+      deliveryAddress: 'Flat 402, Banjara Hills',
+      deliveryCity: 'Hyderabad',
+      deliveryState: 'Telangana',
+      deliveryPincode: '500034',
+      items: [{ productId: 'test-expensive-frame', quantity: 1 }]
+    }
+  });
+  const res = await sfOrdersIndex.onRequestPost(makeContext(req, env));
+  assert.equal(res.status, 400);
+  const data = await res.json();
+  assert.ok(data.error.includes('₹99'));
+});
+
+await test('29. Admin product creation rejects indicative price or variants exceeding ₹99', async () => {
+  const reqOver = makeRequest('http://admin/api/admin/products', {
+    method: 'POST',
+    cookie: adminCookie,
+    body: {
+      sku: 'SWY-OVER-01',
+      name: 'Overpriced Devotional Frame',
+      slug: 'overpriced-devotional-frame',
+      description: 'Above ₹99 ceiling',
+      indicativePrice: 120,
+      minQuantity: 1,
+      status: 'published'
+    }
+  });
+  const resOver = await admProductsList.onRequestPost(makeContext(reqOver, env));
+  assert.equal(resOver.status, 400);
+
+  const reqVariantOver = makeRequest('http://admin/api/admin/products', {
+    method: 'POST',
+    cookie: adminCookie,
+    body: {
+      sku: 'SWY-OVER-VAR',
+      name: 'Variant Overpriced Frame',
+      slug: 'variant-overpriced-frame',
+      description: 'Variant exceeds 99',
+      indicativePrice: 79,
+      hasVariants: true,
+      variants: [{ id: 'large', name: 'Large', indicative_price: 150 }],
+      minQuantity: 1,
+      status: 'published'
+    }
+  });
+  const resVariantOver = await admProductsList.onRequestPost(makeContext(reqVariantOver, env));
+  assert.equal(resVariantOver.status, 400);
+});
+
+await test('30. Admin quotation revisions strictly reject agreed unit prices exceeding ₹99', async () => {
+  const reqOverQuote = makeRequest(`http://admin/api/admin/orders/${createdOrderId}`, {
+    method: 'PATCH',
+    cookie: adminCookie,
+    body: {
+      status: 'quoted',
+      quotation: {
+        items: [
+          {
+            productId: createdProdId,
+            productName: 'Mayur Sri Ganesha Devotional Frame',
+            quantity: 2,
+            agreedUnitPrice: 150 // Exceeds 99!
+          }
+        ],
+        shippingCharge: 50,
+        taxAmount: 0
+      }
+    }
+  });
+  const resOverQuote = await admOrderDetails.onRequestPatch(makeContext(reqOverQuote, env, { id: createdOrderId }));
+  assert.equal(resOverQuote.status, 400);
+  const data = await resOverQuote.json();
+  assert.ok(data.error.includes('₹99'));
+});
+
+await test('31. Storefront queries strictly exclude products priced above ₹99 even if published', async () => {
+  // Query storefront without demo filter
+  const sfRes = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products'), env));
+  const sfData = await sfRes.json();
+  assert.equal(sfData.success, true);
+  for (const p of sfData.products) {
+    if (p.indicativePrice !== null) {
+      assert.ok(p.indicativePrice <= 99, `Product ${p.sku} must not exceed 99 on storefront`);
+    }
+  }
+  // Verify test-expensive-frame is excluded from storefront
+  assert.equal(sfData.products.some(p => p.id === 'test-expensive-frame'), false);
 });
 
 console.log('====================================================');

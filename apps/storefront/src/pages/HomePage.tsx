@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, Sparkles, Gift } from 'lucide-react';
+import { ArrowRight, Sparkles, Phone, MessageSquareQuote, ShieldCheck, Mail } from 'lucide-react';
 import { Hero } from '../components/Hero';
-import { ShopByBudget } from '../components/ShopByBudget';
+import { InfoStrip } from '../components/InfoStrip';
 import { BulkReturnGiftsSection } from '../components/BulkReturnGiftsSection';
-import { ShopByOccasion } from '../components/ShopByOccasion';
 import { OrderProcessExplanation } from '../components/OrderProcessExplanation';
 import { ProductCard } from '../components/ProductCard';
 import { Link } from '../lib/router';
 import { usePageMeta } from '../lib/meta';
 import { useProducts } from '../lib/products';
-import { Product } from '@swayari/shared';
+import { Product, BRAND_TAGLINES } from '@swayari/shared';
 
 export const HomePage: React.FC = () => {
   usePageMeta(
-    'Thoughtful gifts. Beautifully priced.',
-    'Discover gifts for celebrations, return gifting and everyday moments. Gifts ₹999 & under, dedicated ₹99 & under return favors, and heirloom artisanal décor.'
+    BRAND_TAGLINES.headline,
+    `${BRAND_TAGLINES.supporting} Devotional god frames in gold and teak finishes for wedding return gifts, griha pravesh and auspicious celebrations. Shipping quoted separately.`
   );
 
   const { products } = useProducts();
@@ -28,7 +27,7 @@ export const HomePage: React.FC = () => {
         const ids: string[] = JSON.parse(stored);
         const matches = ids
           .map((id) => products.find((p) => p.id === id))
-          .filter((p): p is Product => Boolean(p))
+          .filter((p): p is Product => Boolean(p) && (p.indicativePrice === null || p.indicativePrice <= 99))
           .slice(0, 4);
         setRecentlyViewed(matches);
       }
@@ -37,23 +36,13 @@ export const HomePage: React.FC = () => {
     }
   }, [products]);
 
-  // Budget-specific collections with visible confirmed prices (strictly no quote-only items in budget bands)
-  const under99Items = products
-    .filter((p) => !p.isQuoteOnly && p.indicativePrice !== null && p.indicativePrice <= 99)
-    .slice(0, 4);
+  // Devotional god frames strictly <= ₹99
+  const eligibleFrames = products.filter(
+    (p) => p.indicativePrice !== null && p.indicativePrice <= 99
+  );
 
-  const midRangeItems = products
-    .filter((p) => !p.isQuoteOnly && p.indicativePrice !== null && p.indicativePrice >= 100 && p.indicativePrice <= 499)
-    .slice(0, 4);
-
-  const festiveItems = products
-    .filter((p) => !p.isQuoteOnly && p.indicativePrice !== null && p.indicativePrice >= 500 && p.indicativePrice <= 999)
-    .slice(0, 4);
-
-  // Preserve existing high-value heirloom inventory
-  const heirloomFrames = products
-    .filter((p) => p.indicativePrice !== null && p.indicativePrice >= 1000)
-    .slice(0, 4);
+  // Early Frame Collection: First 8 frames
+  const featuredFrames = eligibleFrames.slice(0, 8);
 
   return (
     <div className="bg-[#FAF7F2] min-h-screen">
@@ -61,171 +50,102 @@ export const HomePage: React.FC = () => {
       {/* 1. Compact Campaign Carousel (~300–340px desktop, ~220px mobile) */}
       <Hero />
 
-      {/* 2. Shop by Budget Shortcuts */}
-      <section className="py-8 sm:py-10 border-b border-[#E7DFD5] bg-[#FFFFFF]">
-        <ShopByBudget />
-      </section>
+      {/* 2. Short Information Strip */}
+      <InfoStrip />
 
-      {/* 3. Selected Gift Collections with Visible Prices */}
-
-      {/* Collection A: Dedicated Entry-Level "₹99 & under" */}
-      <section aria-labelledby="under-99-title" className="py-8 sm:py-12 border-b border-[#E7DFD5] bg-[#FAF7F2]">
+      {/* 3. Devotional Frame Collection: Displayed early on page */}
+      <section aria-labelledby="frames-collection-title" className="py-8 sm:py-12 border-b border-[#E6DDD5] bg-[#FAF7F2]">
         <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-5 gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-2">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#B49155]/15 border border-[#B49155]/30 text-[#8F7138] text-[11px] font-bold uppercase tracking-wider mb-1.5">
-                <Sparkles className="w-3 h-3 text-[#B49155]" />
-                <span>Dedicated Entry Collection</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#C49A45]/15 border border-[#C49A45]/30 text-[#8F7138] text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <Sparkles className="w-3 h-3 text-[#C49A45]" />
+                <span>Devotional Collection</span>
               </div>
-              <h2 id="under-99-title" className="font-display text-[1.5rem] sm:text-[1.875rem] font-bold text-[#292421] leading-tight">
-                Gifts ₹99 &amp; Under
+              <h2 id="frames-collection-title" className="font-display text-[1.5rem] sm:text-[1.875rem] font-bold text-[#2B2625] leading-tight">
+                Devotional Frames ₹99 &amp; Under
               </h2>
-              <p className="text-[13px] sm:text-[14px] text-[#7A6E66] mt-0.5">
-                Brocade potli bags, solid brass kumkum boxes, and fragrant dhoop burners from ₹49.
+              <p className="text-[13px] sm:text-[14px] text-[#6B6362] mt-0.5">
+                Auspicious God frames in gold-relief &amp; teak finishes. Choose designs &amp; quantities for your celebrations.
               </p>
             </div>
             
             <Link
-              to="/shop?budget=under-99"
-              className="text-[13px] font-semibold text-[#571C2A] hover:text-[#441420] flex items-center gap-1.5 group transition-colors"
+              to="/shop"
+              className="text-[13px] font-semibold text-[#5C1D24] hover:text-[#4A161D] flex items-center gap-1.5 group transition-colors"
             >
-              <span>Explore All ₹99 &amp; Under</span>
+              <span>Explore All Frames (≤ ₹99)</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
 
           {/* 4 Cards Across on Desktop, 2 on Mobile */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-5">
-            {(under99Items.length > 0 ? under99Items : products.slice(0, 4)).map((prod, idx) => (
+            {(featuredFrames.length > 0 ? featuredFrames : products.slice(0, 4)).map((prod, idx) => (
               <ProductCard key={prod.id} product={prod} priority={idx < 2} />
             ))}
           </div>
 
-        </div>
-      </section>
-
-      {/* Collection B: Popular Gifts ₹100–₹499 */}
-      <section aria-labelledby="mid-gifts-title" className="py-8 sm:py-12 border-b border-[#E7DFD5] bg-[#FFFFFF]">
-        <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-5 gap-2">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#B49155]/15 border border-[#B49155]/30 text-[#8F7138] text-[11px] font-bold uppercase tracking-wider mb-1.5">
-                <Gift className="w-3 h-3 text-[#B49155]" />
-                <span>Celebration Favorites</span>
-              </div>
-              <h2 id="mid-gifts-title" className="font-display text-[1.5rem] sm:text-[1.875rem] font-bold text-[#292421] leading-tight">
-                Curated Gifts: ₹100–₹499
-              </h2>
-              <p className="text-[13px] sm:text-[14px] text-[#7A6E66] mt-0.5">
-                Classic brass akhand diyas, meenakari peacock boxes, and silver-plated bowls.
-              </p>
-            </div>
-            
+          <div className="mt-8 text-center sm:hidden">
             <Link
-              to="/shop?budget=100-299"
-              className="text-[13px] font-semibold text-[#571C2A] hover:text-[#441420] flex items-center gap-1.5 group transition-colors"
+              to="/shop"
+              className="inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full bg-[#5C1D24] text-white text-[13px] font-semibold shadow-xs"
             >
-              <span>Browse ₹100–₹499</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              <span>View All Devotional Frames</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-5">
-            {(midRangeItems.length > 0 ? midRangeItems : products.slice(4, 8)).map((prod) => (
-              <ProductCard key={prod.id} product={prod} />
-            ))}
-          </div>
-
         </div>
       </section>
 
-      {/* 4. Bulk & Return Gifts Concierge Section */}
-      <BulkReturnGiftsSection products={products} />
+      {/* 4. Wedding Return-Gifting Section with "Plan Your Return Gifts" Action */}
+      <BulkReturnGiftsSection products={eligibleFrames} />
 
-      {/* Collection C: Festive Gifts ₹500–₹999 */}
-      <section aria-labelledby="festive-title" className="py-8 sm:py-12 border-b border-[#E7DFD5] bg-[#FFFFFF]">
-        <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-5 gap-2">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#B49155]/15 border border-[#B49155]/30 text-[#8F7138] text-[11px] font-bold uppercase tracking-wider mb-1.5">
-                <Sparkles className="w-3 h-3 text-[#B49155]" />
-                <span>Festive Elegance</span>
-              </div>
-              <h2 id="festive-title" className="font-display text-[1.5rem] sm:text-[1.875rem] font-bold text-[#292421] leading-tight">
-                Festive Centerpieces: ₹500–₹999
-              </h2>
-              <p className="text-[13px] sm:text-[14px] text-[#7A6E66] mt-0.5">
-                Hand-hammered brass urulis with floating diyas, Lakshmi-Ganesh pairs &amp; luxury gift sets.
-              </p>
-            </div>
-            
-            <Link
-              to="/shop?budget=500-999"
-              className="text-[13px] font-semibold text-[#571C2A] hover:text-[#441420] flex items-center gap-1.5 group transition-colors"
-            >
-              <span>Explore ₹500–₹999</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-5">
-            {(festiveItems.length > 0 ? festiveItems : products.slice(8, 12)).map((prod) => (
-              <ProductCard key={prod.id} product={prod} />
-            ))}
-          </div>
-
-        </div>
-      </section>
-
-      {/* 5. Shop by Occasion */}
-      <ShopByOccasion />
-
-      {/* Preserved Heirloom Section: For Sanctum Frames & High-Value Heritage */}
-      {heirloomFrames.length > 0 && (
-        <section aria-labelledby="heirloom-title" className="py-8 sm:py-12 border-b border-[#E7DFD5] bg-[#FAF7F2]">
-          <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-5 gap-2">
-              <div>
-                <span className="text-[11px] font-bold text-[#B49155] uppercase tracking-wider">
-                  Heirloom Sanctum &amp; Temple Relinquary
-                </span>
-                <h2 id="heirloom-title" className="font-display text-[1.5rem] sm:text-[1.875rem] font-bold text-[#292421] leading-tight">
-                  Heirloom Devotional Frames
-                </h2>
-                <p className="text-[13px] text-[#7A6E66] mt-0.5">
-                  Large hand-embossed gold and silver foil frames for prayer rooms and prestigious dedications.
-                </p>
-              </div>
-              <Link
-                to="/shop?category=devotional-frames"
-                className="text-[13px] font-semibold text-[#571C2A] hover:text-[#441420] flex items-center gap-1.5 group transition-colors"
-              >
-                <span>View Heirloom Collection</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-5">
-              {heirloomFrames.map((prod) => (
-                <ProductCard key={prod.id} product={prod} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 6. Simple Explanation of the Order-Request Process */}
+      {/* 5. How Ordering Works: 1. Choose frames 2. Submit request 3. Team confirms details */}
       <OrderProcessExplanation />
 
-      {/* Recently Viewed (if any) */}
+      {/* 6. Compact Contact & Bulk Enquiry Section */}
+      <section aria-labelledby="contact-strip-title" className="py-8 sm:py-10 bg-[#FFFFFF] border-b border-[#E6DDD5]">
+        <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-xl p-6 sm:p-8 bg-[#FAF7F2] border border-[#E6DDD5] flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="max-w-xl text-center md:text-left">
+              <span className="text-[11px] font-bold text-[#C49A45] uppercase tracking-wider block mb-1">
+                Personal Coordination
+              </span>
+              <h3 id="contact-strip-title" className="font-display text-[1.35rem] sm:text-[1.6rem] font-bold text-[#2B2625]">
+                Need assistance with bulk quantities or custom event dates?
+              </h3>
+              <p className="text-[13px] text-[#6B6362] mt-1.5 leading-relaxed">
+                Our team is happy to guide you on deity selections, mixed design arrangements, safe packaging and courier timings.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                to="/contact"
+                className="px-5 py-2.5 rounded-full bg-[#5C1D24] hover:bg-[#4A161D] text-white text-[13px] font-semibold transition-all shadow-xs flex items-center gap-2"
+              >
+                <Phone className="w-4 h-4 text-[#E8D29E]" />
+                <span>Contact Our Team</span>
+              </Link>
+              <Link
+                to="/shop?bulk=1"
+                className="px-5 py-2.5 rounded-full bg-white hover:bg-[#FAF7F2] border border-[#E6DDD5] text-[#2B2625] text-[13px] font-semibold transition-all shadow-xs flex items-center gap-1.5"
+              >
+                <span>Request a Bulk Quote</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Recently Viewed (if any) */}
       {recentlyViewed.length > 0 && (
         <section aria-labelledby="recent-title" className="py-8 sm:py-10 bg-[#FAF7F2]">
           <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
-            <h3 id="recent-title" className="text-[14px] font-bold uppercase tracking-wider text-[#7A6E66] mb-4">
-              Recently Viewed Pieces
+            <h3 id="recent-title" className="text-[13px] font-bold uppercase tracking-wider text-[#6B6362] mb-4">
+              Recently Viewed Frames
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-5">
               {recentlyViewed.map((prod) => (

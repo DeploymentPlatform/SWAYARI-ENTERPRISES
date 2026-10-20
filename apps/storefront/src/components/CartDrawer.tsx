@@ -111,12 +111,16 @@ export const CartDrawer: React.FC = () => {
                   })}
                 </ul>
 
-                <div className="space-y-4 border-t border-stone-deep bg-white px-5 py-5 sm:px-6">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-ink-soft">Estimated total</span>
-                    <span className="font-medium">
+                <div className="space-y-3 border-t border-stone-deep bg-white px-5 py-5 sm:px-6">
+                  <div className="flex items-baseline justify-between text-sm">
+                    <span className="font-semibold text-ink">Items subtotal</span>
+                    <span className="font-bold text-burgundy text-base">
                       {subtotal === null ? 'Price on request' : `${formatPrice(subtotal)}${hasUnpricedItems ? ' + items on request' : ''}`}
                     </span>
+                  </div>
+                  <div className="flex items-baseline justify-between text-xs text-ink-soft">
+                    <span>Shipping</span>
+                    <span className="italic font-medium text-gold">To be confirmed by our team</span>
                   </div>
                   <OrderDisclaimer compact />
                   <div className="grid gap-2.5">

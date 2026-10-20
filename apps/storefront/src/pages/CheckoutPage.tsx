@@ -374,19 +374,19 @@ export const CheckoutPage: React.FC = () => {
             </ul>
             <dl className="mt-4 space-y-2 border-t border-stone-deep pt-4 text-[0.9375rem]">
               <div className="flex justify-between gap-4">
-                <dt className="text-ink-soft">Estimated total</dt>
-                <dd className="text-right">
+                <dt className="text-ink font-medium">Items subtotal</dt>
+                <dd className="text-right font-bold text-burgundy">
                   {subtotal === null ? 'Price on request' : formatPrice(subtotal)}
                   {subtotal !== null && hasUnpricedItems && <span className="block text-sm text-ink-soft">+ items priced on request</span>}
                 </dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-ink-soft">Shipping</dt>
-                <dd>Confirmed by our team</dd>
+                <dd className="text-right italic text-gold font-medium">To be confirmed by our team</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-ink-soft">Payment</dt>
-                <dd>Not taken online</dd>
+                <dd className="text-right text-ink-soft">Not taken online</dd>
               </div>
             </dl>
           </div>

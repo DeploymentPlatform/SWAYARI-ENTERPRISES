@@ -1,4 +1,4 @@
-import { jsonResponse, errorResponse, requireAdminAuth, generateCryptoId, logAudit } from '../../../_utils.js';
+import { jsonResponse, errorResponse, requireAdminAuth, generateCryptoId, logAudit, validateFramePrice, validateQuantity, validateNonNegativeAmount } from '../../../_utils.js';
 
 export async function onRequestGet(context) {
   const { params, request, env } = context;
@@ -157,11 +157,14 @@ export async function onRequestPatch(context) {
         return errorResponse('Quotation must contain priced items', 400);
       }
 
-      // Strict ₹99 rule: Frame quotation unit price cannot exceed ₹99
-      for (const it of items) {
-        if (Number(it.agreedUnitPrice) > 99) {
-          return errorResponse(`Quoted unit price of ₹${it.agreedUnitPrice} exceeds the maximum frame price limit of ₹99`, 400);
-        }
+      // Validate non-negative shipping and tax
+      const shipCheck = validateNonNegativeAmount(shippingCharge, 'Shipping charge');
+      if (!shipCheck.isValid) {
+        return errorResponse(shipCheck.error, 400);
+      }
+      const taxCheck = validateNonNegativeAmount(taxAmount, 'Tax amount');
+      if (!taxCheck.isValid) {
+        return errorResponse(taxCheck.error, 400);
       }
 
       // Determine next revision number
@@ -170,20 +173,34 @@ export async function onRequestPatch(context) {
       `).bind(orderId).first();
       const nextRev = (maxRevRow?.max_rev || 0) + 1;
 
-      let subtotal = 0;
-      const quotedItems = items.map(it => {
-        const itemTotal = Number(it.agreedUnitPrice) * Number(it.quantity);
-        subtotal += itemTotal;
-        return {
+      let subtotalPaise = 0;
+      const quotedItems = [];
+
+      for (const it of items) {
+        const pCheck = validateFramePrice(it.agreedUnitPrice, `Quoted unit price for "${it.productName || it.productId || 'Item'}"`);
+        if (!pCheck.isValid || pCheck.paise === null) {
+          return errorResponse(pCheck.error || 'Quoted unit price is required and must be a valid positive amount <= ₹99', 400);
+        }
+        const qCheck = validateQuantity(it.quantity, `Quantity for "${it.productName || it.productId || 'Item'}"`);
+        if (!qCheck.isValid) {
+          return errorResponse(qCheck.error, 400);
+        }
+
+        const itemTotalPaise = pCheck.paise * qCheck.quantity;
+        subtotalPaise += itemTotalPaise;
+
+        quotedItems.push({
           productId: it.productId,
           productName: it.productName,
-          quantity: Number(it.quantity),
-          agreedUnitPrice: Number(it.agreedUnitPrice),
+          quantity: qCheck.quantity,
+          agreedUnitPrice: pCheck.amount,
           customisationNote: it.customisationNote || undefined
-        };
-      });
+        });
+      }
 
-      const totalQuotedAmount = subtotal + Number(shippingCharge) + Number(taxAmount);
+      const totalQuotedPaise = subtotalPaise + shipCheck.paise + taxCheck.paise;
+      const subtotal = subtotalPaise / 100;
+      const totalQuotedAmount = totalQuotedPaise / 100;
       const quoteId = 'quote-' + generateCryptoId(16);
 
       batchStatements.push(
@@ -199,8 +216,8 @@ export async function onRequestPatch(context) {
           nextRev,
           JSON.stringify(quotedItems),
           subtotal,
-          Number(shippingCharge),
-          Number(taxAmount),
+          shipCheck.amount,
+          taxCheck.amount,
           totalQuotedAmount,
           quotationNotes,
           session.user.name,

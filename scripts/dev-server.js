@@ -190,14 +190,14 @@ const admServer = http.createServer(async (req, res) => {
       if (pathname === '/api/admin/stats') {
         cfRes = await admStats.onRequestGet(context);
       } else if (pathname === '/api/admin/assets') {
-        cfRes = await admAssets.onRequestGet(context);
+        cfRes = req.method === 'POST' ? await admAssets.onRequestPost(context) : await admAssets.onRequestGet(context);
       } else if (pathname === '/api/admin/banners') {
         cfRes = req.method === 'POST' ? await admBannersList.onRequestPost(context) : await admBannersList.onRequestGet(context);
       } else if (pathname === '/api/admin/products') {
         cfRes = req.method === 'POST' ? await admProductsList.onRequestPost(context) : await admProductsList.onRequestGet(context);
       } else if (pathname.startsWith('/api/admin/products/')) {
         context.params.id = decodeURIComponent(pathname.slice('/api/admin/products/'.length));
-        cfRes = req.method === 'PUT' ? await admProductDetails.onRequestPut(context) : await admProductDetails.onRequestGet(context);
+        cfRes = req.method === 'PUT' ? await admProductDetails.onRequestPut(context) : req.method === 'DELETE' ? await admProductDetails.onRequestDelete(context) : await admProductDetails.onRequestGet(context);
       } else if (pathname === '/api/admin/orders') {
         cfRes = await admOrdersList.onRequestGet(context);
       } else if (pathname.startsWith('/api/admin/orders/')) {

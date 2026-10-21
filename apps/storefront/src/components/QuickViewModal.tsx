@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, ShoppingBag, ShieldCheck, Truck, Sparkles, Phone, AlertCircle } from 'lucide-react';
-import { Product, formatPrice } from '@swayari/shared';
+import { Product, formatPrice, calculateEffectiveUnitPrice } from '@swayari/shared';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { toCartItem } from '../lib/products';
@@ -30,26 +30,13 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
     : ['/assets/products/venkateswara-frame-960.webp'];
 
   // Calculate current applicable unit price based on quantity and bulk tiers
-  let currentUnitPrice = product.indicativePrice;
-  if (product.bulkTiers && product.bulkTiers.length > 0) {
-    const sortedTiers = [...product.bulkTiers].sort((a, b) => b.min_qty - a.min_qty);
-    for (const tier of sortedTiers) {
-      if (quantity >= tier.min_qty) {
-        currentUnitPrice = tier.unit_price;
-        break;
-      }
-    }
-  }
-
-  // Ensure currentUnitPrice never exceeds 99
-  if (currentUnitPrice !== null && currentUnitPrice > 99) {
-    currentUnitPrice = 99;
-  }
-
+  const currentUnitPrice = calculateEffectiveUnitPrice(product.indicativePrice, product.bulkTiers, quantity);
   const itemsSubtotal = currentUnitPrice !== null ? currentUnitPrice * quantity : null;
 
   function handleQuantityChange(rawVal: number) {
-    const validVal = isNaN(rawVal) ? minQty : Math.max(minQty, rawVal);
+    const raw = isNaN(rawVal) ? minQty : Math.max(minQty, rawVal);
+    const rem = (raw - minQty) % incQty;
+    const validVal = rem === 0 ? raw : raw + (incQty - rem);
     setQuantity(validVal);
   }
 

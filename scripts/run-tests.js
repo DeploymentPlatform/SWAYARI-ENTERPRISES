@@ -30,6 +30,15 @@ import * as admProductsList from '../apps/admin/functions/api/admin/products/ind
 import * as admProductDetails from '../apps/admin/functions/api/admin/products/[id].js';
 import * as admCategoriesList from '../apps/admin/functions/api/admin/categories/index.js';
 import * as admAuthConfig from '../apps/admin/functions/api/auth/config.js';
+import * as admAssets from '../apps/admin/functions/api/admin/assets.js';
+import {
+  calculateEffectiveUnitPrice,
+  calculateLineSubtotal,
+  aggregateCartItems,
+  calculateCartTotals,
+  validateQuantityRules,
+  validatePricePaise
+} from '../packages/shared/src/pricing.js';
 
 let passed = 0;
 let failed = 0;
@@ -691,6 +700,422 @@ await test('31. Storefront queries strictly exclude products priced above ₹99 
   }
   // Verify test-expensive-frame is excluded from storefront
   assert.equal(sfData.products.some(p => p.id === 'test-expensive-frame'), false);
+});
+
+// 13. REGRESSION SUITE: BULK PRICING, QUANTITY RULES, UPGRADES, ASSETS, SAMPLE ISOLATION
+
+await test('32. Bulk pricing is consistent across calculation, cart totals, and server order submission', async () => {
+  // Sai Baba frame example: Base ₹65, 100-pc tier ₹42
+  const saiBabaTiers = [
+    { min_qty: 25, unit_price: 58 },
+    { min_qty: 50, unit_price: 49 },
+    { min_qty: 100, unit_price: 42 }
+  ];
+
+  // 1 pc -> base price 65
+  assert.equal(calculateEffectiveUnitPrice(65, saiBabaTiers, 1), 65);
+  assert.equal(calculateLineSubtotal(65, 1), 65);
+
+  // 25 pcs -> 58
+  assert.equal(calculateEffectiveUnitPrice(65, saiBabaTiers, 25), 58);
+  assert.equal(calculateLineSubtotal(58, 25), 1450);
+
+  // 100 pcs -> 42
+  assert.equal(calculateEffectiveUnitPrice(65, saiBabaTiers, 100), 42);
+  assert.equal(calculateLineSubtotal(42, 100), 4200);
+
+  // Cart total must calculate 4,200 (NOT 6,500!)
+  const cartTotals = calculateCartTotals([
+    {
+      productId: 'demo-prod-godframe-12',
+      sku: 'SWY-FRAME-012',
+      name: 'Shirdi Sai Baba Shraddha Saburi Frame',
+      indicativePrice: 42,
+      basePrice: 65,
+      bulkTiers: saiBabaTiers,
+      quantity: 100
+    }
+  ]);
+  assert.equal(cartTotals.subtotal, 4200, 'Cart total must be ₹4,200 at 100 pieces (tier ₹42), not ₹6,500');
+  assert.equal(cartTotals.totalQuantity, 100);
+
+  // Server-side order submission must independently calculate ₹4,200 from D1 database
+  const orderRes = await sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+    method: 'POST',
+    cookie: customerCookie,
+    body: {
+      idempotencyKey: 'test-sai-baba-100pcs-' + Date.now(),
+      customerName: 'Ananya Sharma',
+      customerPhone: '9876543210',
+      deliveryAddress: 'Flat 402, Banjara Hills',
+      deliveryCity: 'Hyderabad',
+      deliveryState: 'Telangana',
+      deliveryPincode: '500034',
+      items: [{ productId: 'demo-prod-godframe-12', quantity: 100 }]
+    }
+  }), env));
+
+  assert.equal(orderRes.status, 201);
+  const orderData = await orderRes.json();
+  assert.equal(orderData.indicativeSubtotal, 4200, 'Server saved order must strictly total ₹4,200');
+});
+
+await test('33. Server and shared validator reject negative, zero, fractional, and malformed quantities, and enforce MOQ & order increments', async () => {
+  // Shared validator checks
+  assert.equal(validateQuantityRules(-5).isValid, false);
+  assert.equal(validateQuantityRules(0).isValid, false);
+  assert.equal(validateQuantityRules(2.5).isValid, false);
+  assert.equal(validateQuantityRules('abc').isValid, false);
+  assert.equal(validateQuantityRules(null).isValid, false);
+
+  // MOQ & Increment enforcement in shared validator
+  assert.equal(validateQuantityRules(5, 10, 5).isValid, false, 'Below MOQ 10 must fail');
+  assert.equal(validateQuantityRules(12, 10, 5).isValid, false, 'Quantity 12 with inc 5 must fail');
+  assert.equal(validateQuantityRules(15, 10, 5).isValid, true, 'Quantity 15 with MOQ 10, inc 5 must pass');
+
+  // Server endpoint rejection
+  const basePayload = {
+    customerName: 'Ananya Sharma',
+    customerPhone: '9876543210',
+    deliveryAddress: 'Flat 402, Banjara Hills',
+    deliveryCity: 'Hyderabad',
+    deliveryState: 'Telangana',
+    deliveryPincode: '500034'
+  };
+
+  // 1. Negative quantity
+  const negRes = await sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+    method: 'POST',
+    cookie: customerCookie,
+    body: { ...basePayload, idempotencyKey: 'test-neg-' + Date.now(), items: [{ productId: 'demo-prod-godframe-01', quantity: -5 }] }
+  }), env));
+  assert.equal(negRes.status, 400);
+
+  // 2. Zero quantity
+  const zeroRes = await sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+    method: 'POST',
+    cookie: customerCookie,
+    body: { ...basePayload, idempotencyKey: 'test-zero-' + Date.now(), items: [{ productId: 'demo-prod-godframe-01', quantity: 0 }] }
+  }), env));
+  assert.equal(zeroRes.status, 400);
+
+  // 3. Fractional quantity
+  const fracRes = await sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+    method: 'POST',
+    cookie: customerCookie,
+    body: { ...basePayload, idempotencyKey: 'test-frac-' + Date.now(), items: [{ productId: 'demo-prod-godframe-01', quantity: 3.5 }] }
+  }), env));
+  assert.equal(fracRes.status, 400);
+
+  // 4. Malformed quantity
+  const malRes = await sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+    method: 'POST',
+    cookie: customerCookie,
+    body: { ...basePayload, idempotencyKey: 'test-mal-' + Date.now(), items: [{ productId: 'demo-prod-godframe-01', quantity: 'fifty' }] }
+  }), env));
+  assert.equal(malRes.status, 400);
+
+  // 5. Below MOQ (SWY-FRAME-001 has MOQ=10, ordering 4)
+  const moqRes = await sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+    method: 'POST',
+    cookie: customerCookie,
+    body: { ...basePayload, idempotencyKey: 'test-moq-' + Date.now(), items: [{ productId: 'demo-prod-godframe-01', quantity: 4 }] }
+  }), env));
+  assert.equal(moqRes.status, 400);
+  assert.ok((await moqRes.json()).error.includes('minimum order quantity'));
+
+  // 6. Violates increment (SWY-FRAME-001 has MOQ=10, inc=5. Ordering 12)
+  const incRes = await sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+    method: 'POST',
+    cookie: customerCookie,
+    body: { ...basePayload, idempotencyKey: 'test-inc-' + Date.now(), items: [{ productId: 'demo-prod-godframe-01', quantity: 12 }] }
+  }), env));
+  assert.equal(incRes.status, 400);
+  assert.ok((await incRes.json()).error.includes('multiples of 5'));
+});
+
+await test('34. Duplicate lines in cart or order request are aggregated cleanly per design and cannot bypass MOQ or pricing', async () => {
+  // In cart: 2 items of Sai Baba frame (50 pcs + 50 pcs)
+  const cartItems = [
+    {
+      productId: 'demo-prod-godframe-12',
+      sku: 'SWY-FRAME-012',
+      name: 'Shirdi Sai Baba Shraddha Saburi Frame',
+      indicativePrice: 65,
+      basePrice: 65,
+      bulkTiers: [{ min_qty: 100, unit_price: 42 }],
+      quantity: 50,
+      customisationNote: 'First batch'
+    },
+    {
+      productId: 'demo-prod-godframe-12',
+      sku: 'SWY-FRAME-012',
+      name: 'Shirdi Sai Baba Shraddha Saburi Frame',
+      indicativePrice: 65,
+      basePrice: 65,
+      bulkTiers: [{ min_qty: 100, unit_price: 42 }],
+      quantity: 50,
+      customisationNote: 'Second batch'
+    }
+  ];
+
+  const aggregated = aggregateCartItems(cartItems);
+  assert.equal(aggregated.length, 1, 'Duplicate lines must combine into a single aggregated line');
+  assert.equal(aggregated[0].quantity, 100);
+  assert.equal(aggregated[0].indicativePrice, 42, 'Aggregated 100 pieces must receive 100-pc bulk tier');
+
+  // Submit to server with 2 lines for same design (50 + 50)
+  const res = await sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+    method: 'POST',
+    cookie: customerCookie,
+    body: {
+      idempotencyKey: 'test-dup-lines-' + Date.now(),
+      customerName: 'Ananya Sharma',
+      customerPhone: '9876543210',
+      deliveryAddress: 'Flat 402, Banjara Hills',
+      deliveryCity: 'Hyderabad',
+      deliveryState: 'Telangana',
+      deliveryPincode: '500034',
+      items: [
+        { productId: 'demo-prod-godframe-12', quantity: 50, customisationNote: 'Batch A' },
+        { productId: 'demo-prod-godframe-12', quantity: 50, customisationNote: 'Batch B' }
+      ]
+    }
+  }), env));
+
+  assert.equal(res.status, 201);
+  const data = await res.json();
+  assert.equal(data.indicativeSubtotal, 4200, 'Aggregated total 100 pcs must evaluate to ₹4,200');
+
+  // Verify in order details that items were combined into 1 line item
+  const ord = await env.DB.prepare('SELECT * FROM order_items WHERE order_id = ?').bind(data.orderId).all();
+  assert.equal(ord.results.length, 1);
+  assert.equal(ord.results[0].quantity, 100);
+  assert.equal(ord.results[0].snapshot_indicative_price, 42);
+});
+
+await test('35. Monetary calculation enforces integer paise, rejects > 9,900 paise and malformed/over-precision values', async () => {
+  // Check validatePricePaise
+  assert.equal(validatePricePaise(99).isValid, true);
+  assert.equal(validatePricePaise(99).paise, 9900);
+  assert.equal(validatePricePaise(49.50).isValid, true);
+  assert.equal(validatePricePaise(49.50).paise, 4950);
+
+  // Exceeds ₹99
+  assert.equal(validatePricePaise(99.01).isValid, false);
+  assert.equal(validatePricePaise(100).isValid, false);
+
+  // Over-precision (more than 2 decimal places)
+  assert.equal(validatePricePaise(49.999).isValid, false);
+  assert.ok(validatePricePaise(49.999).error.includes('decimal places'));
+
+  // Negative / zero / malformed
+  assert.equal(validatePricePaise(0).isValid, false);
+  assert.equal(validatePricePaise(-10).isValid, false);
+  assert.equal(validatePricePaise('invalid').isValid, false);
+});
+
+await test('36. Admin quotation revision strictly rejects invalid prices, negative charges, and fractional quantities', async () => {
+  // 1. Quoted unit price exceeds ₹99
+  const overPriceRes = await admOrderDetails.onRequestPatch(makeContext(makeRequest(`http://admin/api/admin/orders/${createdOrderId}`, {
+    method: 'PATCH',
+    cookie: adminCookie,
+    body: {
+      status: 'quoted',
+      quotation: {
+        items: [{ productId: createdProdId, quantity: 2, agreedUnitPrice: 105 }],
+        shippingCharge: 50
+      }
+    }
+  }), env, { id: createdOrderId }));
+  assert.equal(overPriceRes.status, 400);
+
+  // 2. Negative shipping charge
+  const negShipRes = await admOrderDetails.onRequestPatch(makeContext(makeRequest(`http://admin/api/admin/orders/${createdOrderId}`, {
+    method: 'PATCH',
+    cookie: adminCookie,
+    body: {
+      status: 'quoted',
+      quotation: {
+        items: [{ productId: createdProdId, quantity: 2, agreedUnitPrice: 85 }],
+        shippingCharge: -20
+      }
+    }
+  }), env, { id: createdOrderId }));
+  assert.equal(negShipRes.status, 400);
+  assert.ok((await negShipRes.json()).error.includes('Shipping charge must be a non-negative'));
+
+  // 3. Negative tax amount
+  const negTaxRes = await admOrderDetails.onRequestPatch(makeContext(makeRequest(`http://admin/api/admin/orders/${createdOrderId}`, {
+    method: 'PATCH',
+    cookie: adminCookie,
+    body: {
+      status: 'quoted',
+      quotation: {
+        items: [{ productId: createdProdId, quantity: 2, agreedUnitPrice: 85 }],
+        shippingCharge: 50,
+        taxAmount: -10
+      }
+    }
+  }), env, { id: createdOrderId }));
+  assert.equal(negTaxRes.status, 400);
+
+  // 4. Fractional quantity
+  const fracQtyRes = await admOrderDetails.onRequestPatch(makeContext(makeRequest(`http://admin/api/admin/orders/${createdOrderId}`, {
+    method: 'PATCH',
+    cookie: adminCookie,
+    body: {
+      status: 'quoted',
+      quotation: {
+        items: [{ productId: createdProdId, quantity: 2.5, agreedUnitPrice: 85 }],
+        shippingCharge: 50
+      }
+    }
+  }), env, { id: createdOrderId }));
+  assert.equal(fracQtyRes.status, 400);
+});
+
+await test('37. Migration 0008 preserves owner categories, products, banners, orders, quotations and notes without destructive cascade', async () => {
+  // Test isolated database migration safety: simulate a database at 0007, then upgrade to 0008
+  const { DatabaseSync } = await import('node:sqlite');
+  const pre0008Db = new DatabaseSync(':memory:');
+  const migrationsDir = path.join(process.cwd(), 'migrations');
+  const preFiles = fs.readdirSync(migrationsDir)
+    .filter(f => f.endsWith('.sql') && f < '0008')
+    .sort();
+
+  for (const f of preFiles) {
+    pre0008Db.exec(fs.readFileSync(path.join(migrationsDir, f), 'utf8'));
+  }
+
+  // Insert owner category
+  pre0008Db.prepare(`
+    INSERT INTO categories (id, name, slug, description, display_order, is_active, created_at)
+    VALUES ('owner-cat-festive', 'Festive Special', 'festive-special', 'Owner collection', 99, 1, '2026-10-18T00:00:00Z')
+  `).run();
+
+  // Insert owner product linked to category
+  pre0008Db.prepare(`
+    INSERT INTO products (id, sku, name, slug, description, category_id, indicative_price, min_quantity, status, is_demo, created_at, updated_at)
+    VALUES ('owner-prod-001', 'OWNER-SKU-01', 'Owner Divine Frame', 'owner-divine-frame', 'Owner frame', 'owner-cat-festive', 75, 1, 'published', 0, '2026-10-18T00:00:00Z', '2026-10-18T00:00:00Z')
+  `).run();
+
+  // Insert owner banner
+  pre0008Db.prepare(`
+    INSERT INTO campaign_banners (
+      id, badge, headline, emphasis, supporting, cta_text, cta_href,
+      desktop_image, mobile_image, alt, display_order, is_active, created_at, updated_at
+    ) VALUES (
+      'owner-banner-001', 'Custom Festive Collection', 'Owner bespoke headline', 'Special',
+      'Owner bespoke supporting', 'Shop Now', '/shop',
+      '/assets/owner/banner-desktop.webp', '/assets/owner/banner-mobile.webp',
+      'Owner banner alt', 10, 1, '2026-10-18T00:00:00Z', '2026-10-18T00:00:00Z'
+    )
+  `).run();
+
+  // Execute migration 0008 SQL directly to upgrade database
+  const migration0008Path = path.join(process.cwd(), 'migrations', '0008_devotional_frames_99.sql');
+  const sql = fs.readFileSync(migration0008Path, 'utf8');
+  pre0008Db.exec(sql);
+
+  // 1. Verify owner category is intact
+  const cat = pre0008Db.prepare('SELECT * FROM categories WHERE id = ?').get('owner-cat-festive');
+  assert.ok(cat, 'Owner category must be preserved');
+  assert.equal(cat.name, 'Festive Special');
+
+  // 2. Verify owner product's category_id was NOT set to NULL (No foreign key deletion cascade)
+  const prod = pre0008Db.prepare('SELECT * FROM products WHERE id = ?').get('owner-prod-001');
+  assert.ok(prod, 'Owner product must be preserved');
+  assert.equal(prod.category_id, 'owner-cat-festive', 'Owner product category association must remain intact');
+
+  // 3. Verify owner banner was NOT wiped out by blanket DELETE FROM campaign_banners
+  const banner = pre0008Db.prepare('SELECT * FROM campaign_banners WHERE id = ?').get('owner-banner-001');
+  assert.ok(banner, 'Owner banner must be preserved');
+  assert.equal(banner.headline, 'Owner bespoke headline');
+});
+
+await test('38. Admin photo management endpoint validates magic bytes, size limits, and returns local manifest assets', async () => {
+  // 1. Assets listing returns catalogue photos
+  const listRes = await admAssets.onRequestGet(makeContext(makeRequest('http://admin/api/admin/assets', { cookie: adminCookie }), env));
+  assert.equal(listRes.status, 200);
+  const listData = await listRes.json();
+  assert.equal(listData.success, true);
+  assert.ok(Array.isArray(listData.assets));
+  assert.ok(listData.assets.length > 0, 'Manifest assets must be returned');
+
+  // 2. Asset upload requires admin authentication
+  const unauthRes = await admAssets.onRequestPost(makeContext(makeRequest('http://admin/api/admin/assets', {
+    method: 'POST',
+    body: { fileName: 'test.jpg', base64Data: 'dGVzdA==' }
+  }), env));
+  assert.equal(unauthRes.status, 401, 'Upload must require admin authentication');
+
+  // 3. Asset upload rejects invalid/spoofed image format (non-JPEG/PNG/WebP magic bytes)
+  const badImageRes = await admAssets.onRequestPost(makeContext(makeRequest('http://admin/api/admin/assets', {
+    method: 'POST',
+    cookie: adminCookie,
+    body: { fileName: 'fake.jpg', base64Data: Buffer.from('NOT AN IMAGE FILE').toString('base64') }
+  }), env));
+  assert.equal(badImageRes.status, 400);
+  assert.ok((await badImageRes.json()).error.includes('magic bytes'));
+});
+
+await test('39. Sample data is strictly isolated when ENVIRONMENT is missing, empty, or misspelled', async () => {
+  const invalidEnvironments = [undefined, '', 'staging', 'preview-typo', 'deveopment'];
+
+  for (const envVal of invalidEnvironments) {
+    const testEnv = { ...env, ENVIRONMENT: envVal };
+
+    // Storefront product list with include_demo=1 must ignore include_demo and return 0 demo products
+    const sfRes = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1'), testEnv));
+    const sfData = await sfRes.json();
+    assert.equal(sfData.success, true);
+    for (const p of sfData.products) {
+      assert.equal(p.isDemo, false, `Demo item ${p.sku} leaked under ENVIRONMENT="${envVal}"`);
+    }
+
+    // Direct order submission for demo item must be blocked
+    const ordRes = await sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+      method: 'POST',
+      cookie: customerCookie,
+      body: {
+        idempotencyKey: 'test-env-leak-' + Date.now(),
+        customerName: 'Ananya Sharma',
+        customerPhone: '9876543210',
+        deliveryAddress: 'Flat 402',
+        deliveryCity: 'Hyderabad',
+        deliveryState: 'Telangana',
+        deliveryPincode: '500034',
+        items: [{ productId: 'demo-prod-godframe-01', quantity: 10 }]
+      }
+    }), testEnv));
+    assert.equal(ordRes.status, 400, `Demo order must be refused under ENVIRONMENT="${envVal}"`);
+  }
+});
+
+await test('40. Authentic devotional frame photographs and hero banners exist on disk and have non-zero file sizes', async () => {
+  const assetsDir = path.join(process.cwd(), 'public', 'assets');
+  const requiredAssets = [
+    'products/venkateswara-frame-960.webp',
+    'products/ganesha-frame-800.webp',
+    'products/lakshmi-frame-800.webp',
+    'products/radha-krishna-frame-960.webp',
+    'products/saraswati-frame-800.webp',
+    'products/shiva-parvati-frame-800.webp',
+    'products/murugan-frame-800.webp',
+    'products/sai-baba-frame-800.webp',
+    'products/placeholder-devotional-frame-800.webp',
+    'editorial/hero-devotional-collection-desktop.webp',
+    'editorial/hero-wedding-favors-desktop.webp',
+    'editorial/hero-bulk-process-desktop.webp'
+  ];
+
+  for (const rel of requiredAssets) {
+    const fullPath = path.join(assetsDir, rel);
+    assert.ok(fs.existsSync(fullPath), `Asset ${rel} must exist in public/assets`);
+    const stats = fs.statSync(fullPath);
+    assert.ok(stats.size > 5000, `Asset ${rel} size (${stats.size} bytes) must be > 5,000 bytes`);
+  }
 });
 
 console.log('====================================================');

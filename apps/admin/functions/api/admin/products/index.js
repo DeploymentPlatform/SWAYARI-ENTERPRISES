@@ -1,4 +1,4 @@
-import { jsonResponse, errorResponse, requireAdminAuth, generateCryptoId, logAudit } from '../../../_utils.js';
+import { jsonResponse, errorResponse, requireAdminAuth, generateCryptoId, logAudit, validateFramePrice, validateQuantity } from '../../../_utils.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -143,21 +143,38 @@ export async function onRequestPost(context) {
       return errorResponse('SKU, Name and Description are required', 400);
     }
 
-    // Strict ₹99 rule: Frame price cannot exceed ₹99
-    if (indicativePrice !== undefined && indicativePrice !== null && indicativePrice !== '') {
-      const pNum = Number(indicativePrice);
-      if (pNum > 99) {
-        return errorResponse('Frame indicative price cannot exceed ₹99 as per business direction', 400);
+    // Require valid price and photo before publishing live inventory
+    if (status === 'published' && !isDemo) {
+      if (indicativePrice === undefined || indicativePrice === null || indicativePrice === '') {
+        return errorResponse('Published devotional frames must have a valid price (strictly ₹99 or less). Save as draft if unpriced.', 400);
       }
+      if (!Array.isArray(images) || images.length === 0) {
+        return errorResponse('Published devotional frames must have at least one authentic product photograph attached.', 400);
+      }
+    }
+
+    // Strict ₹99 rule: Integer paise validation
+    const priceCheck = validateFramePrice(indicativePrice, 'Frame indicative price');
+    if (!priceCheck.isValid) {
+      return errorResponse(priceCheck.error, 400);
+    }
+
+    // Validate quantities
+    const minQtyNum = Number(minQuantity);
+    if (!Number.isFinite(minQtyNum) || !Number.isInteger(minQtyNum) || minQtyNum < 1) {
+      return errorResponse('Minimum order quantity must be a positive whole integer (at least 1)', 400);
+    }
+    const incNum = Number(orderIncrement);
+    if (!Number.isFinite(incNum) || !Number.isInteger(incNum) || incNum < 1) {
+      return errorResponse('Order increment must be a positive whole integer (at least 1)', 400);
     }
 
     if (Array.isArray(variants)) {
       for (const v of variants) {
         const vPrice = v.indicativePrice !== undefined ? v.indicativePrice : v.indicative_price;
-        if (vPrice !== undefined && vPrice !== null && vPrice !== '') {
-          if (Number(vPrice) > 99) {
-            return errorResponse(`Variant ${v.name || ''} price cannot exceed ₹99`, 400);
-          }
+        const vCheck = validateFramePrice(vPrice, `Variant ${v.name || ''} price`);
+        if (!vCheck.isValid) {
+          return errorResponse(vCheck.error, 400);
         }
       }
     }
@@ -165,8 +182,9 @@ export async function onRequestPost(context) {
     if (Array.isArray(bulkTiers)) {
       for (const tier of bulkTiers) {
         const tierPrice = tier.unit_price !== undefined ? tier.unit_price : tier.unitPrice;
-        if (tierPrice && Number(tierPrice) > 99) {
-          return errorResponse('Bulk tier price cannot exceed ₹99 per frame', 400);
+        const tCheck = validateFramePrice(tierPrice, 'Bulk tier unit price');
+        if (!tCheck.isValid) {
+          return errorResponse(tCheck.error, 400);
         }
       }
     }

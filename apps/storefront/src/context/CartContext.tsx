@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { CartItem } from '@swayari/shared';
+import { CartItem, calculateEffectiveUnitPrice, calculateCartTotals } from '@swayari/shared';
 import { useAuth } from './AuthContext';
 
 interface CartContextType {
@@ -30,7 +30,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       const parsed = saved ? JSON.parse(saved) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      if (!Array.isArray(parsed)) return [];
+      // Re-normalize loaded items with bulk tiers
+      return parsed.map((it: CartItem) => {
+        const base = it.basePrice ?? it.indicativePrice;
+        const effective = calculateEffectiveUnitPrice(base, it.bulkTiers, it.quantity);
+        return { ...it, basePrice: base, indicativePrice: effective };
+      });
     } catch {
       return [];
     }
@@ -56,8 +62,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   function addItem(newItem: CartItem) {
     setItems(prev => {
       const index = prev.findIndex(it => sameLine(it, newItem.productId, newItem.selectedVariant));
-      if (index === -1) return [...prev, newItem];
-      return prev.map((it, i) => (i === index ? { ...it, quantity: it.quantity + newItem.quantity } : it));
+      if (index === -1) {
+        const base = newItem.basePrice ?? newItem.indicativePrice;
+        const effective = calculateEffectiveUnitPrice(base, newItem.bulkTiers, newItem.quantity);
+        return [...prev, { ...newItem, basePrice: base, indicativePrice: effective }];
+      }
+      return prev.map((it, i) => {
+        if (i !== index) return it;
+        const newQty = it.quantity + newItem.quantity;
+        const base = it.basePrice ?? it.indicativePrice ?? newItem.basePrice ?? newItem.indicativePrice;
+        const tiers = it.bulkTiers || newItem.bulkTiers;
+        const effective = calculateEffectiveUnitPrice(base, tiers, newQty);
+        return {
+          ...it,
+          quantity: newQty,
+          basePrice: base,
+          bulkTiers: tiers,
+          indicativePrice: effective
+        };
+      });
     });
     setLastAddedName(newItem.name);
     setIsDrawerOpen(true);
@@ -72,15 +95,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       prev.map(it => {
         if (!sameLine(it, productId, variant)) return it;
         const min = it.minQuantity || 1;
-        return { ...it, quantity: Math.max(min, Math.min(999, Math.round(quantity))) };
+        const inc = it.orderIncrement || 1;
+        const raw = Math.max(min, Math.min(999, Math.round(quantity)));
+        // Align to increment
+        const rem = (raw - min) % inc;
+        const cleanQty = rem === 0 ? raw : raw + (inc - rem);
+        const base = it.basePrice ?? it.indicativePrice;
+        const effective = calculateEffectiveUnitPrice(base, it.bulkTiers, cleanQty);
+        return { ...it, quantity: cleanQty, basePrice: base, indicativePrice: effective };
       })
     );
   }
 
-  const itemCount = items.reduce((sum, it) => sum + it.quantity, 0);
-  const priced = items.filter(it => it.indicativePrice !== null && it.indicativePrice !== undefined);
-  const subtotal = priced.length ? priced.reduce((sum, it) => sum + (it.indicativePrice as number) * it.quantity, 0) : null;
-  const hasUnpricedItems = priced.length !== items.length;
+  const totals = calculateCartTotals(items);
+  const itemCount = totals.itemCount;
+  const subtotal = totals.subtotal;
+  const hasUnpricedItems = totals.hasUnpricedItems;
 
   return (
     <CartContext.Provider

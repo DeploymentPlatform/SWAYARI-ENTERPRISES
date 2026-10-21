@@ -97,13 +97,21 @@ export const CartDrawer: React.FC = () => {
                               size="sm"
                               value={item.quantity}
                               min={item.minQuantity || 1}
+                              step={item.orderIncrement || 1}
                               onChange={q => updateQuantity(item.productId, item.selectedVariant, q)}
                               label={`Quantity of ${item.name}`}
                             />
-                            <PriceText
-                              value={item.indicativePrice === null ? null : item.indicativePrice * item.quantity}
-                              className="text-sm text-ink-soft"
-                            />
+                            <div className="text-right">
+                              <PriceText
+                                value={item.indicativePrice === null ? null : item.indicativePrice * item.quantity}
+                                className="text-sm font-bold text-burgundy"
+                              />
+                              {item.indicativePrice !== null && (
+                                <span className="block text-[11px] text-ink-soft">
+                                  ₹{item.indicativePrice}/frame
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </li>

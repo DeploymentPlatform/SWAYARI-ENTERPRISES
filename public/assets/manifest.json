@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-20T05:49:05.488Z",
-  "totalAssets": 173,
+  "generatedAt": "2026-10-21T00:44:19.755Z",
+  "totalAssets": 215,
   "assets": [
     {
       "id": "brand_favicon_svg",
@@ -228,6 +228,78 @@
       "updatedAt": "2026-10-19T05:31:12.047Z"
     },
     {
+      "id": "editorial_hero-bulk-process-desktop_jpg",
+      "filename": "hero-bulk-process-desktop.jpg",
+      "path": "/assets/editorial/hero-bulk-process-desktop.jpg",
+      "category": "editorial",
+      "label": "hero bulk process desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 289485,
+      "updatedAt": "2026-10-20T23:48:46.600Z"
+    },
+    {
+      "id": "editorial_hero-bulk-process-desktop_webp",
+      "filename": "hero-bulk-process-desktop.webp",
+      "path": "/assets/editorial/hero-bulk-process-desktop.webp",
+      "category": "editorial",
+      "label": "hero bulk process desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 222124,
+      "updatedAt": "2026-10-20T23:48:46.588Z"
+    },
+    {
+      "id": "editorial_hero-bulk-process-mobile_jpg",
+      "filename": "hero-bulk-process-mobile.jpg",
+      "path": "/assets/editorial/hero-bulk-process-mobile.jpg",
+      "category": "editorial",
+      "label": "hero bulk process mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 139848,
+      "updatedAt": "2026-10-20T23:48:46.643Z"
+    },
+    {
+      "id": "editorial_hero-bulk-process-mobile_webp",
+      "filename": "hero-bulk-process-mobile.webp",
+      "path": "/assets/editorial/hero-bulk-process-mobile.webp",
+      "category": "editorial",
+      "label": "hero bulk process mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 118176,
+      "updatedAt": "2026-10-20T23:48:46.636Z"
+    },
+    {
+      "id": "editorial_hero-devotional-collection-desktop_jpg",
+      "filename": "hero-devotional-collection-desktop.jpg",
+      "path": "/assets/editorial/hero-devotional-collection-desktop.jpg",
+      "category": "editorial",
+      "label": "hero devotional collection desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 308345,
+      "updatedAt": "2026-10-20T23:48:10.719Z"
+    },
+    {
+      "id": "editorial_hero-devotional-collection-desktop_webp",
+      "filename": "hero-devotional-collection-desktop.webp",
+      "path": "/assets/editorial/hero-devotional-collection-desktop.webp",
+      "category": "editorial",
+      "label": "hero devotional collection desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 255900,
+      "updatedAt": "2026-10-20T23:48:10.707Z"
+    },
+    {
+      "id": "editorial_hero-devotional-collection-mobile_jpg",
+      "filename": "hero-devotional-collection-mobile.jpg",
+      "path": "/assets/editorial/hero-devotional-collection-mobile.jpg",
+      "category": "editorial",
+      "label": "hero devotional collection mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 143165,
+      "updatedAt": "2026-10-20T23:48:10.765Z"
+    },
+    {
+      "id": "editorial_hero-devotional-collection-mobile_webp",
+      "filename": "hero-devotional-collection-mobile.webp",
+      "path": "/assets/editorial/hero-devotional-collection-mobile.webp",
+      "category": "editorial",
+      "label": "hero devotional collection mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 124136,
+      "updatedAt": "2026-10-20T23:48:10.757Z"
+    },
+    {
       "id": "editorial_hero-festive-lamps-1080_jpg",
       "filename": "hero-festive-lamps-1080.jpg",
       "path": "/assets/editorial/hero-festive-lamps-1080.jpg",
@@ -242,8 +314,8 @@
       "path": "/assets/editorial/hero-festive-lamps-1080.webp",
       "category": "editorial",
       "label": "hero festive lamps (licensed stock — styling inspiration)",
-      "sizeBytes": 28702,
-      "updatedAt": "2026-10-19T05:31:12.048Z"
+      "sizeBytes": 289884,
+      "updatedAt": "2026-10-20T23:48:43.656Z"
     },
     {
       "id": "editorial_hero-festive-lamps-1600_jpg",
@@ -314,8 +386,8 @@
       "path": "/assets/editorial/hero-festive-lamps-mobile-900.webp",
       "category": "editorial",
       "label": "hero festive lamps mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 45236,
-      "updatedAt": "2026-10-19T05:31:12.051Z"
+      "sizeBytes": 143292,
+      "updatedAt": "2026-10-20T23:48:46.503Z"
     },
     {
       "id": "editorial_hero-slide-1-moments-desktop_jpg",
@@ -332,8 +404,8 @@
       "path": "/assets/editorial/hero-slide-1-moments-desktop.webp",
       "category": "editorial",
       "label": "hero slide 1 moments desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 38482,
-      "updatedAt": "2026-10-19T05:31:12.052Z"
+      "sizeBytes": 222124,
+      "updatedAt": "2026-10-20T23:48:46.721Z"
     },
     {
       "id": "editorial_hero-slide-1-moments-mobile_jpg",
@@ -350,8 +422,8 @@
       "path": "/assets/editorial/hero-slide-1-moments-mobile.webp",
       "category": "editorial",
       "label": "hero slide 1 moments mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 25066,
-      "updatedAt": "2026-10-19T05:31:12.052Z"
+      "sizeBytes": 118176,
+      "updatedAt": "2026-10-20T23:49:05.712Z"
     },
     {
       "id": "editorial_hero-slide-2-devotional-desktop_jpg",
@@ -359,8 +431,8 @@
       "path": "/assets/editorial/hero-slide-2-devotional-desktop.jpg",
       "category": "editorial",
       "label": "hero slide 2 devotional desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 88526,
-      "updatedAt": "2026-10-19T05:31:12.052Z"
+      "sizeBytes": 308345,
+      "updatedAt": "2026-10-20T23:48:18.845Z"
     },
     {
       "id": "editorial_hero-slide-2-devotional-desktop_webp",
@@ -368,8 +440,8 @@
       "path": "/assets/editorial/hero-slide-2-devotional-desktop.webp",
       "category": "editorial",
       "label": "hero slide 2 devotional desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 56328,
-      "updatedAt": "2026-10-19T05:31:12.053Z"
+      "sizeBytes": 255900,
+      "updatedAt": "2026-10-20T23:48:10.853Z"
     },
     {
       "id": "editorial_hero-slide-2-devotional-mobile_jpg",
@@ -377,8 +449,8 @@
       "path": "/assets/editorial/hero-slide-2-devotional-mobile.jpg",
       "category": "editorial",
       "label": "hero slide 2 devotional mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 46158,
-      "updatedAt": "2026-10-19T05:31:12.053Z"
+      "sizeBytes": 143165,
+      "updatedAt": "2026-10-20T23:48:43.408Z"
     },
     {
       "id": "editorial_hero-slide-2-devotional-mobile_webp",
@@ -386,8 +458,8 @@
       "path": "/assets/editorial/hero-slide-2-devotional-mobile.webp",
       "category": "editorial",
       "label": "hero slide 2 devotional mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 34800,
-      "updatedAt": "2026-10-19T05:31:12.053Z"
+      "sizeBytes": 124136,
+      "updatedAt": "2026-10-20T23:48:40.760Z"
     },
     {
       "id": "editorial_hero-slide-3-decor-desktop_jpg",
@@ -460,6 +532,42 @@
       "label": "hero slide 4 gifting mobile (licensed stock — styling inspiration)",
       "sizeBytes": 27864,
       "updatedAt": "2026-10-19T05:31:12.056Z"
+    },
+    {
+      "id": "editorial_hero-wedding-favors-desktop_jpg",
+      "filename": "hero-wedding-favors-desktop.jpg",
+      "path": "/assets/editorial/hero-wedding-favors-desktop.jpg",
+      "category": "editorial",
+      "label": "hero wedding favors desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 337733,
+      "updatedAt": "2026-10-20T23:48:43.527Z"
+    },
+    {
+      "id": "editorial_hero-wedding-favors-desktop_webp",
+      "filename": "hero-wedding-favors-desktop.webp",
+      "path": "/assets/editorial/hero-wedding-favors-desktop.webp",
+      "category": "editorial",
+      "label": "hero wedding favors desktop (licensed stock — styling inspiration)",
+      "sizeBytes": 289884,
+      "updatedAt": "2026-10-20T23:48:43.516Z"
+    },
+    {
+      "id": "editorial_hero-wedding-favors-mobile_jpg",
+      "filename": "hero-wedding-favors-mobile.jpg",
+      "path": "/assets/editorial/hero-wedding-favors-mobile.jpg",
+      "category": "editorial",
+      "label": "hero wedding favors mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 160564,
+      "updatedAt": "2026-10-20T23:48:43.572Z"
+    },
+    {
+      "id": "editorial_hero-wedding-favors-mobile_webp",
+      "filename": "hero-wedding-favors-mobile.webp",
+      "path": "/assets/editorial/hero-wedding-favors-mobile.webp",
+      "category": "editorial",
+      "label": "hero wedding favors mobile (licensed stock — styling inspiration)",
+      "sizeBytes": 143292,
+      "updatedAt": "2026-10-20T23:48:43.565Z"
     },
     {
       "id": "editorial_marigold-garlands-600_jpg",
@@ -989,8 +1097,8 @@
       "path": "/assets/products/demo-frame-baroque-floral-800.jpg",
       "category": "products",
       "label": "demo frame baroque floral",
-      "sizeBytes": 112997,
-      "updatedAt": "2026-10-19T05:31:12.079Z"
+      "sizeBytes": 157778,
+      "updatedAt": "2026-10-20T23:48:10.198Z"
     },
     {
       "id": "products_demo-frame-baroque-floral-800_webp",
@@ -998,8 +1106,8 @@
       "path": "/assets/products/demo-frame-baroque-floral-800.webp",
       "category": "products",
       "label": "demo frame baroque floral",
-      "sizeBytes": 86844,
-      "updatedAt": "2026-10-19T05:31:12.079Z"
+      "sizeBytes": 130424,
+      "updatedAt": "2026-10-20T23:48:10.189Z"
     },
     {
       "id": "products_demo-frame-sanctum-gold-800_jpg",
@@ -1007,8 +1115,8 @@
       "path": "/assets/products/demo-frame-sanctum-gold-800.jpg",
       "category": "products",
       "label": "demo frame sanctum gold",
-      "sizeBytes": 104687,
-      "updatedAt": "2026-10-19T05:31:12.079Z"
+      "sizeBytes": 179860,
+      "updatedAt": "2026-10-20T23:48:10.053Z"
     },
     {
       "id": "products_demo-frame-sanctum-gold-800_webp",
@@ -1016,8 +1124,8 @@
       "path": "/assets/products/demo-frame-sanctum-gold-800.webp",
       "category": "products",
       "label": "demo frame sanctum gold",
-      "sizeBytes": 69642,
-      "updatedAt": "2026-10-19T05:31:12.080Z"
+      "sizeBytes": 152156,
+      "updatedAt": "2026-10-20T23:48:10.044Z"
     },
     {
       "id": "products_demo-frame-temple-collection-800_jpg",
@@ -1025,8 +1133,8 @@
       "path": "/assets/products/demo-frame-temple-collection-800.jpg",
       "category": "products",
       "label": "demo frame temple collection",
-      "sizeBytes": 140041,
-      "updatedAt": "2026-10-19T05:31:12.080Z"
+      "sizeBytes": 173742,
+      "updatedAt": "2026-10-20T23:48:09.898Z"
     },
     {
       "id": "products_demo-frame-temple-collection-800_webp",
@@ -1034,8 +1142,8 @@
       "path": "/assets/products/demo-frame-temple-collection-800.webp",
       "category": "products",
       "label": "demo frame temple collection",
-      "sizeBytes": 117390,
-      "updatedAt": "2026-10-19T05:31:12.081Z"
+      "sizeBytes": 147360,
+      "updatedAt": "2026-10-20T23:48:09.890Z"
     },
     {
       "id": "products_demo-frame-vintage-altar-800_jpg",
@@ -1043,8 +1151,8 @@
       "path": "/assets/products/demo-frame-vintage-altar-800.jpg",
       "category": "products",
       "label": "demo frame vintage altar",
-      "sizeBytes": 84793,
-      "updatedAt": "2026-10-19T05:31:12.081Z"
+      "sizeBytes": 136670,
+      "updatedAt": "2026-10-20T23:48:10.325Z"
     },
     {
       "id": "products_demo-frame-vintage-altar-800_webp",
@@ -1052,8 +1160,8 @@
       "path": "/assets/products/demo-frame-vintage-altar-800.webp",
       "category": "products",
       "label": "demo frame vintage altar",
-      "sizeBytes": 46988,
-      "updatedAt": "2026-10-19T05:31:12.082Z"
+      "sizeBytes": 114020,
+      "updatedAt": "2026-10-20T23:48:10.317Z"
     },
     {
       "id": "products_demo-gift-brocade-potli-800_jpg",
@@ -1344,6 +1452,42 @@
       "updatedAt": "2026-10-19T05:31:12.090Z"
     },
     {
+      "id": "products_ganesha-frame-600_jpg",
+      "filename": "ganesha-frame-600.jpg",
+      "path": "/assets/products/ganesha-frame-600.jpg",
+      "category": "products",
+      "label": "ganesha frame",
+      "sizeBytes": 102224,
+      "updatedAt": "2026-10-20T23:48:09.844Z"
+    },
+    {
+      "id": "products_ganesha-frame-600_webp",
+      "filename": "ganesha-frame-600.webp",
+      "path": "/assets/products/ganesha-frame-600.webp",
+      "category": "products",
+      "label": "ganesha frame",
+      "sizeBytes": 88228,
+      "updatedAt": "2026-10-20T23:48:09.837Z"
+    },
+    {
+      "id": "products_ganesha-frame-800_jpg",
+      "filename": "ganesha-frame-800.jpg",
+      "path": "/assets/products/ganesha-frame-800.jpg",
+      "category": "products",
+      "label": "ganesha frame",
+      "sizeBytes": 173742,
+      "updatedAt": "2026-10-20T23:48:09.808Z"
+    },
+    {
+      "id": "products_ganesha-frame-800_webp",
+      "filename": "ganesha-frame-800.webp",
+      "path": "/assets/products/ganesha-frame-800.webp",
+      "category": "products",
+      "label": "ganesha frame",
+      "sizeBytes": 147360,
+      "updatedAt": "2026-10-20T23:48:09.799Z"
+    },
+    {
       "id": "products_hanuman-frame-600_jpg",
       "filename": "hanuman-frame-600.jpg",
       "path": "/assets/products/hanuman-frame-600.jpg",
@@ -1416,6 +1560,132 @@
       "updatedAt": "2026-10-19T05:31:12.094Z"
     },
     {
+      "id": "products_lakshmi-frame-600_jpg",
+      "filename": "lakshmi-frame-600.jpg",
+      "path": "/assets/products/lakshmi-frame-600.jpg",
+      "category": "products",
+      "label": "lakshmi frame",
+      "sizeBytes": 109355,
+      "updatedAt": "2026-10-20T23:48:09.996Z"
+    },
+    {
+      "id": "products_lakshmi-frame-600_webp",
+      "filename": "lakshmi-frame-600.webp",
+      "path": "/assets/products/lakshmi-frame-600.webp",
+      "category": "products",
+      "label": "lakshmi frame",
+      "sizeBytes": 95982,
+      "updatedAt": "2026-10-20T23:48:09.990Z"
+    },
+    {
+      "id": "products_lakshmi-frame-800_jpg",
+      "filename": "lakshmi-frame-800.jpg",
+      "path": "/assets/products/lakshmi-frame-800.jpg",
+      "category": "products",
+      "label": "lakshmi frame",
+      "sizeBytes": 179860,
+      "updatedAt": "2026-10-20T23:48:09.959Z"
+    },
+    {
+      "id": "products_lakshmi-frame-800_webp",
+      "filename": "lakshmi-frame-800.webp",
+      "path": "/assets/products/lakshmi-frame-800.webp",
+      "category": "products",
+      "label": "lakshmi frame",
+      "sizeBytes": 152156,
+      "updatedAt": "2026-10-20T23:48:09.951Z"
+    },
+    {
+      "id": "products_murugan-frame-600_jpg",
+      "filename": "murugan-frame-600.jpg",
+      "path": "/assets/products/murugan-frame-600.jpg",
+      "category": "products",
+      "label": "murugan frame",
+      "sizeBytes": 106356,
+      "updatedAt": "2026-10-20T23:48:10.424Z"
+    },
+    {
+      "id": "products_murugan-frame-600_webp",
+      "filename": "murugan-frame-600.webp",
+      "path": "/assets/products/murugan-frame-600.webp",
+      "category": "products",
+      "label": "murugan frame",
+      "sizeBytes": 90930,
+      "updatedAt": "2026-10-20T23:48:10.418Z"
+    },
+    {
+      "id": "products_murugan-frame-800_jpg",
+      "filename": "murugan-frame-800.jpg",
+      "path": "/assets/products/murugan-frame-800.jpg",
+      "category": "products",
+      "label": "murugan frame",
+      "sizeBytes": 179010,
+      "updatedAt": "2026-10-20T23:48:10.387Z"
+    },
+    {
+      "id": "products_murugan-frame-800_webp",
+      "filename": "murugan-frame-800.webp",
+      "path": "/assets/products/murugan-frame-800.webp",
+      "category": "products",
+      "label": "murugan frame",
+      "sizeBytes": 152030,
+      "updatedAt": "2026-10-20T23:48:10.379Z"
+    },
+    {
+      "id": "products_placeholder-devotional-frame-600_jpg",
+      "filename": "placeholder-devotional-frame-600.jpg",
+      "path": "/assets/products/placeholder-devotional-frame-600.jpg",
+      "category": "products",
+      "label": "placeholder devotional frame",
+      "sizeBytes": 65394,
+      "updatedAt": "2026-10-20T23:48:10.617Z"
+    },
+    {
+      "id": "products_placeholder-devotional-frame-600_webp",
+      "filename": "placeholder-devotional-frame-600.webp",
+      "path": "/assets/products/placeholder-devotional-frame-600.webp",
+      "category": "products",
+      "label": "placeholder devotional frame",
+      "sizeBytes": 48716,
+      "updatedAt": "2026-10-20T23:48:10.610Z"
+    },
+    {
+      "id": "products_placeholder-devotional-frame-800_jpg",
+      "filename": "placeholder-devotional-frame-800.jpg",
+      "path": "/assets/products/placeholder-devotional-frame-800.jpg",
+      "category": "products",
+      "label": "placeholder devotional frame",
+      "sizeBytes": 110013,
+      "updatedAt": "2026-10-21T00:32:32.847Z"
+    },
+    {
+      "id": "products_placeholder-devotional-frame-800_webp",
+      "filename": "placeholder-devotional-frame-800.webp",
+      "path": "/assets/products/placeholder-devotional-frame-800.webp",
+      "category": "products",
+      "label": "placeholder devotional frame",
+      "sizeBytes": 76376,
+      "updatedAt": "2026-10-21T00:32:32.844Z"
+    },
+    {
+      "id": "products_placeholder-devotional-frame_jpg",
+      "filename": "placeholder-devotional-frame.jpg",
+      "path": "/assets/products/placeholder-devotional-frame.jpg",
+      "category": "products",
+      "label": "placeholder devotional frame",
+      "sizeBytes": 110013,
+      "updatedAt": "2026-10-20T23:48:10.583Z"
+    },
+    {
+      "id": "products_placeholder-devotional-frame_webp",
+      "filename": "placeholder-devotional-frame.webp",
+      "path": "/assets/products/placeholder-devotional-frame.webp",
+      "category": "products",
+      "label": "placeholder devotional frame",
+      "sizeBytes": 76376,
+      "updatedAt": "2026-10-20T23:48:10.575Z"
+    },
+    {
       "id": "products_radha-krishna-frame-600_jpg",
       "filename": "radha-krishna-frame-600.jpg",
       "path": "/assets/products/radha-krishna-frame-600.jpg",
@@ -1486,6 +1756,114 @@
       "label": "radha krishna frame photo",
       "sizeBytes": 142596,
       "updatedAt": "2026-10-19T05:31:12.099Z"
+    },
+    {
+      "id": "products_sai-baba-frame-600_jpg",
+      "filename": "sai-baba-frame-600.jpg",
+      "path": "/assets/products/sai-baba-frame-600.jpg",
+      "category": "products",
+      "label": "sai baba frame",
+      "sizeBytes": 104507,
+      "updatedAt": "2026-10-20T23:48:10.528Z"
+    },
+    {
+      "id": "products_sai-baba-frame-600_webp",
+      "filename": "sai-baba-frame-600.webp",
+      "path": "/assets/products/sai-baba-frame-600.webp",
+      "category": "products",
+      "label": "sai baba frame",
+      "sizeBytes": 92586,
+      "updatedAt": "2026-10-20T23:48:10.521Z"
+    },
+    {
+      "id": "products_sai-baba-frame-800_jpg",
+      "filename": "sai-baba-frame-800.jpg",
+      "path": "/assets/products/sai-baba-frame-800.jpg",
+      "category": "products",
+      "label": "sai baba frame",
+      "sizeBytes": 174082,
+      "updatedAt": "2026-10-20T23:48:10.486Z"
+    },
+    {
+      "id": "products_sai-baba-frame-800_webp",
+      "filename": "sai-baba-frame-800.webp",
+      "path": "/assets/products/sai-baba-frame-800.webp",
+      "category": "products",
+      "label": "sai baba frame",
+      "sizeBytes": 149178,
+      "updatedAt": "2026-10-20T23:48:10.478Z"
+    },
+    {
+      "id": "products_saraswati-frame-600_jpg",
+      "filename": "saraswati-frame-600.jpg",
+      "path": "/assets/products/saraswati-frame-600.jpg",
+      "category": "products",
+      "label": "saraswati frame",
+      "sizeBytes": 94533,
+      "updatedAt": "2026-10-20T23:48:10.145Z"
+    },
+    {
+      "id": "products_saraswati-frame-600_webp",
+      "filename": "saraswati-frame-600.webp",
+      "path": "/assets/products/saraswati-frame-600.webp",
+      "category": "products",
+      "label": "saraswati frame",
+      "sizeBytes": 78358,
+      "updatedAt": "2026-10-20T23:48:10.138Z"
+    },
+    {
+      "id": "products_saraswati-frame-800_jpg",
+      "filename": "saraswati-frame-800.jpg",
+      "path": "/assets/products/saraswati-frame-800.jpg",
+      "category": "products",
+      "label": "saraswati frame",
+      "sizeBytes": 157778,
+      "updatedAt": "2026-10-20T23:48:10.110Z"
+    },
+    {
+      "id": "products_saraswati-frame-800_webp",
+      "filename": "saraswati-frame-800.webp",
+      "path": "/assets/products/saraswati-frame-800.webp",
+      "category": "products",
+      "label": "saraswati frame",
+      "sizeBytes": 130424,
+      "updatedAt": "2026-10-20T23:48:10.102Z"
+    },
+    {
+      "id": "products_shiva-parvati-frame-600_jpg",
+      "filename": "shiva-parvati-frame-600.jpg",
+      "path": "/assets/products/shiva-parvati-frame-600.jpg",
+      "category": "products",
+      "label": "shiva parvati frame",
+      "sizeBytes": 80997,
+      "updatedAt": "2026-10-20T23:48:10.280Z"
+    },
+    {
+      "id": "products_shiva-parvati-frame-600_webp",
+      "filename": "shiva-parvati-frame-600.webp",
+      "path": "/assets/products/shiva-parvati-frame-600.webp",
+      "category": "products",
+      "label": "shiva parvati frame",
+      "sizeBytes": 68148,
+      "updatedAt": "2026-10-20T23:48:10.274Z"
+    },
+    {
+      "id": "products_shiva-parvati-frame-800_jpg",
+      "filename": "shiva-parvati-frame-800.jpg",
+      "path": "/assets/products/shiva-parvati-frame-800.jpg",
+      "category": "products",
+      "label": "shiva parvati frame",
+      "sizeBytes": 136670,
+      "updatedAt": "2026-10-20T23:48:10.249Z"
+    },
+    {
+      "id": "products_shiva-parvati-frame-800_webp",
+      "filename": "shiva-parvati-frame-800.webp",
+      "path": "/assets/products/shiva-parvati-frame-800.webp",
+      "category": "products",
+      "label": "shiva parvati frame",
+      "sizeBytes": 114020,
+      "updatedAt": "2026-10-20T23:48:10.241Z"
     },
     {
       "id": "products_venkateswara-frame-600_jpg",

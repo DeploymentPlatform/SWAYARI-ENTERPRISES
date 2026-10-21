@@ -426,4 +426,64 @@ SWAYARI has transitioned to a confirmed business direction focusing exclusively 
 - Production branch (`main`) remains untouched.
 - Ready for remote GitHub push and owner review.
 
+---
+
+## Milestone 7: Verified Issue Corrections, Bulk Pricing Consistency, Admin Photo Management, Safe Migrations & Regression Suite
+
+- **Date & Time (Asia/Kolkata):** `2026-10-21T06:15:00+05:30`
+- **Working Branch:** `feature/swayari-devotional-frames-under-99`
+- **Reviewed HEAD:** `1c75c91a496854fb3a3ca0f19a1e222ffd73093b`
+
+### 1. Context & Motivation
+Following review of the devotional frames release, a precision verification and correction audit identified 10 issues across imagery mapping, cart bulk pricing discrepancies, MOQ and order increment enforcement, missing photo management in the admin modal, risky database migration patterns in 0008, incomplete price validation (paise precision and quotations), lingering legacy gift links, TypeScript compilation failures, and lack of real browser workflow screenshots.
+
+### 2. Architecture & Components Implemented
+1. **Accurate Product & Hero Imagery (Issue 1):**
+   - Eliminated misleading demo assets (street, bedroom, stairs, rabbit).
+   - Generated authentic gold foil devotional frames for all deities (Sri Venkateswara, Ganesha, Lakshmi, Saraswati, Radha Krishna, Shiva Parvati, Murugan, Sai Baba) with WebP and JPG variants.
+   - Created neutral placeholder `placeholder-devotional-frame-800.webp` and 3 responsive marketing hero banners.
+   - Synchronized assets across `public/assets` and both portal origins via `scripts/sync-assets.js`.
+2. **Unified Bulk Pricing Engine (Issue 2):**
+   - Implemented `packages/shared/src/pricing.ts` and pure ESM `packages/shared/src/pricing.js`.
+   - Exported `calculateEffectiveUnitPrice`, `calculateLineSubtotal`, `aggregateCartItems`, `calculateCartTotals`, `validateQuantityRules`, and `validatePricePaise`.
+   - Updated `CartContext.tsx`, `CartDrawer.tsx`, `CartPage.tsx`, `ProductDetailPage.tsx`, and `QuickViewModal.tsx` to dynamically apply volume tier discounts.
+   - Verified that 100 pieces of Shirdi Sai Baba frame (@ ₹42 tier) subtotal to ₹4,200 (never ₹6,500).
+   - Separated shipping charge labeled *"To be confirmed by our team"*.
+3. **Bulk Quantity & Duplicate Line Enforcement (Issue 3):**
+   - Strictly enforced positive whole integer quantities; rejected negative, zero, fractional, and malformed inputs.
+   - Enforced configured MOQ (`min_quantity`) and order increment (`order_increment`) across UI numeric controls and server API.
+   - Aggregated duplicate lines by design (`productId` + `selectedVariant`) in cart and order creation.
+4. **Admin Photo Management (Issue 4):**
+   - Restored photo management controls in `ProductEditorModal.tsx` with primary photo designation badge, move up/down reordering, safe removal, and catalogue asset picker.
+   - Added secure `POST /api/admin/assets` endpoint with magic byte validation (JPEG, PNG, WebP) and 5MB limit.
+   - Enforced genuine photo requirement before publishing live inventory.
+5. **Non-Destructive Database Migrations (Issue 5):**
+   - Rewrote `migrations/0008_devotional_frames_99.sql` using non-destructive `INSERT INTO categories ... ON CONFLICT(id) DO UPDATE SET ...` to prevent `ON DELETE SET NULL` cascade on existing products.
+   - Removed blanket `DELETE FROM campaign_banners;`, replaced with targeted retirement of known legacy seed banners (`WHERE id IN (...)`), preserving owner products, categories, banners, and quotations.
+6. **Integer Paise & Strict ₹99 Ceiling Validation (Issue 6):**
+   - Enforced integer paise calculations with upper limit of 9,900 paise (₹99).
+   - Validated admin quotations (unit price `<= ₹99`, whole integer quantities, non-negative shipping and tax).
+   - Isolated sample data in non-dev/preview environments.
+7. **Business Content Cleanup (Issue 7):**
+   - Removed outdated links to lamps, sculptures, and urulis from `Footer.tsx`.
+   - Preserved exact verbatim disclaimer across all request review and submission flows:
+     *"Our team will contact you to confirm availability, final pricing, shipping charges and delivery details. Submitting this request does not confirm a purchase or reserve stock."*
+8. **TypeScript Fixes & Expanded Regression Test Suite (Issue 8):**
+   - Fixed `BudgetBandDefinition` export in `ShopByBudget.tsx` and `deity` in `useProducts` options type in `ShopPage.tsx`.
+   - Expanded test suite in `scripts/run-tests.js` to 40 passing tests.
+9. **Real Application Verification via Chrome DevTools Protocol (Issue 9):**
+   - Captured real screenshots of desktop home, mobile home, product detail, cart with ₹4,200 tier pricing, checkout with Google sign-in gating, order confirmation, admin login, admin dashboard, admin order detail with private staff notes, and admin product photo manager.
+
+### 3. Checks & Verification Executed
+- `npm run typecheck`: 0 errors.
+- `npm test`: 40/40 tests passing.
+- `npm run build`: Clean production builds for Storefront and Admin.
+- Real application verified end-to-end with native headless Chrome.
+
+### 4. Deployment Status & Handoff
+- Working branch: `feature/swayari-devotional-frames-under-99`.
+- Production branch (`main`) remains untouched.
+- Ready for remote GitHub push and owner review.
+
+
 

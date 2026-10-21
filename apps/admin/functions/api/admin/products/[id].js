@@ -1,4 +1,4 @@
-import { jsonResponse, errorResponse, requireAdminAuth, logAudit } from '../../../_utils.js';
+import { jsonResponse, errorResponse, requireAdminAuth, logAudit, validateFramePrice, validateQuantity } from '../../../_utils.js';
 
 export async function onRequestGet(context) {
   const { params, request, env } = context;
@@ -112,7 +112,7 @@ export async function onRequestPut(context) {
       borderFinish
     } = body;
 
-    const existing = await env.DB.prepare('SELECT id, is_demo, has_variants, variants_json, price_type, set_contents, order_increment, is_quote_only, bulk_tiers_json, packaging_options_json, shipping_info, occasions_json, supports_individual, supports_bulk, deity, frame_size, orientation, border_finish FROM products WHERE id = ?').bind(productId).first();
+    const existing = await env.DB.prepare('SELECT * FROM products WHERE id = ?').bind(productId).first();
     if (!existing) {
       return errorResponse('Product not found', 404);
     }
@@ -120,21 +120,43 @@ export async function onRequestPut(context) {
       return errorResponse('SKU, name, slug and description are required', 400);
     }
 
-    // Strict ₹99 rule: Frame price cannot exceed ₹99
-    if (indicativePrice !== undefined && indicativePrice !== null && indicativePrice !== '') {
-      const pNum = Number(indicativePrice);
-      if (pNum > 99) {
-        return errorResponse('Frame indicative price cannot exceed ₹99 as per business direction', 400);
+    const finalStatus = status !== undefined ? status : (existing.status || 'published');
+    const finalIsDemo = isDemo === undefined ? Number(existing.is_demo) : (isDemo ? 1 : 0);
+    const finalImages = images !== undefined ? images : JSON.parse(existing.images || '[]');
+    const finalIndicativePrice = indicativePrice !== undefined
+      ? (indicativePrice !== null && indicativePrice !== '' ? Number(indicativePrice) : null)
+      : (existing.indicative_price !== null ? Number(existing.indicative_price) : null);
+
+    // Require valid price and photo before publishing live inventory
+    if (finalStatus === 'published' && !finalIsDemo) {
+      if (finalIndicativePrice === undefined || finalIndicativePrice === null || finalIndicativePrice === '') {
+        return errorResponse('Published devotional frames must have a valid price (strictly ₹99 or less). Save as draft if unpriced.', 400);
+      }
+      if (!Array.isArray(finalImages) || finalImages.length === 0) {
+        return errorResponse('Published devotional frames must have at least one authentic product photograph attached.', 400);
       }
     }
+
+    // Strict ₹99 rule: Integer paise validation
+    const priceCheck = validateFramePrice(finalIndicativePrice, 'Frame indicative price');
+    if (!priceCheck.isValid) {
+      return errorResponse(priceCheck.error, 400);
+    }
+
+    const finalMinQuantity = minQuantity !== undefined ? minQuantity : (existing.min_quantity || 1);
+    const qCheck = validateQuantity(finalMinQuantity, 'Minimum order quantity');
+    if (!qCheck.isValid) return errorResponse(qCheck.error, 400);
+
+    const finalOrderIncrement = orderIncrement !== undefined ? orderIncrement : (existing.order_increment || 1);
+    const incCheck = validateQuantity(finalOrderIncrement, 'Order increment');
+    if (!incCheck.isValid) return errorResponse(incCheck.error, 400);
 
     if (Array.isArray(variants)) {
       for (const v of variants) {
         const vPrice = v.indicativePrice !== undefined ? v.indicativePrice : v.indicative_price;
-        if (vPrice !== undefined && vPrice !== null && vPrice !== '') {
-          if (Number(vPrice) > 99) {
-            return errorResponse(`Variant ${v.name || ''} price cannot exceed ₹99`, 400);
-          }
+        const vCheck = validateFramePrice(vPrice, `Variant ${v.name || ''} price`);
+        if (!vCheck.isValid) {
+          return errorResponse(vCheck.error, 400);
         }
       }
     }
@@ -142,20 +164,24 @@ export async function onRequestPut(context) {
     if (Array.isArray(bulkTiers)) {
       for (const tier of bulkTiers) {
         const tierPrice = tier.unit_price !== undefined ? tier.unit_price : tier.unitPrice;
-        if (tierPrice && Number(tierPrice) > 99) {
-          return errorResponse('Bulk tier price cannot exceed ₹99 per frame', 400);
+        const tCheck = validateFramePrice(tierPrice, 'Bulk tier unit price');
+        if (!tCheck.isValid) {
+          return errorResponse(tCheck.error, 400);
         }
       }
     }
 
     // Fields the editor does not send are preserved. In particular a preview/sample item must
     // never become live inventory merely because it was edited.
-    const finalIsDemo = isDemo === undefined ? Number(existing.is_demo) : (isDemo ? 1 : 0);
+    const finalCategoryId = categoryId !== undefined ? categoryId : existing.category_id;
+    const finalMaterial = material !== undefined ? material : existing.material;
+    const finalDimensions = dimensions !== undefined ? dimensions : existing.dimensions;
+    const finalAvailabilityLabel = availabilityLabel !== undefined ? availabilityLabel : (existing.availability_label || 'Available on Request');
+    const finalCustomisationInfo = customisationInfo !== undefined ? customisationInfo : existing.customisation_info;
     const finalHasVariants = hasVariants === undefined ? Number(existing.has_variants) : (hasVariants ? 1 : 0);
     const finalVariantsJson = variants === undefined ? (existing.variants_json || '[]') : JSON.stringify(variants || []);
     const finalPriceType = priceType !== undefined ? priceType : (existing.price_type || 'piece');
     const finalSetContents = setContents !== undefined ? setContents : existing.set_contents;
-    const finalOrderIncrement = orderIncrement !== undefined ? Number(orderIncrement) : (existing.order_increment || 1);
     const finalIsQuoteOnly = isQuoteOnly !== undefined ? (isQuoteOnly ? 1 : 0) : Number(existing.is_quote_only || 0);
     const finalBulkTiersJson = bulkTiers !== undefined ? JSON.stringify(bulkTiers || []) : (existing.bulk_tiers_json || '[]');
     const finalPackagingOptionsJson = packagingOptions !== undefined ? JSON.stringify(packagingOptions || []) : (existing.packaging_options_json || '[]');
@@ -187,21 +213,21 @@ export async function onRequestPut(context) {
       name.trim(),
       slug.trim(),
       description.trim(),
-      categoryId || null,
-      JSON.stringify(images || []),
-      material || null,
-      dimensions || null,
+      finalCategoryId || null,
+      JSON.stringify(finalImages || []),
+      finalMaterial || null,
+      finalDimensions || null,
       finalHasVariants,
       finalVariantsJson,
-      indicativePrice !== undefined && indicativePrice !== null && indicativePrice !== '' ? Number(indicativePrice) : null,
-      minQuantity ? Number(minQuantity) : 1,
-      availabilityLabel || 'Available on Request',
-      customisationInfo || null,
-      status || 'published',
+      finalIndicativePrice,
+      qCheck.quantity,
+      finalAvailabilityLabel,
+      finalCustomisationInfo,
+      finalStatus,
       finalIsDemo,
       finalPriceType,
       finalSetContents,
-      finalOrderIncrement,
+      incCheck.quantity,
       finalIsQuoteOnly,
       finalBulkTiersJson,
       finalPackagingOptionsJson,

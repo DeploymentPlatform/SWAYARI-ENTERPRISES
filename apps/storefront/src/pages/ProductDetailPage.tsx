@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronRight, Truck, ShieldCheck, Sparkles, AlertCircle } from 'lucide-react';
-import { Product, formatPrice } from '@swayari/shared';
+import { Product, formatPrice, calculateEffectiveUnitPrice } from '@swayari/shared';
 import { Link } from '../lib/router';
 import { productImageSources } from '../lib/media';
 import { usePageMeta, useStructuredData } from '../lib/meta';
@@ -115,21 +115,7 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
   const requestable = canRequest(product);
 
   // Bulk tier pricing calculation (strictly <= 99)
-  let currentUnitPrice = product.indicativePrice;
-  if (product.bulkTiers && product.bulkTiers.length > 0) {
-    const sortedTiers = [...product.bulkTiers].sort((a, b) => b.min_qty - a.min_qty);
-    for (const tier of sortedTiers) {
-      if (quantity >= tier.min_qty) {
-        currentUnitPrice = tier.unit_price;
-        break;
-      }
-    }
-  }
-
-  if (currentUnitPrice !== null && currentUnitPrice > 99) {
-    currentUnitPrice = 99;
-  }
-
+  const currentUnitPrice = calculateEffectiveUnitPrice(product.indicativePrice, product.bulkTiers, quantity);
   const calculatedSubtotal = currentUnitPrice !== null ? currentUnitPrice * quantity : null;
 
   return (
@@ -317,7 +303,15 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
                   <QuantityStepper
                     value={quantity}
                     min={product.minQuantity || 1}
-                    onChange={q => setQuantity(Math.max(product.minQuantity || 1, q))}
+                    step={product.orderIncrement || 1}
+                    onChange={q => {
+                      const min = product.minQuantity || 1;
+                      const inc = product.orderIncrement || 1;
+                      const raw = Math.max(min, q);
+                      const rem = (raw - min) % inc;
+                      const clean = rem === 0 ? raw : raw + (inc - rem);
+                      setQuantity(clean);
+                    }}
                     label="Frame quantity"
                   />
                   <button type="submit" className="btn-primary flex-1 py-3 text-sm font-semibold">

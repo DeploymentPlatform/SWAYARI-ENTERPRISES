@@ -50,16 +50,27 @@ export const CartPage: React.FC = () => {
                       {item.selectedVariant && <p className="text-sm text-ink-soft">{item.selectedVariant}</p>}
                       {item.customisationNote && <p className="mt-1 text-sm text-ink-soft">Note: {item.customisationNote}</p>}
                     </div>
-                    <PriceText
-                      value={item.indicativePrice === null ? null : item.indicativePrice * item.quantity}
-                      className="whitespace-nowrap text-[0.9375rem] text-ink-soft"
-                    />
+                    <div className="text-right">
+                      <PriceText
+                        value={item.indicativePrice === null ? null : item.indicativePrice * item.quantity}
+                        className="whitespace-nowrap text-[0.9375rem] font-bold text-burgundy"
+                      />
+                      {item.indicativePrice !== null && (
+                        <div className="text-xs text-ink-soft">
+                          <span>₹{item.indicativePrice}/frame</span>
+                          {item.basePrice && item.indicativePrice < item.basePrice && (
+                            <span className="text-emerald-700 font-medium ml-1"> (Bulk discount)</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="mt-auto flex items-center justify-between gap-4 pt-4">
                     <QuantityStepper
                       size="sm"
                       value={item.quantity}
                       min={item.minQuantity || 1}
+                      step={item.orderIncrement || 1}
                       onChange={q => updateQuantity(item.productId, item.selectedVariant, q)}
                       label={`Quantity of ${item.name}`}
                     />

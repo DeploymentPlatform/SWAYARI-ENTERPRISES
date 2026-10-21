@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.0] - 2026-10-21
+
+### Fixed & Enhanced
+- **Corrected Every Product Image (Issue 1):**
+  - Replaced misleading and mismatched demo files (street, bedroom, stairs, rabbit) with authentic gold foil devotional frames for all deities (Sri Venkateswara, Ganesha, Lakshmi, Saraswati, Radha Krishna, Shiva Parvati, Murugan, Sai Baba).
+  - Generated neutral devotional placeholder `placeholder-devotional-frame-800.webp` and 3 responsive marketing hero banners (`hero-devotional-collection-desktop`, `hero-wedding-favors-desktop`, `hero-bulk-process-desktop`).
+  - Synchronized assets across `public/assets` and both portal origins (`apps/storefront/public/assets`, `apps/admin/public/assets`) and regenerated `manifest.json`.
+- **Bulk Pricing Consistency (Issue 2):**
+  - Implemented shared pricing calculation engine in `packages/shared/src/pricing.ts` and `pricing.js` (`calculateEffectiveUnitPrice`, `calculateLineSubtotal`, `aggregateCartItems`, `calculateCartTotals`).
+  - Shared calculation used across Quick View, product details, cart drawer, cart page, and server-side order calculation (`/api/orders`).
+  - Correctly applies volume discount tiers (e.g. Shirdi Sai Baba frame base price ₹65, 100-piece tier ₹42/frame; 100 pieces correctly subtotal to ₹4,200, never ₹6,500).
+  - Kept shipping charge separate and explicitly labeled *"To be confirmed by our team"*.
+- **Enforced Bulk Quantity Rules & Duplicate Line Aggregation (Issue 3):**
+  - Strictly required finite positive whole integer quantities; rejected negative, zero, fractional, and malformed inputs.
+  - Enforced configured MOQ (`min_quantity`) and order increment (`order_increment`) across all quantity controls, typed inputs, cart edits, and server order validation.
+  - Aggregated duplicate cart and order lines by design (`productId` + `selectedVariant`) so splitting or combining lines cannot bypass MOQ or alter tiered pricing.
+- **Restored Admin Photo Management (Issue 4):**
+  - Restored full photo management controls in `ProductEditorModal.tsx`: image upload, thumbnail preview, primary photo selection badge, move up/down reordering, safe photo removal, and catalogue asset picker.
+  - Added secure `POST /api/admin/assets` endpoint with magic byte validation (JPEG, PNG, WebP) and 5MB size limit.
+  - Enforced mandatory genuine photograph requirement before publishing live inventory.
+- **Safe Database Migrations (Issue 5):**
+  - Rewrote `migrations/0008_devotional_frames_99.sql` using non-destructive `INSERT INTO categories ... ON CONFLICT(id) DO UPDATE SET ...` to prevent `ON DELETE SET NULL` cascade on existing products.
+  - Eliminated unconditional `DELETE FROM campaign_banners;`, replacing it with targeted retirement of known legacy seed banners (`WHERE id IN (...)`), preserving owner categories, products, banners, and quotations.
+- **Integer Paise & Strict ₹99 Ceiling Validation (Issue 6):**
+  - Standardized monetary calculations on integer paise (`validatePricePaise`). Replaced basic `price > 99` check with strict validation requiring valid positive amounts `<= 9,900` paise.
+  - Enforced equivalent rules for variants, bulk tiers, and admin quotation agreed unit prices (`<= ₹99`), nonnegative shipping/tax, and whole integer quantities.
+  - Strictly isolated sample data when `ENVIRONMENT` is missing, misspelled, or non-dev/preview.
+- **Business Content Cleanup (Issue 7):**
+  - Removed outdated links to lamps, sculptures, and urulis from `Footer.tsx` and customer navigation.
+  - Removed unconfirmed marketing claims.
+  - Preserved exact verbatim disclaimer across all request review and submission flows: *"Our team will contact you to confirm availability, final pricing, shipping charges and delivery details. Submitting this request does not confirm a purchase or reserve stock."*
+- **Fixed Typecheck & Added Meaningful Regression Tests (Issue 8):**
+  - Fixed TypeScript errors: exported `BudgetBandDefinition` in `ShopByBudget.tsx`, added `deity` to `useProducts` options type in `ShopPage.tsx`.
+  - Expanded test suite in `scripts/run-tests.js` to 40 passing tests covering bulk pricing consistency, duplicate lines aggregation, MOQ/increments, integer paise validation, quotation checks, migration 0007->0008 upgrade safety, admin assets upload with magic bytes, sample isolation, and disk asset presence.
+- **Verified Real Application End-to-End (Issue 9):**
+  - Executed end-to-end verification across Storefront (`http://127.0.0.1:8790`) and Admin (`http://127.0.0.1:8791`) using native headless Chrome with Chrome DevTools Protocol (CDP).
+  - Captured real screenshots of desktop home, mobile home, product detail, cart with ₹4,200 tier pricing, checkout with Google sign-in gating, order confirmation, admin login, admin dashboard, admin order detail with private staff notes, and admin product photo manager.
+
+---
+
 ## [0.6.0] - 2026-10-20
 
 ### Changed

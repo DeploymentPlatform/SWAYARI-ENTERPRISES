@@ -72,14 +72,53 @@ export async function onRequestPost(context) {
       }, 200);
     }
 
-    // 4. Server-side product price re-verification: Do NOT trust client submitted prices!
+    // 4. Server-side product price & quantity re-verification: Do NOT trust client submitted prices!
+    // Group duplicate line items by design (productId + selectedVariant)
+    const aggregatedMap = new Map();
+    for (const item of items) {
+      if (!item || !item.productId || typeof item.productId !== 'string') {
+        return errorResponse('Valid productId is required for each item', 400);
+      }
+
+      const rawQty = item.quantity;
+      if (rawQty === null || rawQty === undefined || typeof rawQty === 'boolean') {
+        return errorResponse(`Quantity is missing or invalid for item ${item.productId}`, 400);
+      }
+      const qty = Number(rawQty);
+      if (!Number.isFinite(qty) || !Number.isInteger(qty) || qty <= 0) {
+        return errorResponse(`Quantity for item ${item.productId} must be a positive whole integer (no fractions or zero)`, 400);
+      }
+
+      const key = `${item.productId}:::${item.selectedVariant || ''}`;
+      if (aggregatedMap.has(key)) {
+        const existing = aggregatedMap.get(key);
+        existing.quantity += qty;
+        if (item.customisationNote && item.customisationNote.trim()) {
+          existing.customisationNote = existing.customisationNote
+            ? `${existing.customisationNote}; ${item.customisationNote.trim()}`
+            : item.customisationNote.trim();
+        }
+      } else {
+        aggregatedMap.set(key, {
+          productId: item.productId,
+          selectedVariant: item.selectedVariant || null,
+          quantity: qty,
+          customisationNote: item.customisationNote ? String(item.customisationNote).trim() : null
+        });
+      }
+    }
+
+    const aggregatedItems = Array.from(aggregatedMap.values());
     const verifiedItems = [];
-    let calculatedSubtotal = 0;
+    let calculatedSubtotalPaise = 0;
     let hasUnpricedItem = false;
 
-    for (const item of items) {
+    // Check environment: preview samples permitted ONLY if explicitly approved development/preview
+    const isApprovedDevOrPreview = env.ENVIRONMENT === 'development' || env.ENVIRONMENT === 'preview';
+
+    for (const item of aggregatedItems) {
       const prod = await env.DB.prepare(`
-        SELECT id, sku, name, indicative_price, images, status, min_quantity, is_demo, bulk_tiers_json
+        SELECT id, sku, name, indicative_price, images, status, min_quantity, order_increment, is_demo, bulk_tiers_json
         FROM products
         WHERE id = ?
       `).bind(item.productId).first();
@@ -87,28 +126,46 @@ export async function onRequestPost(context) {
       if (!prod || prod.status !== 'published') {
         return errorResponse(`Product ${item.productId} was not found or is no longer available`, 404);
       }
-      // Preview/sample items can only be requested in local development, never in production.
-      if (prod.is_demo && env.ENVIRONMENT !== 'development') {
+
+      // Preview/sample items can only be requested in approved development/preview environments
+      if (prod.is_demo && !isApprovedDevOrPreview) {
         return errorResponse(`${prod.name} is a preview sample and cannot be requested`, 400);
       }
 
-      // Strict ₹99 rule: Any frame priced above ₹99 cannot be requested
-      if (prod.indicative_price !== null && Number(prod.indicative_price) > 99) {
-        return errorResponse(`Product ${prod.name} exceeds the maximum frame price limit of ₹99`, 400);
+      // Validate base price: must be positive and <= 9,900 paise (₹99)
+      if (prod.indicative_price === null || prod.indicative_price === undefined) {
+        hasUnpricedItem = true;
+      } else {
+        const basePrice = Number(prod.indicative_price);
+        if (!Number.isFinite(basePrice) || basePrice <= 0 || basePrice > 99) {
+          return errorResponse(`Product ${prod.name} does not meet the ₹99 devotional frame price limit`, 400);
+        }
       }
 
-      const qty = Math.max(1, parseInt(item.quantity, 10) || 1);
-      const images = JSON.parse(prod.images || '[]');
-      const firstImage = images.length > 0 ? images[0] : null;
+      // Enforce MOQ (Minimum Order Quantity)
+      const minQty = Math.max(1, parseInt(prod.min_quantity, 10) || 1);
+      if (item.quantity < minQty) {
+        return errorResponse(`Product "${prod.name}" requires a minimum order quantity of ${minQty} frames`, 400);
+      }
 
+      // Enforce Order Increment
+      const increment = Math.max(1, parseInt(prod.order_increment, 10) || 1);
+      if ((item.quantity - minQty) % increment !== 0) {
+        return errorResponse(`Product "${prod.name}" quantity must be in multiples of ${increment} above the minimum quantity of ${minQty}`, 400);
+      }
+
+      // Calculate effective tier price in integer paise
       let unitPrice = prod.indicative_price !== null && prod.indicative_price !== undefined ? Number(prod.indicative_price) : null;
       const bulkTiers = JSON.parse(prod.bulk_tiers_json || '[]');
-      if (Array.isArray(bulkTiers) && bulkTiers.length > 0) {
+      if (Array.isArray(bulkTiers) && bulkTiers.length > 0 && unitPrice !== null) {
         const sortedTiers = [...bulkTiers].sort((a, b) => b.min_qty - a.min_qty);
         for (const tier of sortedTiers) {
-          if (qty >= tier.min_qty && tier.unit_price) {
-            unitPrice = Number(tier.unit_price);
-            break;
+          if (item.quantity >= tier.min_qty && tier.unit_price) {
+            const tierPrice = Number(tier.unit_price);
+            if (Number.isFinite(tierPrice) && tierPrice > 0 && tierPrice <= unitPrice) {
+              unitPrice = tierPrice;
+              break;
+            }
           }
         }
       }
@@ -118,10 +175,14 @@ export async function onRequestPost(context) {
       }
 
       if (unitPrice !== null) {
-        calculatedSubtotal += unitPrice * qty;
+        const unitPricePaise = Math.round(unitPrice * 100);
+        calculatedSubtotalPaise += unitPricePaise * item.quantity;
       } else {
         hasUnpricedItem = true;
       }
+
+      const images = JSON.parse(prod.images || '[]');
+      const firstImage = images.length > 0 ? images[0] : null;
 
       verifiedItems.push({
         id: 'item-' + generateCryptoId(16),
@@ -129,7 +190,7 @@ export async function onRequestPost(context) {
         productSku: prod.sku,
         productName: prod.name,
         selectedVariant: item.selectedVariant || null,
-        quantity: qty,
+        quantity: item.quantity,
         snapshotIndicativePrice: unitPrice,
         snapshotImageUrl: firstImage,
         customisationNote: item.customisationNote ? String(item.customisationNote).slice(0, 500) : null
@@ -139,7 +200,7 @@ export async function onRequestPost(context) {
     // 5. Generate Order Reference
     const orderId = generateOrderReference();
     const nowIso = new Date().toISOString();
-    const finalSubtotal = hasUnpricedItem && calculatedSubtotal === 0 ? null : calculatedSubtotal;
+    const finalSubtotal = hasUnpricedItem && calculatedSubtotalPaise === 0 ? null : (calculatedSubtotalPaise / 100);
 
     // 6. Atomic save with D1 batch transaction
     const batchStatements = [

@@ -170,3 +170,40 @@ export async function logAudit(env, entityType, entityId, action, performedBy, d
     console.error('Audit log failure:', err.message);
   }
 }
+
+export function validateFramePrice(val, fieldLabel = 'Price') {
+  if (val === undefined || val === null || val === '') return { isValid: true, paise: null };
+  const num = Number(val);
+  if (!Number.isFinite(num) || num <= 0) {
+    return { isValid: false, error: `${fieldLabel} must be a positive finite amount` };
+  }
+  const paise = Math.round(num * 100);
+  if (Math.abs(num * 100 - paise) > 0.0001) {
+    return { isValid: false, error: `${fieldLabel} cannot have more than 2 decimal places` };
+  }
+  if (paise > 9900) {
+    return { isValid: false, error: `${fieldLabel} (₹${num}) exceeds the maximum devotional frame limit of ₹99 (9,900 paise)` };
+  }
+  return { isValid: true, paise, amount: paise / 100 };
+}
+
+export function validateQuantity(val, fieldLabel = 'Quantity') {
+  const num = Number(val);
+  if (!Number.isFinite(num) || !Number.isInteger(num) || num < 1) {
+    return { isValid: false, error: `${fieldLabel} must be a positive whole integer (at least 1)` };
+  }
+  return { isValid: true, quantity: num };
+}
+
+export function validateNonNegativeAmount(val, fieldLabel = 'Amount') {
+  if (val === undefined || val === null || val === '') return { isValid: true, amount: 0, paise: 0 };
+  const num = Number(val);
+  if (!Number.isFinite(num) || num < 0) {
+    return { isValid: false, error: `${fieldLabel} must be a non-negative finite amount` };
+  }
+  const paise = Math.round(num * 100);
+  if (Math.abs(num * 100 - paise) > 0.0001) {
+    return { isValid: false, error: `${fieldLabel} cannot have more than 2 decimal places` };
+  }
+  return { isValid: true, amount: paise / 100, paise };
+}

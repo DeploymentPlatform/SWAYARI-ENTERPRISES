@@ -31,9 +31,9 @@ export async function onRequestGet(context) {
     `;
     const params = [];
 
-    const isProduction = env.ENVIRONMENT === 'production';
-    // Strictly exclude demo items unless explicitly asked for in preview mode
-    if (isProduction || !includeDemo) {
+    const isApprovedDevOrPreview = env.ENVIRONMENT === 'development' || env.ENVIRONMENT === 'preview';
+    // Strictly exclude demo items unless explicitly in an approved development/preview environment AND requested
+    if (!isApprovedDevOrPreview || !includeDemo) {
       query += ' AND p.is_demo = 0';
     }
 

@@ -10,8 +10,8 @@ export async function onRequestGet(context) {
   }
 
   try {
-    const isProduction = env.ENVIRONMENT === 'production';
-    const demoFilter = (isProduction || !includeDemo) ? 'AND p.is_demo = 0' : '';
+    const isApprovedDevOrPreview = env.ENVIRONMENT === 'development' || env.ENVIRONMENT === 'preview';
+    const demoFilter = (!isApprovedDevOrPreview || !includeDemo) ? 'AND p.is_demo = 0' : '';
 
     const row = await env.DB.prepare(`
       SELECT p.id, p.sku, p.name, p.slug, p.description, p.category_id,

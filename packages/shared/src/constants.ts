@@ -96,6 +96,7 @@ export const FRAME_PRICE_BANDS: FramePriceBandDefinition[] = [
 
 // Backwards compatibility alias for components referencing BUDGET_BANDS
 export const BUDGET_BANDS = FRAME_PRICE_BANDS;
+export type BudgetBandDefinition = FramePriceBandDefinition;
 
 export const DEITIES = [
   { id: 'all', name: 'All Deities' },

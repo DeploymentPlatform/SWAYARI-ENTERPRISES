@@ -201,6 +201,8 @@ export interface CartItem {
   slug: string;
   image: string;
   indicativePrice: number | null;
+  basePrice?: number | null;
+  bulkTiers?: BulkPriceTier[];
   minQuantity: number;
   quantity: number;
   selectedVariant?: string | null;

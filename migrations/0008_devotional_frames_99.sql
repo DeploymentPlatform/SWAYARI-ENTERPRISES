@@ -1,9 +1,10 @@
 -- SWAYARI ENTERPRISES D1 Migration 0008: Devotional Frames Under ₹99
 --
 -- 1. Schema Extensions for Devotional God Frames
--- 2. Devotional Categories & Archival of Incompatible Legacy Products (> ₹99 / Non-Frames)
--- 3. 12 Authentic Devotional Frame Sample Products (All Strictly <= ₹99)
--- 4. Campaign Banners aligned with the 3 confirmed business messages
+-- 2. Non-destructive Devotional Categories Upsert (Preserves product associations; NO ON DELETE SET NULL)
+-- 3. Archive Incompatible Legacy Seed Products (> ₹99 / Non-Frames)
+-- 4. 12 Authentic Devotional Frame Sample Products (All Strictly <= ₹99, Authentic Imagery)
+-- 5. Safe Campaign Banners Update (Deactivate legacy seed banners by ID; preserve owner banners)
 
 -- 1. Alter products table with frame-specific fields
 ALTER TABLE products ADD COLUMN deity TEXT DEFAULT NULL;
@@ -11,21 +12,26 @@ ALTER TABLE products ADD COLUMN frame_size TEXT DEFAULT NULL;
 ALTER TABLE products ADD COLUMN orientation TEXT DEFAULT 'portrait';
 ALTER TABLE products ADD COLUMN border_finish TEXT DEFAULT 'Antique Gold Foil';
 
--- 2. Devotional Frame Categories
-INSERT OR REPLACE INTO categories (id, name, slug, description, display_order, is_active, created_at) VALUES
+-- 2. Devotional Frame Categories (Safe Upsert using ON CONFLICT to protect foreign key relationships)
+INSERT INTO categories (id, name, slug, description, display_order, is_active, created_at) VALUES
 ('cat-devotional-frames', 'All Devotional Frames', 'devotional-frames', 'Auspicious devotional god frames under ₹99 for wedding return gifts and celebrations', 1, 1, '2026-10-18T07:00:00.000Z'),
 ('cat-ganesha', 'Lord Ganesha Frames', 'ganesha-frames', 'Auspicious Vighnaharta frames for wedding invitations and welcome return gifts', 2, 1, '2026-10-18T07:00:00.000Z'),
 ('cat-lakshmi', 'Goddess Lakshmi Frames', 'lakshmi-frames', 'Prosperity and Dhanalakshmi blessings for your wedding guests', 3, 1, '2026-10-18T07:00:00.000Z'),
 ('cat-balaji', 'Tirupati Balaji Frames', 'balaji-frames', 'Sri Venkateswara Swamy sanctum frames in gold and brass-relief finish', 4, 1, '2026-10-18T07:00:00.000Z'),
 ('cat-radha-krishna', 'Radha Krishna Frames', 'radha-krishna-frames', 'Divine love and celebratory return gifts for family ceremonies', 5, 1, '2026-10-18T07:00:00.000Z'),
-('cat-mini-favors', 'Mini Return Gift Frames', 'mini-return-gift-frames', 'Compact 3×3 & pocket prayer frames under ₹49 and ₹69', 6, 1, '2026-10-18T07:00:00.000Z');
+('cat-mini-favors', 'Mini Return Gift Frames', 'mini-return-gift-frames', 'Compact 3×3 & pocket prayer frames under ₹49 and ₹69', 6, 1, '2026-10-18T07:00:00.000Z')
+ON CONFLICT(id) DO UPDATE SET
+  name = excluded.name,
+  slug = excluded.slug,
+  description = excluded.description,
+  display_order = excluded.display_order,
+  is_active = excluded.is_active;
 
--- 3. Archive incompatible legacy products (strictly hide items > ₹99 and non-frame decor from storefront while preserving records)
+-- 3. Archive incompatible legacy seed products (strictly hide items > ₹99 and non-frame decor from storefront while preserving records)
 UPDATE products SET status = 'archived' WHERE indicative_price > 99;
 UPDATE products SET status = 'archived' WHERE sku LIKE 'SWY-AFFORD-%';
 
--- 4. Insert 12 Authentic Devotional Frame Sample Products (All <= ₹99)
--- Timestamps set to 2026-10-18T07:xx so SWY-DEMO-001 (at 12:00:00) remains top row deterministically
+-- 4. Upsert 12 Authentic Devotional Frame Sample Products (All <= ₹99 with Authentic Photographs)
 INSERT INTO products (
     id, sku, name, slug, description, category_id, images, material, dimensions,
     has_variants, variants_json, indicative_price, min_quantity, availability_label,
@@ -107,7 +113,7 @@ INSERT INTO products (
     'lord-ganesha-siddhivinayak-temple-frame',
     'Traditional Lord Ganesha framed relief featuring modak and lotus motifs. The quintessential auspicious choice for wedding invitations, welcome hampers and return gifting.',
     'cat-ganesha',
-    '["/assets/products/demo-frame-temple-collection-800.webp","/assets/products/demo-frame-temple-collection-800.jpg"]',
+    '["/assets/products/ganesha-frame-800.webp","/assets/products/ganesha-frame-800.jpg"]',
     'Gold Foil Relief in Rosewood Finish Border', '3" x 3"',
     0, '[]', 85, 15, 'Sample preview',
     'Event personalisation tag available',
@@ -124,7 +130,7 @@ INSERT INTO products (
     'goddess-lakshmi-ashta-lakshmi-blessings-frame',
     'Radiant Goddess Lakshmi seated on a sacred pink lotus shower of golden coins. An auspicious token of prosperity and joy for marriage guests.',
     'cat-lakshmi',
-    '["/assets/products/demo-frame-sanctum-gold-800.webp","/assets/products/demo-frame-sanctum-gold-800.jpg"]',
+    '["/assets/products/lakshmi-frame-800.webp","/assets/products/lakshmi-frame-800.jpg"]',
     'Gold Foil Embossed Art with Deep Laminated Shield', '4" x 6"',
     0, '[]', 95, 10, 'Sample preview',
     'Gift box option available',
@@ -141,7 +147,7 @@ INSERT INTO products (
     'saraswati-devi-divine-wisdom-mini-frame',
     'Auspicious mini prayer frame depicting Goddess Saraswati with veena and sacred scriptures. A thoughtful return gift for family ceremonies and spiritual gatherings.',
     'cat-mini-favors',
-    '["/assets/products/demo-frame-baroque-floral-800.webp","/assets/products/demo-frame-baroque-floral-800.jpg"]',
+    '["/assets/products/saraswati-frame-800.webp","/assets/products/saraswati-frame-800.jpg"]',
     'Golden Motif Plaque with Desktop Stand Backing', '3" x 3"',
     0, '[]', 59, 20, 'Sample preview',
     'Custom thank-you tags for wedding requests',
@@ -158,7 +164,7 @@ INSERT INTO products (
     'shiva-parvati-kalyanam-wedding-favors-frame',
     'Divine wedding posture of Lord Shiva and Goddess Parvati in wide landscape orientation. Symbolic of sacred union and enduring marital harmony.',
     'cat-devotional-frames',
-    '["/assets/products/demo-frame-vintage-altar-800.webp","/assets/products/demo-frame-vintage-altar-800.jpg"]',
+    '["/assets/products/shiva-parvati-frame-800.webp","/assets/products/shiva-parvati-frame-800.jpg"]',
     'Wide Metallic Foil Relief in Antique Wood Trim', '6" x 4"',
     0, '[]', 89, 10, 'Sample preview',
     'Engraved couple initials on backing plaque available',
@@ -192,7 +198,7 @@ INSERT INTO products (
     'shree-ganesha-mangal-murti-golden-frame',
     'Auspicious pocket and mini pooja altar frame of Lord Ganesha in warm antique gold foil. Pure auspiciousness starting at just ₹49.',
     'cat-ganesha',
-    '["/assets/products/demo-frame-sanctum-gold-800.webp"]',
+    '["/assets/products/ganesha-frame-600.webp","/assets/products/ganesha-frame-600.jpg"]',
     'Gold Foil Relief in Beaded Metallic Finish Border', '3" x 3"',
     0, '[]', 49, 25, 'Sample preview',
     'Personalised tags available on bulk request',
@@ -209,7 +215,7 @@ INSERT INTO products (
     'lord-murugan-divine-vel-auspicious-frame',
     'Auspicious devotional frame portraying Lord Murugan with the divine Vel and mayur (peacock). Revered return gift for South Indian weddings and sashtiapthapoorthi ceremonies.',
     'cat-devotional-frames',
-    '["/assets/products/demo-frame-vintage-altar-800.webp"]',
+    '["/assets/products/murugan-frame-800.webp","/assets/products/murugan-frame-800.jpg"]',
     'Gold Foil Embossed Plaque in Teak Finish Frame', '4" x 6"',
     0, '[]', 75, 15, 'Sample preview',
     'Event tags available for bulk orders',
@@ -226,7 +232,7 @@ INSERT INTO products (
     'shirdi-sai-baba-shraddha-saburi-frame',
     'Peaceful and serene devotional frame of Shirdi Sai Baba blessing devotees with Shraddha and Saburi. A beloved keepsake for wedding and housewarming guests.',
     'cat-devotional-frames',
-    '["/assets/products/demo-frame-temple-collection-800.webp"]',
+    '["/assets/products/sai-baba-frame-800.webp","/assets/products/sai-baba-frame-800.jpg"]',
     'Gold Embossed Relief in Ornate Border', '4" x 6"',
     0, '[]', 65, 15, 'Sample preview',
     'Custom thank-you tags for bulk requests',
@@ -237,10 +243,34 @@ INSERT INTO products (
     '["Wedding Return Gifts", "Housewarming", "Family Celebrations"]',
     1, 1, 'Sai Baba', 'Classic 4"×6"', 'portrait', 'Antique Gold Foil',
     '2026-10-18T07:12:00.000Z', '2026-10-18T07:12:00.000Z'
-);
+)
+ON CONFLICT(id) DO UPDATE SET
+    sku = excluded.sku,
+    name = excluded.name,
+    slug = excluded.slug,
+    description = excluded.description,
+    category_id = excluded.category_id,
+    images = excluded.images,
+    material = excluded.material,
+    dimensions = excluded.dimensions,
+    indicative_price = excluded.indicative_price,
+    min_quantity = excluded.min_quantity,
+    order_increment = excluded.order_increment,
+    bulk_tiers_json = excluded.bulk_tiers_json,
+    packaging_options_json = excluded.packaging_options_json,
+    shipping_info = excluded.shipping_info,
+    occasions_json = excluded.occasions_json,
+    deity = excluded.deity,
+    frame_size = excluded.frame_size,
+    orientation = excluded.orientation,
+    border_finish = excluded.border_finish;
 
--- 5. Update Campaign Banners to the 3 confirmed messages
-DELETE FROM campaign_banners;
+-- 5. Safe Campaign Banners Management:
+-- Safely deactivate older seed banners by explicit IDs (DO NOT delete all banners; preserves owner-created banners)
+UPDATE campaign_banners SET is_active = 0 WHERE id IN (
+  'banner-moments', 'banner-devotional', 'banner-lighting', 'banner-uruli',
+  'banner-under-999', 'banner-under-99', 'banner-bulk'
+);
 
 INSERT INTO campaign_banners (
     id, badge, headline, emphasis, supporting, cta_text, cta_href,
@@ -250,8 +280,8 @@ INSERT INTO campaign_banners (
     'banner-devotional-99', 'Auspicious Celebrations', 'Devotional frames', '₹99 & under',
     'Thoughtful return gifts for your special celebrations. Choose your designs and quantities. Shipping quoted separately.',
     'Explore Frames', '/shop',
-    '/assets/editorial/hero-slide-2-devotional-desktop.webp',
-    '/assets/editorial/hero-slide-2-devotional-mobile.jpg',
+    '/assets/editorial/hero-devotional-collection-desktop.webp',
+    '/assets/editorial/hero-devotional-collection-mobile.webp',
     'Devotional sanctum frames for weddings and celebrations',
     1, 1, '2026-10-18T10:00:00.000Z', '2026-10-18T10:00:00.000Z'
 ),
@@ -259,8 +289,8 @@ INSERT INTO campaign_banners (
     'banner-wedding-guest', 'Cherished Keepsakes', 'A thoughtful thank-you', 'for every guest.',
     'Blessings of Ganesha, Lakshmi, Balaji & Radha Krishna. High quality devotional frames quoted separately for bulk shipping.',
     'Request a Bulk Quote', '/shop?bulk=1',
-    '/assets/editorial/hero-festive-lamps-1080.webp',
-    '/assets/editorial/hero-festive-lamps-mobile-900.webp',
+    '/assets/editorial/hero-wedding-favors-desktop.webp',
+    '/assets/editorial/hero-wedding-favors-mobile.webp',
     'Auspicious wedding return gift frames',
     2, 1, '2026-10-18T10:00:00.000Z', '2026-10-18T10:00:00.000Z'
 ),
@@ -268,8 +298,20 @@ INSERT INTO campaign_banners (
     'banner-bulk-process', 'Seamless Bulk Requests', 'Choose your frames.', 'Tell us your quantity.',
     'Select your preferred deity designs. Our team contacts you to confirm availability, pricing, packing and delivery.',
     'Explore Frames', '/shop',
-    '/assets/editorial/hero-slide-1-moments-desktop.webp',
-    '/assets/editorial/hero-slide-1-moments-mobile.webp',
+    '/assets/editorial/hero-bulk-process-desktop.webp',
+    '/assets/editorial/hero-bulk-process-mobile.webp',
     'Bulk devotional return gifts',
     3, 1, '2026-10-18T10:00:00.000Z', '2026-10-18T10:00:00.000Z'
-);
+)
+ON CONFLICT(id) DO UPDATE SET
+    badge = excluded.badge,
+    headline = excluded.headline,
+    emphasis = excluded.emphasis,
+    supporting = excluded.supporting,
+    cta_text = excluded.cta_text,
+    cta_href = excluded.cta_href,
+    desktop_image = excluded.desktop_image,
+    mobile_image = excluded.mobile_image,
+    alt = excluded.alt,
+    display_order = excluded.display_order,
+    is_active = excluded.is_active;

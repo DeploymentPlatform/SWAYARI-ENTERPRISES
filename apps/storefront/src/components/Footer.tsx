@@ -24,12 +24,12 @@ export const Footer: React.FC = () => (
           </div>
 
           <p className="mt-4 text-[13px] text-[#F7F4EF]/85 leading-relaxed max-w-sm">
-            Curators of fine Indian artisanal devotional art, solid bell-metal brassware, temple deepams, and bespoke celebration gifting.
+            Devotional god frames priced at ₹99 or less per frame. Auspicious return gifts for weddings, griha pravesh and family celebrations.
           </p>
 
           <div className="mt-5 p-3.5 rounded-xl bg-white/5 border border-white/10 text-[11.5px] text-[#F7F4EF]/80 leading-relaxed">
             <strong className="text-[#D8C29D] font-semibold block mb-0.5">Order Request Policy:</strong>
-            Submitting an order request does not take online payments or reserve stock. Our team phones you directly to confirm availability, dimensions, packaging, and final pricing.
+            Submitting an order request does not take online payments or reserve stock. Our team contacts you directly to confirm availability, dimensions, packaging, and final pricing.
           </div>
         </div>
 
@@ -41,27 +41,32 @@ export const Footer: React.FC = () => (
           <ul className="mt-4 space-y-2.5 text-[13px]">
             <li>
               <Link to="/shop?category=devotional-frames" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
-                Devotional Frames
+                All Devotional Frames (≤ ₹99)
               </Link>
             </li>
             <li>
-              <Link to="/shop?category=decorative-lamps" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
-                Decorative Brass Lamps
+              <Link to="/shop?category=ganesha-frames" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Lord Ganesha Frames
               </Link>
             </li>
             <li>
-              <Link to="/shop?category=home-accents" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
-                Home Accents &amp; Sculptures
+              <Link to="/shop?category=lakshmi-frames" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Goddess Lakshmi Frames
               </Link>
             </li>
             <li>
-              <Link to="/shop?category=festive-decor" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
-                Festive Urulis &amp; Pooja Décor
+              <Link to="/shop?category=balaji-frames" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Tirupati Balaji Frames
               </Link>
             </li>
             <li>
-              <Link to="/shop?category=gift-sets" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
-                Curated Gift Sets
+              <Link to="/shop?category=radha-krishna-frames" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Radha Krishna Frames
+              </Link>
+            </li>
+            <li>
+              <Link to="/shop?category=mini-return-gift-frames" className="text-[#F7F4EF]/80 hover:text-white hover:underline transition-colors">
+                Mini Return Gift Frames (≤ ₹49)
               </Link>
             </li>
           </ul>
@@ -119,7 +124,7 @@ export const Footer: React.FC = () => (
             </div>
             <div className="flex items-start gap-2.5">
               <ShieldCheck className="w-4 h-4 text-[#B49155] flex-shrink-0 mt-0.5" />
-              <span>Insured Transit &amp; Dedicated Multi-Layer Fragile Packaging</span>
+              <span>Protective Packaging for Celebration Gifting</span>
             </div>
           </div>
         </div>

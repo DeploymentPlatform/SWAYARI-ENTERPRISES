@@ -45,6 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Executed end-to-end verification across Storefront (`http://127.0.0.1:8790`) and Admin (`http://127.0.0.1:8791`) using native headless Chrome with Chrome DevTools Protocol (CDP).
   - Captured real screenshots of desktop home, mobile home, product detail, cart with ₹4,200 tier pricing, checkout with Google sign-in gating, order confirmation, admin login, admin dashboard, admin order detail with private staff notes, and admin product photo manager.
 
+Implementation commit: `5f21dc7`.
+
 ---
 
 ## [0.6.0] - 2026-10-20

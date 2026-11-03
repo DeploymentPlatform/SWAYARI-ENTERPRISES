@@ -21,11 +21,20 @@ const slugify = (v: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)+/g, '');
 
-const Section: React.FC<{ title: string; hint?: string; children: React.ReactNode }> = ({ title, hint, children }) => (
-  <section className="adm-card p-5">
-    <h3 className="adm-section-title">{title}</h3>
-    {hint && <p className="adm-hint">{hint}</p>}
-    <div className="mt-4 space-y-4">{children}</div>
+const Section: React.FC<{ title: string; hint?: string; step?: number; children: React.ReactNode }> = ({ title, hint, step, children }) => (
+  <section className="adm-card p-5 sm:p-6">
+    <div className="flex items-start gap-3">
+      {step !== undefined && (
+        <span aria-hidden className="mt-[-2px] flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-gold/40 bg-gold-pale/60 text-[0.75rem] font-semibold tabular-nums text-gold-dark">
+          {step}
+        </span>
+      )}
+      <div className="min-w-0">
+        <h3 className="font-display text-[1.25rem] font-semibold leading-tight text-ink">{title}</h3>
+        {hint && <p className="adm-hint">{hint}</p>}
+      </div>
+    </div>
+    <div className="mt-5 space-y-4">{children}</div>
   </section>
 );
 
@@ -305,7 +314,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
       title={editing ? `Edit ${f.name || 'product'}` : 'New Devotional Frame'}
       subtitle={editing ? f.sku : 'Devotional frames strictly priced at ₹99 or less per frame. Shipping quoted separately.'}
       footer={
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-between gap-2 sm:justify-end">
           <button type="button" className="adm-btn-quiet" onClick={onClose}>
             Cancel
           </button>
@@ -315,13 +324,20 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
         </div>
       }
     >
-      {state === 'loading' && <p className="py-12 text-center text-sm text-ink-soft">Loading product…</p>}
+      {state === 'loading' && (
+        <div className="space-y-4" role="status">
+          <span className="sr-only">Loading product…</span>
+          {[40, 56, 44].map(h => (
+            <span key={h} className="adm-skeleton block rounded-card" style={{ height: `${h * 4}px` }} aria-hidden />
+          ))}
+        </div>
+      )}
       {state === 'error' && <ErrorBanner message="Could not load this product." />}
       {state === 'ready' && (
         <form id="product-form" onSubmit={save} className="space-y-5" noValidate>
           {error && <ErrorBanner message={error} />}
 
-          <Section title="Basics">
+          <Section step={1} title="Basics">
             <div className="grid gap-4 sm:grid-cols-[10rem_1fr]">
               <label>
                 <span className="adm-label">SKU</span>
@@ -372,6 +388,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
 
           {/* Photo Management Section */}
           <Section
+            step={2}
             title="Product Photographs & Gallery"
             hint="Manage genuine devotional frame photographs. The first image is the primary photo shown on listings, cards and bulk request summaries."
           >
@@ -379,10 +396,12 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
 
             {/* Gallery list */}
             {images.length === 0 ? (
-              <div className="p-4 border-2 border-dashed border-[#E6DDD5] rounded-xl text-center bg-[#FAF7F2]">
-                <ImageIcon className="w-8 h-8 text-[#9E9493] mx-auto mb-2" />
-                <p className="text-xs font-semibold text-[#2B2625]">No photographs attached yet</p>
-                <p className="text-[11px] text-[#6B6362] mt-0.5">
+              <div className="rounded-xl border-2 border-dashed border-stone-shade/80 bg-ivory-light px-5 py-7 text-center">
+                <span className="adm-empty-icon h-12 w-12 after:hidden">
+                  <ImageIcon className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+                </span>
+                <p className="mt-3 text-sm font-semibold text-ink">No photographs attached yet</p>
+                <p className="mx-auto mt-1 max-w-md text-[0.8125rem] leading-relaxed text-ink-soft">
                   Published frames must include at least one genuine photograph. Upload a frame photo or select from existing catalogue assets below.
                 </p>
               </div>
@@ -394,17 +413,17 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                     return (
                       <div
                         key={`${img}-${idx}`}
-                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                        className={`flex items-center gap-3 rounded-xl border p-3 transition-all duration-300 ease-luxury ${
                           isPrimary
-                            ? 'bg-[#FFFBF0] border-[#C49A45] shadow-xs'
-                            : 'bg-white border-[#E6DDD5] hover:border-[#C49A45]/60'
+                            ? 'border-gold bg-gold-pale/40 shadow-gold'
+                            : 'border-stone-deep bg-white hover:border-gold/60'
                         }`}
                       >
-                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-[#E6DDD5] flex-shrink-0 bg-[#FAF7F2]">
+                        <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border border-stone-deep bg-stone">
                           <img src={img} alt="" className="w-full h-full object-cover" />
                           {isPrimary && (
-                            <span className="absolute top-1 left-1 bg-[#5C1D24] text-white p-0.5 rounded-full" title="Primary Photo">
-                              <Star className="w-3 h-3 fill-current text-[#E8D29E]" />
+                            <span className="absolute left-1 top-1 rounded-full bg-burgundy p-0.5 text-white" title="Primary Photo">
+                              <Star className="h-3 w-3 fill-current text-gold-light" />
                             </span>
                           )}
                         </div>
@@ -412,14 +431,12 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             {isPrimary ? (
-                              <span className="text-[10px] font-bold text-[#8F7138] uppercase tracking-wider bg-[#C49A45]/20 px-1.5 py-0.5 rounded">
-                                Primary Photo
-                              </span>
+                              <span className="adm-badge-gold">Primary Photo</span>
                             ) : (
-                              <span className="text-[10px] text-[#6B6362] font-medium">Photo #{idx + 1}</span>
+                              <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-ink-faint">Photo #{idx + 1}</span>
                             )}
                           </div>
-                          <p className="text-xs font-mono text-[#2B2625] truncate mt-0.5" title={img}>
+                          <p className="mt-1 truncate font-mono text-[0.75rem] text-ink" title={img}>
                             {img.split('/').pop()}
                           </p>
 
@@ -428,10 +445,10 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                               <button
                                 type="button"
                                 onClick={() => setAsPrimary(idx)}
-                                className="text-[11px] text-[#5C1D24] hover:underline font-semibold flex items-center gap-0.5"
+                                className="-ml-1 flex min-h-[36px] items-center gap-1 rounded-full px-1.5 text-[0.75rem] font-semibold text-burgundy underline-offset-4 hover:underline"
                                 title="Set as primary photo"
                               >
-                                <Star className="w-3 h-3 text-[#C49A45]" /> Set Primary
+                                <Star className="h-3 w-3 text-gold" /> Set Primary
                               </button>
                             )}
                             <div className="ml-auto flex items-center gap-1">
@@ -439,7 +456,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                                 type="button"
                                 onClick={() => moveImage(idx, -1)}
                                 disabled={idx === 0}
-                                className="p-1 rounded text-[#6B6362] hover:bg-[#FAF7F2] disabled:opacity-30"
+                                className="adm-icon-btn h-9 w-9 sm:h-8 sm:w-8"
                                 title="Move up"
                               >
                                 <ArrowUp className="w-3.5 h-3.5" />
@@ -448,7 +465,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                                 type="button"
                                 onClick={() => moveImage(idx, 1)}
                                 disabled={idx === images.length - 1}
-                                className="p-1 rounded text-[#6B6362] hover:bg-[#FAF7F2] disabled:opacity-30"
+                                className="adm-icon-btn h-9 w-9 sm:h-8 sm:w-8"
                                 title="Move down"
                               >
                                 <ArrowDown className="w-3.5 h-3.5" />
@@ -456,7 +473,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                               <button
                                 type="button"
                                 onClick={() => removeImage(idx)}
-                                className="p-1 rounded text-red-600 hover:bg-red-50 ml-1"
+                                className="adm-icon-btn h-9 w-9 text-red-700 hover:bg-red-50 hover:text-red-800 sm:h-8 sm:w-8"
                                 title="Remove photo"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -472,11 +489,11 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
             )}
 
             {/* Add/Upload Controls */}
-            <div className="pt-2 border-t border-[#E6DDD5] grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-4 border-t border-stone-deep/70 pt-4 sm:grid-cols-2">
               <div>
                 <span className="adm-label mb-1.5 block">Upload New Frame Photo</span>
-                <label className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-[#E6DDD5] bg-[#FAF7F2] hover:bg-white text-xs font-semibold text-[#2B2625] cursor-pointer transition-colors">
-                  <Upload className="w-4 h-4 text-[#5C1D24]" />
+                <label className="flex min-h-[44px] cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-gold/60 bg-gold-pale/30 px-4 py-2.5 text-[0.8125rem] font-semibold text-ink transition-all duration-300 ease-luxury focus-within:ring-4 focus-within:ring-gold/20 hover:border-gold hover:bg-gold-pale/60">
+                  <Upload className="h-4 w-4 text-burgundy" />
                   <span>{uploading ? 'Uploading photo…' : 'Choose JPG/PNG/WebP (Max 5MB)'}</span>
                   <input
                     type="file"
@@ -492,7 +509,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                 <span className="adm-label mb-1.5 block">Or Attach from Catalogue Assets</span>
                 <div className="flex gap-2">
                   <select
-                    className="adm-input text-xs flex-1"
+                    className="adm-input flex-1 sm:text-[0.8125rem]"
                     value={selectedAssetPath}
                     onChange={e => setSelectedAssetPath(e.target.value)}
                   >
@@ -507,7 +524,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                     type="button"
                     onClick={addExistingAsset}
                     disabled={!selectedAssetPath}
-                    className="px-3 py-2 rounded-lg bg-[#5C1D24] text-white text-xs font-semibold hover:bg-[#4A161D] disabled:opacity-40 transition-colors"
+                    className="adm-btn-primary px-5"
                   >
                     Add
                   </button>
@@ -517,7 +534,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
           </Section>
 
           {/* Devotional Deity & Frame Specifications */}
-          <Section title="Devotional Attributes & Frame Specs">
+          <Section step={3} title="Devotional Attributes & Frame Specs">
             <div className="grid gap-4 sm:grid-cols-2">
               <label>
                 <span className="adm-label">Deity / Holy Figure</span>
@@ -590,9 +607,9 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
           </Section>
 
           {/* Strict <= 99 Pricing Section */}
-          <Section title="Strict ₹99 Price Ceiling & Bulk Tiers">
-            <div className="p-3 bg-[#FFFBF0] border border-[#C49A45]/40 rounded-lg text-xs text-[#6B5018] flex items-center gap-2 mb-2">
-              <AlertCircle className="w-4 h-4 text-[#C49A45] flex-shrink-0" />
+          <Section step={4} title="Strict ₹99 Price Ceiling & Bulk Tiers">
+            <div className="flex items-start gap-3 rounded-xl border border-gold/40 bg-gold-pale/50 px-4 py-3 text-[0.8125rem] leading-relaxed text-gold-dark">
+              <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-gold" />
               <span>
                 <strong>Strict Business Rule:</strong> Every purchasable frame and volume tier must be priced at <strong>₹99 or less</strong>. Shipping is quoted separately.
               </span>
@@ -605,7 +622,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                   type="number"
                   min={0}
                   max={99}
-                  className="adm-input font-bold text-burgundy"
+                  className="adm-input font-semibold tabular-nums text-burgundy"
                   value={f.indicativePrice}
                   onChange={set('indicativePrice')}
                   placeholder="Max ₹99"
@@ -650,7 +667,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
           </Section>
 
           {/* Status & Publication */}
-          <Section title="Publishing Status">
+          <Section step={5} title="Publishing Status">
             <div className="grid gap-4 sm:grid-cols-2">
               <label>
                 <span className="adm-label">Publication Status</span>
@@ -660,10 +677,10 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                   <option value="archived">Archived (soft-hidden, past orders preserved)</option>
                 </select>
               </label>
-              <label className="flex items-center gap-2 pt-5">
+              <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-xl border border-stone-deep bg-ivory-light px-4 py-2.5 transition-colors hover:border-gold/60 sm:mt-[1.6rem]">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 accent-burgundy"
+                  className="h-4 w-4 flex-shrink-0 accent-burgundy"
                   checked={f.isDemo}
                   onChange={set('isDemo')}
                 />

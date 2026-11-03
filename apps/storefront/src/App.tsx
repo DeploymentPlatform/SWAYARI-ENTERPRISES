@@ -8,6 +8,7 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { SignInDialog } from './components/SignInDialog';
+import { PageTransition } from './components/motion';
 
 import { HomePage } from './pages/HomePage';
 import { ShopPage } from './pages/ShopPage';
@@ -26,6 +27,15 @@ import { DevLoginPage } from './pages/DevLoginPage';
 initPreviewMode();
 
 function Routes() {
+  const { path } = useRouter();
+  return (
+    <PageTransition routeKey={path}>
+      <RouteSwitch />
+    </PageTransition>
+  );
+}
+
+function RouteSwitch() {
   const { path, search } = useRouter();
 
   if (path === '/') return <HomePage />;
@@ -49,7 +59,7 @@ const PreviewIndicator: React.FC = () => {
   const [on, setOn] = useState(isPreviewMode());
   if (!on) return null;
   return (
-    <div className="fixed bottom-2 left-2 z-30 flex items-center gap-1 border border-gold/50 bg-ivory/95 py-0.5 pl-2 pr-0.5 text-[0.6875rem] text-ink-soft shadow-subtle backdrop-blur">
+    <div className="fixed bottom-[76px] left-3 z-30 flex items-center gap-1 rounded-full border border-gold/40 bg-ivory-light/95 py-0.5 pl-3 pr-1 text-[0.6875rem] text-ink-soft shadow-soft backdrop-blur md:bottom-4">
       <span>Sample preview</span>
       <button
         type="button"
@@ -74,13 +84,13 @@ export const App: React.FC = () => (
         <CartProvider>
           <a
             href="#main"
-            className="sr-only z-[70] bg-burgundy px-4 py-3 text-ivory focus:not-sr-only focus:fixed focus:left-3 focus:top-3"
+            className="sr-only z-[70] rounded-full bg-burgundy px-5 py-3 text-ivory focus:not-sr-only focus:fixed focus:left-3 focus:top-3"
           >
             Skip to content
           </a>
           <div className="flex min-h-screen flex-col">
             <Header />
-            <main id="main" className="flex-1" tabIndex={-1}>
+            <main id="main" className="flex-1 pb-[68px] focus:outline-none md:pb-0" tabIndex={-1}>
               <Routes />
             </main>
             <Footer />

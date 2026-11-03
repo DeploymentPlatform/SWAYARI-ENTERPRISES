@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Edit2, Trash2, Eye, Check, X, ArrowUpRight, Monitor, Smartphone } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Plus, Edit2, Trash2, ArrowUpRight, Monitor, Smartphone, GalleryHorizontal } from 'lucide-react';
 import { CampaignBanner } from '@swayari/shared';
-import { ErrorBanner, PageHeader, Drawer } from '../components/ui';
+import { ErrorBanner, PageHeader, Drawer, EmptyState, SkeletonRows } from '../components/ui';
+import { EASE_LUXURY, Stagger, StaggerItem } from '../components/motion';
 
 const PRESET_BANNERS = [
   {
@@ -170,6 +172,7 @@ export const BannersPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Storefront"
         title="Campaign Banners"
         description="Dynamic multi-slide promotional hero carousel on the customer storefront. Reorder, update copy, toggle active state, or add seasonal campaigns."
         actions={
@@ -184,124 +187,123 @@ export const BannersPage: React.FC = () => {
       {/* Banner List */}
       <div className="adm-card overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-sm text-ink-soft">Loading campaign banners…</div>
+          <SkeletonRows rows={3} label="Loading campaign banners…" />
         ) : banners.length === 0 ? (
-          <div className="p-8 text-center text-sm text-ink-soft">No banners created yet. Click "New Campaign Slide" to create one.</div>
+          <EmptyState icon={GalleryHorizontal} title="No banners created yet">
+            Click "New Campaign Slide" to create one.
+          </EmptyState>
         ) : (
-          <div className="divide-y divide-stone-deep">
-            {banners.map((b) => (
-              <div key={b.id} className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-stone/30 transition-colors">
-                
+          <Stagger as="ul" className="divide-y divide-stone-deep/60">
+            {banners.map(b => (
+              <StaggerItem as="li" key={b.id} className="group flex flex-col justify-between gap-4 p-4 transition-colors duration-300 hover:bg-ivory-light sm:p-5 md:flex-row md:items-center">
                 {/* Left: Thumbnail & Copy */}
-                <div className="flex items-start gap-4 min-w-0">
-                  <div className="relative w-28 h-16 sm:w-36 sm:h-20 flex-shrink-0 bg-stone rounded border border-stone-deep overflow-hidden">
-                    <img
-                      src={b.desktopImage}
-                      alt={b.alt || b.headline}
-                      className="w-full h-full object-cover"
-                    />
-                    <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/70 text-[10px] font-bold text-white tracking-wider">
+                <div className="flex min-w-0 items-start gap-4">
+                  <div className="relative h-[72px] w-28 flex-shrink-0 overflow-hidden rounded-xl border border-stone-deep bg-stone shadow-subtle sm:h-24 sm:w-44">
+                    <img src={b.desktopImage} alt={b.alt || b.headline} className="h-full w-full object-cover text-[0px] text-transparent transition-transform duration-700 ease-luxury group-hover:scale-105" />
+                    <span className="absolute left-1.5 top-1.5 rounded-full bg-umber/75 px-2 py-0.5 text-[0.625rem] font-semibold tracking-wider text-gold-light backdrop-blur">
                       #{b.displayOrder}
                     </span>
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      {b.badge && (
-                        <span className="px-2 py-0.5 rounded-full bg-[#FAF7F2] text-[#8F7138] border border-[#E7DFD5] text-[10.5px] font-semibold uppercase tracking-wider">
-                          {b.badge}
-                        </span>
-                      )}
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        b.isActive ? 'bg-[#ECFDF3] text-[#027A48]' : 'bg-[#FEF3F2] text-[#B42318]'
-                      }`}>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {b.badge && <span className="adm-badge-gold max-w-full truncate">{b.badge}</span>}
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] ring-1 ring-inset ${
+                          b.isActive ? 'bg-emerald-50 text-emerald-800 ring-emerald-200' : 'bg-stone text-ink-faint ring-stone-shade/70'
+                        }`}
+                      >
+                        <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${b.isActive ? 'bg-emerald-600' : 'bg-ink-faint'}`} />
                         {b.isActive ? 'Active' : 'Disabled'}
                       </span>
                     </div>
 
-                    <h4 className="mt-1 text-[15px] font-semibold text-ink truncate">
-                      {b.headline} <span className="text-burgundy italic">{b.emphasis}</span>
+                    <h4 className="mt-1.5 truncate font-display text-[1.3rem] font-semibold leading-tight text-ink">
+                      {b.headline} <span className="italic text-burgundy">{b.emphasis}</span>
                     </h4>
 
-                    {b.supporting && (
-                      <p className="text-[12.5px] text-ink-soft line-clamp-1 mt-0.5">
-                        {b.supporting}
-                      </p>
-                    )}
+                    {b.supporting && <p className="mt-0.5 line-clamp-1 text-[0.8125rem] text-ink-soft">{b.supporting}</p>}
 
-                    <div className="mt-1.5 flex items-center gap-3 text-[11.5px] text-ink-faint">
-                      <span>CTA: <strong className="text-ink-soft">{b.ctaText}</strong></span>
-                      <span>Link: <code className="text-burgundy">{b.ctaHref}</code></span>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.75rem] text-ink-faint">
+                      <span>
+                        CTA: <strong className="font-semibold text-ink-soft">{b.ctaText}</strong>
+                      </span>
+                      <span className="min-w-0 truncate">
+                        Link: <code className="text-burgundy">{b.ctaHref}</code>
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Right: Actions */}
-                <div className="flex items-center gap-2 self-end md:self-center">
+                <div className="flex flex-shrink-0 items-center gap-2 self-end md:self-center">
                   <button
                     type="button"
                     onClick={() => handleToggleActive(b)}
-                    className={`adm-btn-secondary text-[12px] h-8 px-2.5 ${b.isActive ? 'text-ink-soft' : 'text-[#027A48]'}`}
+                    className={`adm-btn-secondary h-10 px-4 text-[0.8125rem] sm:h-9 ${b.isActive ? 'text-ink-soft' : 'text-emerald-800'}`}
                     title={b.isActive ? 'Disable banner' : 'Enable banner'}
                   >
                     {b.isActive ? 'Disable' : 'Enable'}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenEdit(b)}
-                    className="adm-btn-secondary text-[12px] h-8 px-2.5 flex items-center gap-1.5"
-                  >
+                  <button type="button" onClick={() => handleOpenEdit(b)} className="adm-btn-secondary h-10 px-4 text-[0.8125rem] sm:h-9">
                     <Edit2 className="h-3.5 w-3.5" />
                     <span>Edit</span>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(b)}
-                    className="adm-btn-danger text-[12px] h-8 px-2.5 flex items-center gap-1.5"
-                    title="Delete slide"
-                  >
+                  <button type="button" onClick={() => handleDelete(b)} className="adm-btn-danger h-10 w-10 px-0 sm:h-9 sm:w-9" title="Delete slide" aria-label="Delete slide">
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
-
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         )}
       </div>
 
       {/* Editor Drawer */}
+      <AnimatePresence>
       {isCreating && (
         <Drawer
           title={editingBanner ? 'Edit Campaign Slide' : 'New Campaign Slide'}
           onClose={() => { setIsCreating(false); setEditingBanner(null); }}
+          footer={
+            <div className="flex items-center justify-between gap-3 sm:justify-end">
+              <button
+                type="button"
+                className="adm-btn-quiet"
+                onClick={() => { setIsCreating(false); setEditingBanner(null); }}
+              >
+                Cancel
+              </button>
+              <button type="submit" form="banner-form" disabled={saving} className="adm-btn-primary">
+                {saving ? 'Saving…' : editingBanner ? 'Update Slide' : 'Create Slide'}
+              </button>
+            </div>
+          }
         >
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form id="banner-form" onSubmit={handleSubmit} className="space-y-6">
             {formError && <ErrorBanner message={formError} />}
 
             {/* Device Preview Toggle */}
-            <div className="p-3.5 bg-stone/40 rounded-lg border border-stone-deep space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-ink-soft">
+            <div className="adm-panel-muted space-y-3 p-3.5 sm:p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="adm-section-title">
                   Interactive Live Preview
                 </span>
-                <div className="flex items-center gap-1 bg-white rounded border border-stone-deep p-0.5">
+                <div className="adm-segment">
                   <button
                     type="button"
+                    aria-pressed={previewDevice === 'desktop'}
                     onClick={() => setPreviewDevice('desktop')}
-                    className={`px-2 py-1 text-xs rounded flex items-center gap-1 ${
-                      previewDevice === 'desktop' ? 'bg-burgundy text-white font-medium' : 'text-ink-soft hover:text-ink'
-                    }`}
+                    className="adm-segment-btn"
                   >
                     <Monitor className="w-3 h-3" />
                     <span>Desktop</span>
                   </button>
                   <button
                     type="button"
+                    aria-pressed={previewDevice === 'mobile'}
                     onClick={() => setPreviewDevice('mobile')}
-                    className={`px-2 py-1 text-xs rounded flex items-center gap-1 ${
-                      previewDevice === 'mobile' ? 'bg-burgundy text-white font-medium' : 'text-ink-soft hover:text-ink'
-                    }`}
+                    className="adm-segment-btn"
                   >
                     <Smartphone className="w-3 h-3" />
                     <span>Mobile</span>
@@ -310,22 +312,25 @@ export const BannersPage: React.FC = () => {
               </div>
 
               {/* Rendered Slide Mockup */}
-              <div className={`relative overflow-hidden rounded bg-[#1B1310] text-white shadow-md mx-auto transition-all ${
-                previewDevice === 'desktop' ? 'w-full h-44 sm:h-52' : 'w-64 h-56'
+              <motion.div
+                layout
+                transition={{ duration: 0.5, ease: EASE_LUXURY }}
+                className={`relative mx-auto overflow-hidden rounded-xl bg-umber text-white shadow-card ring-1 ring-gold/20 ${
+                previewDevice === 'desktop' ? 'w-full h-44 sm:h-52' : 'w-full max-w-[16rem] h-56'
               }`}>
                 <img
                   src={previewDevice === 'desktop' ? formData.desktopImage : formData.mobileImage}
                   alt={formData.alt || 'Preview'}
-                  className="absolute inset-0 w-full h-full object-cover opacity-85"
+                  className="absolute inset-0 h-full w-full object-cover text-transparent opacity-85"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent p-4 flex flex-col justify-end sm:justify-center">
+                <div className="absolute inset-0 bg-gradient-to-r from-umber/85 via-umber/40 to-transparent p-4 flex flex-col justify-end sm:justify-center">
                   {formData.badge && (
-                    <span className="text-[9.5px] font-bold text-[#D8C29D] uppercase tracking-wider mb-1 truncate">
+                    <span className="mb-1 truncate text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-gold-light">
                       {formData.badge}
                     </span>
                   )}
-                  <h3 className="font-serif text-base sm:text-lg font-bold leading-tight drop-shadow-sm">
-                    {formData.headline} <span className="italic text-[#D8C29D]">{formData.emphasis}</span>
+                  <h3 className="font-display text-lg font-semibold leading-tight drop-shadow-sm sm:text-xl">
+                    {formData.headline} <span className="italic text-gold-light">{formData.emphasis}</span>
                   </h3>
                   {formData.supporting && (
                     <p className="text-[11px] text-white/80 line-clamp-2 mt-1 max-w-[280px]">
@@ -333,31 +338,32 @@ export const BannersPage: React.FC = () => {
                     </p>
                   )}
                   <div className="mt-2.5">
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded bg-[#B49155] text-white text-[10.5px] font-semibold uppercase tracking-wider shadow-sm">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-b from-gold-light to-gold px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-burgundy-deep shadow-sm">
                       {formData.ctaText}
                       <ArrowUpRight className="w-3 h-3" />
                     </span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Presets selection */}
             <div>
               <span className="adm-label mb-1.5 block">Select Imagery Preset or Custom URL</span>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
                 {PRESET_BANNERS.map((p, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, desktopImage: p.desktop, mobileImage: p.mobile }))}
-                    className={`p-2 rounded border text-left text-xs transition-all flex items-center gap-2 ${
+                    aria-pressed={formData.desktopImage === p.desktop}
+                    className={`flex min-h-[48px] items-center gap-2.5 rounded-xl border p-2 text-left text-[0.8125rem] transition-all duration-300 ease-luxury ${
                       formData.desktopImage === p.desktop
-                        ? 'border-burgundy bg-burgundy-soft text-burgundy-deep font-medium'
-                        : 'border-stone-deep bg-white text-ink-soft hover:border-ink'
+                        ? 'border-gold bg-gold-pale/50 font-semibold text-burgundy-deep shadow-gold'
+                        : 'border-stone-deep bg-white text-ink-soft hover:border-gold/60 hover:text-ink'
                     }`}
                   >
-                    <img src={p.desktop} alt="" className="w-10 h-6 object-cover rounded flex-shrink-0" />
+                    <img src={p.desktop} alt="" className="h-8 w-12 flex-shrink-0 rounded-md bg-stone object-cover" />
                     <span className="truncate">{p.name.split('—')[1] || p.name}</span>
                   </button>
                 ))}
@@ -377,7 +383,7 @@ export const BannersPage: React.FC = () => {
               </label>
               <label>
                 <span className="adm-label">Order & Visibility</span>
-                <div className="flex items-center gap-3 mt-1.5">
+                <div className="flex items-center gap-3">
                   <input
                     type="number"
                     className="adm-input w-24"
@@ -389,7 +395,7 @@ export const BannersPage: React.FC = () => {
                       type="checkbox"
                       checked={formData.isActive}
                       onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
-                      className="rounded border-stone-deep text-burgundy focus:ring-burgundy"
+                      className="h-4 w-4 accent-burgundy"
                     />
                     <span>Active Slide</span>
                   </label>
@@ -484,26 +490,10 @@ export const BannersPage: React.FC = () => {
               />
             </label>
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-stone-deep">
-              <button
-                type="button"
-                className="adm-btn-quiet"
-                onClick={() => { setIsCreating(false); setEditingBanner(null); }}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="adm-btn-primary"
-              >
-                {saving ? 'Saving…' : editingBanner ? 'Update Slide' : 'Create Slide'}
-              </button>
-            </div>
-
           </form>
         </Drawer>
       )}
+      </AnimatePresence>
 
     </div>
   );

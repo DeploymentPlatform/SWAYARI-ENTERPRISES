@@ -8,8 +8,9 @@ import { ProductsPage } from './pages/ProductsPage';
 import { CategoriesPage } from './pages/CategoriesPage';
 import { BannersPage } from './pages/BannersPage';
 import { AssetsPage } from './pages/AssetsPage';
-import { Loader2 } from 'lucide-react';
-import { Wordmark } from './components/ui';
+import { MotionConfig, motion } from 'framer-motion';
+import { Ornament, Wordmark } from './components/ui';
+import { EASE_LUXURY, PageTransition } from './components/motion';
 
 const AdminContent: React.FC = () => {
   const { user, isLoading } = useAdminAuth();
@@ -18,11 +19,23 @@ const AdminContent: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 text-sm text-ink-soft" role="status">
-        <Wordmark />
-        <span className="flex items-center gap-2">
-          <Loader2 className="h-4 w-4 animate-spin text-burgundy" aria-hidden /> Checking your staff session…
-        </span>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-sm text-ink-soft" role="status">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: EASE_LUXURY }}
+          className="flex flex-col items-center gap-5"
+        >
+          <Wordmark size="lg" />
+          <Ornament />
+          <span className="flex items-center gap-3">
+            <span aria-hidden className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold/60 motion-reduce:animate-none" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-gold" />
+            </span>
+            Checking your staff session…
+          </span>
+        </motion.div>
       </div>
     );
   }
@@ -70,16 +83,18 @@ const AdminContent: React.FC = () => {
 
   return (
     <AdminLayout currentTab={currentTab} setCurrentTab={setCurrentTab}>
-      {renderTabContent()}
+      <PageTransition routeKey={currentTab}>{renderTabContent()}</PageTransition>
     </AdminLayout>
   );
 };
 
 export const App: React.FC = () => {
   return (
-    <AdminAuthProvider>
-      <AdminContent />
-    </AdminAuthProvider>
+    <MotionConfig reducedMotion="user">
+      <AdminAuthProvider>
+        <AdminContent />
+      </AdminAuthProvider>
+    </MotionConfig>
   );
 };
 

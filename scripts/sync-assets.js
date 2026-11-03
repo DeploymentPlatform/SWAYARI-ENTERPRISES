@@ -1,8 +1,8 @@
 // Copies the canonical Git-tracked assets in public/assets/ into each portal's Vite public dir.
 //
 // - Storefront receives brand, products, demo and editorial photography.
-// - Admin receives brand, products and demo only (product thumbnails must resolve on the admin
-//   origin too); editorial lifestyle photography is customer-site only.
+// - Admin receives the same set: product thumbnails and campaign banner previews (editorial)
+//   must resolve on the admin origin too.
 //
 // Usage: node scripts/sync-assets.js [storefront|admin|all]
 import fs from 'node:fs';
@@ -14,7 +14,7 @@ const source = path.join(projectRoot, 'public', 'assets');
 
 const TARGETS = {
   storefront: { dir: 'apps/storefront/public/assets', folders: ['brand', 'products', 'demo', 'editorial', 'categories'] },
-  admin: { dir: 'apps/admin/public/assets', folders: ['brand', 'products', 'demo', 'categories'] }
+  admin: { dir: 'apps/admin/public/assets', folders: ['brand', 'products', 'demo', 'editorial', 'categories'] }
 };
 
 function copyFolder(from, to) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePageMeta } from '../lib/meta';
-import { PageIntro } from '../components/States';
+import { EditorialSections, PageIntro } from '../components/States';
 
 const SECTIONS = [
   {
@@ -29,17 +29,10 @@ export const PrivacyPolicyPage: React.FC = () => {
   usePageMeta('Privacy policy');
   return (
     <div className="container-content max-w-3xl pb-20 md:pb-28">
-      <PageIntro eyebrow="Help" title="Privacy policy" />
-      <div className="mt-12 space-y-10">
-        {SECTIONS.map((s, i) => (
-          <section key={s.title} aria-labelledby={`privacy-${i}`}>
-            <h2 id={`privacy-${i}`} className="text-[1.75rem] leading-tight">
-              {s.title}
-            </h2>
-            <p className="mt-3 text-lg leading-relaxed text-ink-soft">{s.body}</p>
-          </section>
-        ))}
-      </div>
+      <PageIntro eyebrow="Help" title={<>Privacy <em>policy</em></>} align="center">
+        What we collect, why, and how it is kept. Written plainly.
+      </PageIntro>
+      <EditorialSections sections={SECTIONS} idPrefix="privacy" />
     </div>
   );
 };

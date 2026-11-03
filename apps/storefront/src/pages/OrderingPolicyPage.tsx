@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePageMeta } from '../lib/meta';
-import { PageIntro } from '../components/States';
+import { EditorialSections, PageIntro } from '../components/States';
 import { OrderDisclaimer } from '../components/ui';
 
 const SECTIONS = [
@@ -30,18 +30,11 @@ export const OrderingPolicyPage: React.FC = () => {
   usePageMeta('How ordering works', 'How SWAYARI order requests work: no online payment, personal confirmation of availability, pricing and delivery.');
   return (
     <div className="container-content max-w-3xl pb-20 md:pb-28">
-      <PageIntro eyebrow="Help" title="How ordering works" />
-      <OrderDisclaimer className="mt-10" />
-      <div className="mt-12 space-y-10">
-        {SECTIONS.map((s, i) => (
-          <section key={s.title} aria-labelledby={`policy-${i}`}>
-            <h2 id={`policy-${i}`} className="text-[1.75rem] leading-tight">
-              {s.title}
-            </h2>
-            <p className="mt-3 text-lg leading-relaxed text-ink-soft">{s.body}</p>
-          </section>
-        ))}
-      </div>
+      <PageIntro eyebrow="Help" title={<>How ordering <em>works</em></>} align="center">
+        No online payment — every request is confirmed with you personally by our team.
+      </PageIntro>
+      <OrderDisclaimer className="mt-4" />
+      <EditorialSections sections={SECTIONS} idPrefix="policy" />
     </div>
   );
 };

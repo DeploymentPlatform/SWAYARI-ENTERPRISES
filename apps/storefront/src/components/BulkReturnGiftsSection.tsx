@@ -2,121 +2,106 @@ import React from 'react';
 import { Product } from '@swayari/shared';
 import { ProductCard } from './ProductCard';
 import { Link } from '../lib/router';
-import { Heart, Users, Sparkles, Truck, ArrowRight, MessageSquareQuote, CheckCircle2 } from 'lucide-react';
+import { Heart, Sparkles, Truck, ArrowRight, MessageSquareQuote, CheckCircle2 } from 'lucide-react';
+import { Reveal, StaggerGroup, StaggerItem } from './motion';
 
 interface BulkReturnGiftsSectionProps {
   products: Product[];
 }
 
+const PILLARS = [
+  {
+    icon: CheckCircle2,
+    title: 'Auspicious deity selection',
+    body: 'Choose Ganesha, Lakshmi, Balaji, Radha Krishna and Hanuman frames. Mix designs freely across your request.'
+  },
+  {
+    icon: Sparkles,
+    title: 'Strict ₹99 price ceiling',
+    body: 'Every frame and variant is ₹99 or less, with quantity pricing tiers from ₹49 for mass favours.'
+  },
+  {
+    icon: Truck,
+    title: 'Separate shipping quote',
+    body: 'Shipping calculated for your order volume and destination PIN code. No hidden fees.'
+  }
+];
+
 export const BulkReturnGiftsSection: React.FC<BulkReturnGiftsSectionProps> = ({ products }) => {
-  // Real devotional frames for wedding return gifts (strictly <= 99)
-  const displayItems = products
-    .filter(p => p.indicativePrice !== null && p.indicativePrice <= 99)
-    .slice(0, 4);
+  const displayItems = products.filter(p => p.indicativePrice !== null && p.indicativePrice <= 99).slice(0, 4);
 
   return (
-    <section aria-labelledby="wedding-return-title" className="py-10 sm:py-14 border-b border-[#E6DDD5] bg-[#FAF7F2]">
-      <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Banner with Wedding Return Gifting Proposition */}
-        <div className="rounded-2xl p-6 sm:p-8 bg-gradient-to-r from-[#5C1D24] via-[#4A161D] to-[#2B1017] text-white shadow-lg mb-8 relative overflow-hidden">
-          <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#C49A45]/20 to-transparent pointer-events-none" />
+    <section aria-labelledby="wedding-return-title" className="section">
+      <div className="container-content">
+        <Reveal>
+          <div className="relative overflow-hidden rounded-[28px] bg-burgundy-deep text-ivory-light shadow-dialog">
+            <img
+              src="/assets/editorial/hero-slide-1-moments-desktop.webp"
+              alt=""
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-luminosity"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-burgundy-deep via-burgundy-deep/90 to-burgundy-deep/40" />
+            <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-gold/25 blur-[90px]" />
 
-          <div className="relative z-10 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C49A45]/20 border border-[#C49A45]/40 text-[#E8D29E] text-[11px] font-bold uppercase tracking-wider mb-2.5">
-              <Heart className="w-3.5 h-3.5 text-[#C49A45]" />
-              <span>Wedding &amp; Celebration Return Gifts</span>
+            <div className="relative grid gap-10 p-7 sm:p-12 lg:grid-cols-[1.2fr_1fr] lg:p-16">
+              <div>
+                <p className="inline-flex items-center gap-2 rounded-full border border-gold-light/30 bg-white/5 px-3.5 py-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-gold-light">
+                  <Heart className="h-3.5 w-3.5" /> Wedding &amp; celebration return gifts
+                </p>
+                <h2 id="wedding-return-title" className="mt-5 text-ivory-light font-display text-[2.2rem] font-medium leading-[1.02] sm:text-[3rem] lg:text-[3.4rem]">
+                  A blessing in every guest’s hands, <span className="italic text-gold-light">beautifully framed.</span>
+                </h2>
+                <p className="mt-5 max-w-xl text-[0.95rem] leading-relaxed text-ivory-light/80 sm:text-base">
+                  Planning a wedding, griha pravesh or family celebration? Choose auspicious devotional frames at ₹99 or less. Mix designs or pick one deity, tell us your quantity, and our team handles personal confirmation and safe dispatch.
+                </p>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Link to="/shop?bulk=1" className="btn-gold">
+                    Plan your return gifts <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link to="/contact" className="btn-ghost-light">
+                    <MessageSquareQuote className="h-4 w-4 text-gold-light" /> Enquire by phone
+                  </Link>
+                </div>
+              </div>
+
+              <ul className="grid content-center gap-4">
+                {PILLARS.map(p => (
+                  <li key={p.title} className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/[0.06] p-5 backdrop-blur-md transition-colors duration-500 hover:border-gold-light/40 hover:bg-white/10">
+                    <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-full border border-gold-light/40 text-gold-light">
+                      <p.icon className="h-5 w-5" strokeWidth={1.5} />
+                    </span>
+                    <span>
+                      <span className="block font-display text-[1.25rem] text-ivory-light">{p.title}</span>
+                      <span className="mt-1 block text-[0.8125rem] leading-relaxed text-ivory-light/70">{p.body}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
+          </div>
+        </Reveal>
 
-            <h2 id="wedding-return-title" className="font-display text-[1.65rem] sm:text-[2.1rem] font-bold leading-tight">
-              Thoughtful Return Gifts for Your Cherished Guests
-            </h2>
-
-            <p className="mt-2 text-[13.5px] sm:text-[14.5px] text-[#FDFBF7]/90 leading-relaxed">
-              Planning a wedding, griha pravesh, or family celebration? Choose auspicious devotional frames priced at ₹99 or less per frame. Mix designs or pick one sacred deity, specify your quantity, and let our team handle personal confirmation and safe dispatch.
-            </p>
-
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <Link
-                to="/shop?bulk=1"
-                className="px-5 py-2.5 rounded-full bg-[#C49A45] hover:bg-[#b08736] text-[#2B2625] text-[13px] font-bold transition-all shadow-md flex items-center gap-1.5"
-              >
-                <span>Plan Your Return Gifts</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+        {displayItems.length > 0 && (
+          <div className="mt-16">
+            <Reveal className="flex items-end justify-between gap-4">
+              <div>
+                <p className="eyebrow">Guest favourites</p>
+                <h3 className="mt-3 font-display text-[1.9rem] leading-tight sm:text-[2.4rem]">Popular return gift designs</h3>
+              </div>
+              <Link to="/shop?bulk=1" className="text-link group hidden sm:inline-flex">
+                View all bulk frames <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
-              
-              <Link
-                to="/contact"
-                className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-[13px] font-semibold transition-all backdrop-blur-sm flex items-center gap-1.5"
-              >
-                <MessageSquareQuote className="w-3.5 h-3.5 text-[#E8D29E]" />
-                <span>Enquire by Phone</span>
-              </Link>
-            </div>
+            </Reveal>
+            <StaggerGroup className="mt-8 grid grid-cols-2 gap-3.5 sm:gap-6 lg:grid-cols-4">
+              {displayItems.map(prod => (
+                <StaggerItem key={prod.id}>
+                  <ProductCard product={prod} />
+                </StaggerItem>
+              ))}
+            </StaggerGroup>
           </div>
-        </div>
-
-        {/* 3 Pillars of Devotional Return Gifting */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="p-4 rounded-xl bg-white border border-[#E6DDD5] flex items-start gap-3 shadow-xs">
-            <div className="w-9 h-9 rounded-lg bg-[#FAF7F2] border border-[#E6DDD5] flex items-center justify-center text-[#5C1D24] flex-shrink-0">
-              <CheckCircle2 className="w-4 h-4 text-[#C49A45]" />
-            </div>
-            <div>
-              <h4 className="text-[13px] font-bold text-[#2B2625]">Auspicious Deity Selection</h4>
-              <p className="text-[11.5px] text-[#6B6362] mt-0.5 leading-relaxed">
-                Choose Ganesha, Lakshmi, Balaji, Radha Krishna and Hanuman frames. Mix designs freely across your request.
-              </p>
-            </div>
-          </div>
-
-          <div className="p-4 rounded-xl bg-white border border-[#E6DDD5] flex items-start gap-3 shadow-xs">
-            <div className="w-9 h-9 rounded-lg bg-[#FAF7F2] border border-[#E6DDD5] flex items-center justify-center text-[#5C1D24] flex-shrink-0">
-              <Sparkles className="w-4 h-4 text-[#C49A45]" />
-            </div>
-            <div>
-              <h4 className="text-[13px] font-bold text-[#2B2625]">Strict ₹99 Price Ceiling</h4>
-              <p className="text-[11.5px] text-[#6B6362] mt-0.5 leading-relaxed">
-                Every frame and variant is ₹99 or less. Genuine quantity pricing tiers starting from ₹49 for mass favors.
-              </p>
-            </div>
-          </div>
-
-          <div className="p-4 rounded-xl bg-white border border-[#E6DDD5] flex items-start gap-3 shadow-xs">
-            <div className="w-9 h-9 rounded-lg bg-[#FAF7F2] border border-[#E6DDD5] flex items-center justify-center text-[#5C1D24] flex-shrink-0">
-              <Truck className="w-4 h-4 text-[#C49A45]" />
-            </div>
-            <div>
-              <h4 className="text-[13px] font-bold text-[#2B2625]">Separate Shipping Quote</h4>
-              <p className="text-[11.5px] text-[#6B6362] mt-0.5 leading-relaxed">
-                Shipping calculated accurately based on order volume and your destination PIN code. No hidden fees.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Selected Return Gifts Grid (4 across desktop, 2 across mobile) */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-display text-[1.25rem] font-bold text-[#2B2625]">
-              Popular Return Gift Designs
-            </h3>
-            <Link
-              to="/shop?bulk=1"
-              className="text-[13px] font-semibold text-[#5C1D24] hover:text-[#4A161D] flex items-center gap-1 group"
-            >
-              <span>View All Bulk Frames</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-5">
-            {displayItems.map((prod) => (
-              <ProductCard key={prod.id} product={prod} />
-            ))}
-          </div>
-        </div>
-
+        )}
       </div>
     </section>
   );

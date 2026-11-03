@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Plus } from 'lucide-react';
-import { ErrorBanner, PageHeader } from '../components/ui';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Layers, Plus } from 'lucide-react';
+import { EmptyState, ErrorBanner, PageHeader, SkeletonRows } from '../components/ui';
+import { EASE_LUXURY } from '../components/motion';
 
 interface CategoryRow {
   id: string;
@@ -58,8 +60,9 @@ export const CategoriesPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl space-y-6">
+    <div className="max-w-5xl space-y-6">
       <PageHeader
+        eyebrow="Catalogue"
         title="Categories"
         description="Groups shown as filters on the customer website. Categories without published products are hidden there automatically."
         actions={
@@ -71,65 +74,106 @@ export const CategoriesPage: React.FC = () => {
         }
       />
 
-      {creating && (
-        <form onSubmit={create} className="adm-card space-y-4 p-5">
-          {formError && <ErrorBanner message={formError} />}
-          <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
-            <label>
-              <span className="adm-label">Name</span>
-              <input className="adm-input" value={name} onChange={e => setName(e.target.value)} autoFocus />
-            </label>
-            <label>
-              <span className="adm-label">Order</span>
-              <input type="number" className="adm-input" value={displayOrder} onChange={e => setDisplayOrder(e.target.value)} />
-            </label>
-          </div>
-          <label className="block">
-            <span className="adm-label">Description (optional)</span>
-            <input className="adm-input" value={description} onChange={e => setDescription(e.target.value)} />
-          </label>
-          <div className="flex justify-end gap-2">
-            <button type="button" className="adm-btn-quiet" onClick={() => setCreating(false)}>
-              Cancel
-            </button>
-            <button type="submit" className="adm-btn-primary">
-              Save category
-            </button>
-          </div>
-        </form>
-      )}
+      <AnimatePresence initial={false}>
+        {creating && (
+          <motion.form
+            onSubmit={create}
+            className="adm-card overflow-hidden"
+            initial={{ opacity: 0, y: -8, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -8, height: 0 }}
+            transition={{ duration: 0.45, ease: EASE_LUXURY }}
+          >
+            <div className="adm-card-header">
+              <div>
+                <p className="adm-eyebrow">New</p>
+                <h2 className="adm-card-title mt-1">Add a category</h2>
+              </div>
+            </div>
+            <div className="space-y-4 p-5 sm:p-6">
+              {formError && <ErrorBanner message={formError} />}
+              <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
+                <label>
+                  <span className="adm-label">Name</span>
+                  <input className="adm-input" value={name} onChange={e => setName(e.target.value)} autoFocus />
+                </label>
+                <label>
+                  <span className="adm-label">Order</span>
+                  <input type="number" className="adm-input" value={displayOrder} onChange={e => setDisplayOrder(e.target.value)} />
+                </label>
+              </div>
+              <label className="block">
+                <span className="adm-label">Description (optional)</span>
+                <input className="adm-input" value={description} onChange={e => setDescription(e.target.value)} />
+              </label>
+            </div>
+            <div className="flex flex-col-reverse gap-2 border-t border-stone-deep/80 bg-ivory-light px-5 py-3 sm:flex-row sm:justify-end sm:px-6">
+              <button type="button" className="adm-btn-quiet" onClick={() => setCreating(false)}>
+                Cancel
+              </button>
+              <button type="submit" className="adm-btn-primary">
+                Save category
+              </button>
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
 
       {state === 'error' && <ErrorBanner message="Could not load categories." onRetry={load} />}
 
       <div className="adm-card overflow-hidden">
         {state === 'loading' ? (
-          <p className="px-5 py-10 text-center text-sm text-ink-soft">Loading…</p>
+          <SkeletonRows rows={4} thumb={false} label="Loading…" />
         ) : categories.length === 0 ? (
-          <p className="px-5 py-10 text-center text-sm text-ink-soft">No categories yet.</p>
+          <EmptyState icon={Layers} title="No categories yet.">
+            Create a category to group products into filters on the customer website.
+          </EmptyState>
         ) : (
-          <table className="adm-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Web address</th>
-                <th className="text-right">Products</th>
-                <th className="text-right">Order</th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            {/* Phones: stacked rows */}
+            <ul className="adm-list sm:hidden">
               {categories.map(c => (
-                <tr key={c.id}>
-                  <td>
-                    <p className="font-medium">{c.name}</p>
-                    {c.description && <p className="text-[0.8125rem] text-ink-soft">{c.description}</p>}
-                  </td>
-                  <td className="font-mono text-[0.8125rem] text-ink-soft">/shop?category={c.slug}</td>
-                  <td className="text-right tabular-nums">{c.productCount}</td>
-                  <td className="text-right tabular-nums text-ink-soft">{c.displayOrder}</td>
-                </tr>
+                <li key={c.id} className="px-4 py-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-semibold text-ink">{c.name}</p>
+                    <span className="adm-badge-gold flex-shrink-0 tabular-nums">{c.productCount} products</span>
+                  </div>
+                  {c.description && <p className="mt-1 text-[0.8125rem] text-ink-soft">{c.description}</p>}
+                  <p className="mt-2 flex items-center justify-between gap-3 text-[0.75rem] text-ink-faint">
+                    <span className="truncate font-mono">/shop?category={c.slug}</span>
+                    <span className="flex-shrink-0">Order {c.displayOrder}</span>
+                  </p>
+                </li>
               ))}
-            </tbody>
-          </table>
+            </ul>
+            <div className="adm-table-wrap hidden sm:block">
+              <table className="adm-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Web address</th>
+                    <th className="text-right">Products</th>
+                    <th className="text-right">Order</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {categories.map(c => (
+                    <tr key={c.id}>
+                      <td>
+                        <p className="font-semibold">{c.name}</p>
+                        {c.description && <p className="mt-0.5 text-[0.8125rem] text-ink-soft">{c.description}</p>}
+                      </td>
+                      <td>
+                        <code className="whitespace-nowrap rounded-md bg-stone/70 px-2 py-1 font-mono text-[0.75rem] text-ink-soft">/shop?category={c.slug}</code>
+                      </td>
+                      <td className="text-right font-medium tabular-nums">{c.productCount}</td>
+                      <td className="text-right tabular-nums text-ink-soft">{c.displayOrder}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

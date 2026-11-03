@@ -1,74 +1,35 @@
 import React from 'react';
-import { Tag, Users, Truck, ShieldCheck } from 'lucide-react';
+import { BadgeIndianRupee, Users, Truck, ShieldCheck, Sparkles, HandHeart } from 'lucide-react';
 
-export const InfoStrip: React.FC = () => {
-  return (
-    <section aria-label="Key ordering assurances" className="py-4 sm:py-5 border-b border-[#E6DDD5] bg-[#FFFFFF]">
-      <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
-          
-          {/* Feature 1: ₹99 or less per frame */}
-          <div className="flex items-center gap-3 p-2">
-            <div className="w-9 h-9 rounded-full bg-[#FAF7F2] border border-[#E6DDD5] flex items-center justify-center text-[#5C1D24] flex-shrink-0">
-              <Tag className="w-4 h-4 text-[#C49A45]" />
-            </div>
-            <div>
-              <p className="text-[12.5px] sm:text-[13px] font-bold text-[#2B2625] leading-tight">
-                ₹99 or less per frame
-              </p>
-              <p className="text-[11px] text-[#6B6362] mt-0.5 leading-tight">
-                Transparent price ceiling on every design
-              </p>
-            </div>
-          </div>
+const ASSURANCES = [
+  { icon: BadgeIndianRupee, label: '₹99 or less per frame' },
+  { icon: Users, label: 'Bulk orders for weddings & functions' },
+  { icon: Truck, label: 'Shipping quoted for your location' },
+  { icon: ShieldCheck, label: 'No online payment — order by request' },
+  { icon: HandHeart, label: 'Personally confirmed by our team' },
+  { icon: Sparkles, label: 'Gold-relief & teak finishes' }
+];
 
-          {/* Feature 2: Bulk order enquiries */}
-          <div className="flex items-center gap-3 p-2">
-            <div className="w-9 h-9 rounded-full bg-[#FAF7F2] border border-[#E6DDD5] flex items-center justify-center text-[#5C1D24] flex-shrink-0">
-              <Users className="w-4 h-4 text-[#C49A45]" />
-            </div>
-            <div>
-              <p className="text-[12.5px] sm:text-[13px] font-bold text-[#2B2625] leading-tight">
-                Bulk order enquiries
-              </p>
-              <p className="text-[11px] text-[#6B6362] mt-0.5 leading-tight">
-                Weddings &amp; family return gifts
-              </p>
-            </div>
-          </div>
-
-          {/* Feature 3: Shipping quoted separately */}
-          <div className="flex items-center gap-3 p-2">
-            <div className="w-9 h-9 rounded-full bg-[#FAF7F2] border border-[#E6DDD5] flex items-center justify-center text-[#5C1D24] flex-shrink-0">
-              <Truck className="w-4 h-4 text-[#C49A45]" />
-            </div>
-            <div>
-              <p className="text-[12.5px] sm:text-[13px] font-bold text-[#2B2625] leading-tight">
-                Shipping quoted separately
-              </p>
-              <p className="text-[11px] text-[#6B6362] mt-0.5 leading-tight">
-                Calculated accurately for your location
-              </p>
-            </div>
-          </div>
-
-          {/* Feature 4: Order-request model */}
-          <div className="flex items-center gap-3 p-2">
-            <div className="w-9 h-9 rounded-full bg-[#FAF7F2] border border-[#E6DDD5] flex items-center justify-center text-[#5C1D24] flex-shrink-0">
-              <ShieldCheck className="w-4 h-4 text-[#C49A45]" />
-            </div>
-            <div>
-              <p className="text-[12.5px] sm:text-[13px] font-bold text-[#2B2625] leading-tight">
-                Order-request model
-              </p>
-              <p className="text-[11px] text-[#6B6362] mt-0.5 leading-tight">
-                No automatic checkout or payment gate
-              </p>
-            </div>
-          </div>
-
+/** Slow, endless ribbon of ordering assurances (pauses on hover; static for reduced motion). */
+export const InfoStrip: React.FC = () => (
+  <section aria-label="Key ordering assurances" className="relative overflow-hidden border-y border-gold/25 bg-ivory-light">
+    <ul className="sr-only">
+      {ASSURANCES.map(a => (
+        <li key={a.label}>{a.label}</li>
+      ))}
+    </ul>
+    <div className="mask-fade-x group flex py-4 sm:py-5" aria-hidden>
+      {[0, 1].map(copy => (
+        <div key={copy} className="flex shrink-0 animate-marquee items-center group-hover:[animation-play-state:paused]">
+          {ASSURANCES.concat(ASSURANCES).map((a, i) => (
+            <span key={`${copy}-${i}`} className="flex items-center gap-3 whitespace-nowrap px-6 sm:px-9">
+              <a.icon className="h-4 w-4 text-gold-dark" strokeWidth={1.6} />
+              <span className="font-display text-[1.05rem] italic text-ink-soft sm:text-[1.2rem]">{a.label}</span>
+              <span className="ml-6 h-1.5 w-1.5 rotate-45 bg-gold/60 sm:ml-9" />
+            </span>
+          ))}
         </div>
-      </div>
-    </section>
-  );
-};
+      ))}
+    </div>
+  </section>
+);

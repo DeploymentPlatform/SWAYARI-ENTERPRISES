@@ -81,10 +81,10 @@ export const QuantityStepper: React.FC<{
 }> = ({ value, min = 1, step = 1, onChange, label, size = 'md' }) => {
   const box = size === 'sm' ? 'h-9 w-9' : 'h-12 w-12';
   return (
-    <div className="inline-flex items-center border border-[#E6DDD5] bg-white rounded-lg overflow-hidden shadow-xs" role="group" aria-label={label}>
+    <div className="inline-flex items-center overflow-hidden rounded-full border border-stone-deep bg-white shadow-subtle" role="group" aria-label={label}>
       <button
         type="button"
-        className={`${box} inline-flex items-center justify-center text-[#2B2625] transition-colors hover:bg-[#FAF7F2] disabled:cursor-not-allowed disabled:text-[#9E9493]/50 font-bold`}
+        className={`${box} inline-flex items-center justify-center text-ink transition-colors duration-300 hover:bg-gold-pale hover:text-burgundy disabled:cursor-not-allowed disabled:text-ink-faint/40 disabled:hover:bg-transparent`}
         onClick={() => onChange(Math.max(min, value - step))}
         disabled={value <= min}
         aria-label={`Decrease quantity${min > 1 ? ` (minimum ${min})` : ''}`}
@@ -100,12 +100,12 @@ export const QuantityStepper: React.FC<{
           const parsed = parseInt(e.target.value, 10);
           onChange(isNaN(parsed) ? min : Math.max(min, parsed));
         }}
-        className={`${size === 'sm' ? 'w-12 text-sm' : 'w-16 text-base'} text-center font-bold tabular-nums text-[#2B2625] focus:outline-none focus:bg-[#FAF7F2]`}
+        className={`${size === 'sm' ? 'w-12 text-sm' : 'w-16 text-base'} bg-transparent text-center font-semibold tabular-nums text-ink focus:bg-ivory-light focus:outline-none`}
         aria-label={label}
       />
       <button
         type="button"
-        className={`${box} inline-flex items-center justify-center text-[#2B2625] transition-colors hover:bg-[#FAF7F2] font-bold`}
+        className={`${box} inline-flex items-center justify-center text-ink transition-colors duration-300 hover:bg-gold-pale hover:text-burgundy`}
         onClick={() => onChange(value + step)}
         aria-label="Increase quantity"
       >
@@ -119,8 +119,8 @@ export const QuantityStepper: React.FC<{
 
 /** The mandatory order-request notice (exact wording from @swayari/shared). */
 export const OrderDisclaimer: React.FC<{ className?: string; compact?: boolean }> = ({ className = '', compact }) => (
-  <div className={`flex gap-3 border-l-2 border-gold bg-stone/70 px-4 py-3 ${className}`}>
-    <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-burgundy" aria-hidden />
+  <div className={`flex gap-3 rounded-2xl border border-gold/30 bg-gold-pale/40 px-4 py-3.5 ${className}`}>
+    <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-gold-dark" aria-hidden />
     <p className={`${compact ? 'text-[0.8125rem]' : 'text-sm'} leading-relaxed text-ink-soft`}>{ORDER_DISCLAIMER_TEXT}</p>
   </div>
 );
@@ -130,28 +130,44 @@ export const PriceText: React.FC<{ value: number | null | undefined; className?:
 );
 
 export const SampleTag: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <span className={`inline-flex items-center border border-gold/60 px-1.5 py-0.5 text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-gold-dark ${className}`}>
+  <span className={`inline-flex items-center rounded-full border border-gold/50 bg-white/85 px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-gold-dark backdrop-blur ${className}`}>
     Sample
   </span>
 );
 
 export const SectionHeading: React.FC<{
   eyebrow?: string;
-  title: string;
+  title: React.ReactNode;
   intro?: React.ReactNode;
   action?: React.ReactNode;
   as?: 'h1' | 'h2';
   id?: string;
-}> = ({ eyebrow, title, intro, action, as = 'h2', id }) => {
+  align?: 'left' | 'center';
+}> = ({ eyebrow, title, intro, action, as = 'h2', id, align = 'left' }) => {
   const Heading = as;
-  return (
-    <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-      <div className="max-w-2xl">
-        {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
-        <Heading id={id} className="text-display-sm md:text-display-md">
+  if (align === 'center') {
+    return (
+      <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+        {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
+        <Heading id={id} className="display-title">
           {title}
         </Heading>
-        {intro && <div className="mt-3 text-base text-ink-soft md:text-lg">{intro}</div>}
+        <div className="ornament mt-5" aria-hidden>
+          <span className="block h-1.5 w-1.5 rotate-45 bg-gold" />
+        </div>
+        {intro && <div className="lede mt-5">{intro}</div>}
+        {action && <div className="mt-7">{action}</div>}
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      <div className="max-w-3xl">
+        {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
+        <Heading id={id} className="display-title">
+          {title}
+        </Heading>
+        {intro && <div className="lede mt-4">{intro}</div>}
       </div>
       {action && <div className="flex-shrink-0">{action}</div>}
     </div>

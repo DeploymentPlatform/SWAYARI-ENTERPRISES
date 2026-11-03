@@ -16,7 +16,7 @@ export const ProductCollection: React.FC<{ products: Product[]; priorityFirst?: 
 
   if (products.length <= 3) {
     return (
-      <div className={`grid gap-x-6 gap-y-12 sm:grid-cols-2 ${products.length === 3 ? 'lg:grid-cols-3' : 'lg:gap-x-10'}`}>
+      <div className={`grid gap-6 sm:grid-cols-2 ${products.length === 3 ? 'lg:grid-cols-3' : 'lg:gap-10'}`}>
         {products.map((p, i) => (
           <ProductCard
             key={p.id}
@@ -30,7 +30,7 @@ export const ProductCollection: React.FC<{ products: Product[]; priorityFirst?: 
   }
 
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 lg:gap-y-14">
+    <div className="grid grid-cols-2 gap-3.5 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
       {products.map((p, i) => (
         <ProductCard key={p.id} product={p} priority={priorityFirst && i < 2} sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw" />
       ))}
@@ -44,19 +44,19 @@ export const FeaturedProduct: React.FC<{ product: Product }> = ({ product }) => 
   return (
     <article className="group grid items-center gap-8 md:grid-cols-12 md:gap-12">
       <Link to={href} className="block md:col-span-7" tabIndex={-1} aria-label={product.name}>
-        <ProductImage product={product} sizes="(min-width: 768px) 58vw, 100vw" priority />
+        <ProductImage product={product} sizes="(min-width: 768px) 58vw, 100vw" priority className="rounded-card border border-stone-deep/70 shadow-card" />
       </Link>
       <div className="md:col-span-5">
         {product.categoryName && <p className="eyebrow mb-3">{product.categoryName}</p>}
         <div className="flex items-start gap-3">
-          <h3 className="text-display-sm md:text-display-md">
+          <h3 className="display-title">
             <Link to={href} className="transition-colors hover:text-burgundy">
               {product.name}
             </Link>
           </h3>
           {product.isDemo && <SampleTag className="mt-3" />}
         </div>
-        <PriceText value={product.indicativePrice} className="mt-3 block text-lg text-ink-soft" />
+        <PriceText value={product.indicativePrice} className="mt-4 block text-xl font-semibold text-burgundy" />
         <p className="mt-5 max-w-prose text-base leading-relaxed text-ink-soft">{product.description}</p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           {canRequest(product) && (

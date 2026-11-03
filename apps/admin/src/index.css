@@ -2,69 +2,266 @@
 @tailwind components;
 @tailwind utilities;
 
-/* SWAYARI staff portal — neutral operations variant of the shared tokens (docs/DESIGN_DIRECTION.md §9) */
+/* SWAYARI staff portal — the storefront's "temple-luxe" language, tuned denser and calmer for a back office. */
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
-    @apply bg-[#F6F4F0] font-sans text-ink antialiased;
+    @apply bg-ivory font-sans text-ink antialiased;
     font-size: 0.9375rem;
     line-height: 1.55;
+    text-rendering: optimizeLegibility;
+    background-image:
+      radial-gradient(1100px 520px at 0% -10%, rgba(227, 204, 154, 0.16), transparent 60%),
+      radial-gradient(900px 480px at 110% 0%, rgba(124, 34, 54, 0.045), transparent 60%);
+    background-attachment: fixed;
+  }
+  h1, h2, h3 {
+    letter-spacing: -0.005em;
+  }
+  ::selection {
+    background: theme('colors.burgundy.DEFAULT');
+    color: theme('colors.ivory.light');
   }
   :focus-visible {
-    outline: 2px solid #6b1f2a;
+    outline: 2px solid theme('colors.gold.DEFAULT');
     outline-offset: 2px;
+    border-radius: 6px;
+  }
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+  input[type='checkbox'] {
+    accent-color: theme('colors.burgundy.DEFAULT');
   }
 }
 
 @layer components {
-  .adm-card {
-    @apply rounded-md border border-stone-deep bg-white;
-  }
+  /* ── Typography ─────────────────────────────────────────── */
   .adm-page-title {
-    @apply font-display text-[2rem] font-semibold leading-tight text-ink;
+    @apply font-display text-[2rem] font-semibold leading-[1.05] text-ink sm:text-[2.5rem];
+    letter-spacing: -0.015em;
+  }
+  .adm-eyebrow {
+    @apply inline-flex items-center gap-2 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-gold-dark;
+  }
+  .adm-eyebrow::before {
+    content: '';
+    @apply inline-block h-px w-5 bg-gold;
   }
   .adm-section-title {
-    @apply text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-ink-soft;
+    @apply text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-ink-soft;
   }
+  .adm-card-title {
+    @apply font-display text-[1.375rem] font-semibold leading-tight text-ink;
+  }
+
+  /* Ornamental gold divider: line — diamond — line */
+  .adm-ornament {
+    @apply flex items-center gap-3 text-gold;
+  }
+  .adm-ornament::before,
+  .adm-ornament::after {
+    content: '';
+    @apply h-px w-10 bg-gradient-to-r from-transparent to-gold/80;
+  }
+  .adm-ornament::after {
+    @apply bg-gradient-to-l;
+  }
+
+  /* ── Surfaces ───────────────────────────────────────────── */
+  .adm-card {
+    @apply rounded-card border border-stone-deep/80 bg-white/95 shadow-card;
+  }
+  .adm-card-hover {
+    @apply transition-all duration-300 ease-luxury hover:-translate-y-0.5 hover:border-gold/50 hover:shadow-card-hover;
+  }
+  .adm-card-header {
+    @apply flex flex-wrap items-center justify-between gap-3 border-b border-stone-deep/80 px-5 py-4 sm:px-6;
+  }
+  .adm-panel-muted {
+    @apply rounded-xl border border-stone-deep/70 bg-ivory-light;
+  }
+
+  /* ── Buttons ────────────────────────────────────────────── */
   .adm-btn {
-    @apply inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+    @apply relative isolate inline-flex h-11 select-none items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-full px-5 text-[0.875rem] font-semibold tracking-[0.01em] transition-all duration-300 ease-luxury active:scale-[0.98] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 sm:h-10;
   }
   .adm-btn-primary {
-    @apply adm-btn bg-burgundy text-white hover:bg-burgundy-hover;
+    @apply adm-btn bg-gradient-to-b from-burgundy-accent to-burgundy text-ivory-light shadow-[0_10px_22px_-12px_rgba(94,26,40,0.75)] hover:-translate-y-px hover:from-burgundy hover:to-burgundy-hover hover:shadow-[0_14px_28px_-14px_rgba(94,26,40,0.85)];
+  }
+  /* soft sheen sweep on the primary action */
+  .adm-btn-primary::after {
+    content: '';
+    @apply pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 transition-all duration-700 ease-luxury;
+  }
+  .adm-btn-primary:hover::after {
+    @apply left-[120%] opacity-100;
+  }
+  .adm-btn-gold {
+    @apply adm-btn bg-gradient-to-b from-gold-light to-gold text-burgundy-deep shadow-[0_10px_22px_-12px_rgba(140,107,46,0.8)] hover:-translate-y-px hover:to-gold-dark hover:text-umber;
   }
   .adm-btn-secondary {
-    @apply adm-btn border border-stone-shade bg-white text-ink hover:bg-stone;
+    @apply adm-btn border border-stone-shade/80 bg-white text-ink shadow-subtle hover:-translate-y-px hover:border-gold/60 hover:text-burgundy hover:shadow-soft;
   }
   .adm-btn-quiet {
-    @apply adm-btn text-ink-soft hover:bg-stone hover:text-ink;
+    @apply adm-btn text-ink-soft hover:bg-stone/70 hover:text-ink;
   }
+  .adm-btn-danger {
+    @apply adm-btn border border-red-200 bg-white text-red-800 hover:-translate-y-px hover:border-red-300 hover:bg-red-50;
+  }
+  .adm-icon-btn {
+    @apply inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-ink-soft transition-all duration-300 ease-luxury hover:bg-stone/80 hover:text-ink active:scale-95 disabled:pointer-events-none disabled:opacity-30 sm:h-9 sm:w-9;
+  }
+
+  /* ── Forms ──────────────────────────────────────────────── */
   .adm-label {
-    @apply mb-1.5 block text-sm font-medium text-ink;
+    @apply mb-1.5 block text-[0.8125rem] font-semibold text-ink;
   }
   .adm-hint {
-    @apply mt-1 text-[0.8125rem] text-ink-soft;
+    @apply mt-1 text-[0.8125rem] leading-relaxed text-ink-faint;
   }
   .adm-input {
-    @apply block w-full rounded-md border border-stone-shade bg-white px-3 py-2 text-[0.9375rem] text-ink placeholder:text-ink-faint focus:border-burgundy focus:outline-none focus:ring-1 focus:ring-burgundy;
+    @apply block min-h-[44px] w-full rounded-xl border border-stone-deep bg-white px-3.5 py-2.5 text-base text-ink shadow-subtle transition-[border-color,box-shadow,background-color] duration-300 ease-luxury placeholder:text-ink-faint/80 hover:border-stone-shade focus:border-gold focus:bg-white focus:outline-none focus:ring-4 focus:ring-gold/15 disabled:cursor-not-allowed disabled:bg-stone/50 disabled:text-ink-faint sm:min-h-[42px] sm:text-[0.9375rem];
+  }
+  select.adm-input {
+    @apply appearance-none bg-no-repeat pr-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238C6B2E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 0.85rem center;
+    background-size: 16px 16px;
+  }
+  textarea.adm-input,
+  .adm-textarea {
+    @apply min-h-[88px] resize-y leading-relaxed;
+  }
+  .adm-textarea {
+    @apply block w-full rounded-xl border border-stone-deep bg-white px-3.5 py-2.5 text-base text-ink shadow-subtle transition-[border-color,box-shadow] duration-300 ease-luxury placeholder:text-ink-faint/80 hover:border-stone-shade focus:border-gold focus:outline-none focus:ring-4 focus:ring-gold/15 sm:text-[0.9375rem];
+  }
+  .adm-input[aria-invalid='true'] {
+    @apply border-red-700 focus:border-red-700 focus:ring-red-700/15;
+  }
+
+  /* ── Tables ─────────────────────────────────────────────── */
+  .adm-table-wrap {
+    @apply w-full overflow-x-auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Scroll container that lets the header stick while long lists scroll (desktop) */
+  .adm-table-scroll {
+    @apply adm-table-wrap lg:max-h-[min(68vh,46rem)] lg:overflow-y-auto;
   }
   .adm-table {
-    @apply w-full text-left text-sm;
+    @apply w-full border-separate border-spacing-0 text-left text-sm;
   }
   .adm-table thead th {
-    @apply whitespace-nowrap border-b border-stone-deep bg-[#FAF8F5] px-4 py-2.5 text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-ink-soft;
+    @apply sticky top-0 z-[1] whitespace-nowrap border-b border-stone-deep bg-ivory-light/95 px-4 py-3 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-ink-faint backdrop-blur first:pl-5 last:pr-5 sm:first:pl-6 sm:last:pr-6;
   }
   .adm-table tbody td {
-    @apply border-b border-stone-deep/70 px-4 py-3 align-middle;
+    @apply border-b border-stone-deep/60 px-4 py-3.5 align-middle transition-colors duration-200 first:pl-5 last:pr-5 sm:first:pl-6 sm:last:pr-6;
+  }
+  .adm-table tbody tr {
+    @apply transition-colors duration-200;
+  }
+  .adm-table tbody tr:hover td {
+    @apply bg-ivory-light;
   }
   .adm-table tbody tr:last-child td {
     @apply border-b-0;
   }
+  .adm-row-active td {
+    @apply !bg-burgundy-soft/60;
+  }
+  .adm-row-active td:first-child {
+    box-shadow: inset 3px 0 0 theme('colors.gold.DEFAULT');
+  }
+
+  /* Stacked list rows used in place of tables on small screens */
+  .adm-list {
+    @apply divide-y divide-stone-deep/70;
+  }
+  .adm-list-row {
+    @apply flex w-full items-start gap-3 px-4 py-4 text-left transition-colors duration-200 hover:bg-ivory-light active:bg-stone/50 sm:px-5;
+  }
+
+  /* ── Chips & badges ─────────────────────────────────────── */
   .adm-chip {
-    @apply inline-flex h-8 items-center whitespace-nowrap rounded-md border px-3 text-sm transition-colors;
+    @apply inline-flex h-10 flex-shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-4 text-[0.8125rem] font-medium transition-all duration-300 ease-luxury sm:h-9;
   }
   .adm-chip-on {
-    @apply adm-chip border-burgundy bg-burgundy text-white;
+    @apply adm-chip border-burgundy bg-burgundy text-ivory-light shadow-[0_8px_18px_-10px_rgba(94,26,40,0.8)];
   }
   .adm-chip-off {
-    @apply adm-chip border-stone-shade bg-white text-ink hover:border-ink-faint;
+    @apply adm-chip border-stone-deep bg-white/80 text-ink-soft hover:border-gold hover:text-burgundy;
+  }
+  .adm-badge-gold {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold-pale/70 px-2.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-gold-dark;
+  }
+  .adm-segment {
+    @apply inline-flex items-center gap-1 rounded-full border border-stone-deep bg-white p-1 shadow-subtle;
+  }
+  .adm-segment-btn {
+    @apply inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold text-ink-soft transition-all duration-300 ease-luxury hover:text-ink;
+  }
+  .adm-segment-btn[aria-pressed='true'] {
+    @apply bg-burgundy text-ivory-light shadow-[0_6px_14px_-8px_rgba(94,26,40,0.8)];
+  }
+
+  /* ── Feedback ───────────────────────────────────────────── */
+  .adm-skeleton {
+    @apply rounded-lg bg-[length:200%_100%] animate-shimmer;
+    background-image: linear-gradient(
+      90deg,
+      theme('colors.stone.DEFAULT') 0%,
+      theme('colors.ivory.light') 45%,
+      theme('colors.stone.DEFAULT') 90%
+    );
+  }
+  .adm-toast {
+    @apply flex items-center gap-3 rounded-xl border border-emerald-200/80 bg-white px-4 py-3 text-sm text-ink shadow-soft;
+  }
+  .adm-empty-icon {
+    @apply relative mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-gold/30 bg-gradient-to-b from-gold-pale to-ivory-light text-gold-dark shadow-[0_10px_24px_-14px_rgba(140,107,46,0.6)];
+  }
+  .adm-empty-icon::after {
+    content: '';
+    @apply absolute -inset-2 rounded-full border border-dashed border-gold/25;
+  }
+}
+
+@layer utilities {
+  /* Cormorant defaults to old-style figures; a console reads better with lining ones */
+  .font-display {
+    font-feature-settings: 'lnum' 1;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .mask-fade-r {
+    -webkit-mask-image: linear-gradient(to right, #000 85%, transparent);
+    mask-image: linear-gradient(to right, #000 85%, transparent);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-shimmer, .animate-spin-slow, .animate-float {
+      animation: none !important;
+    }
   }
 }

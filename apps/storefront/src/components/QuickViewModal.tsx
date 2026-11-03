@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, ShoppingBag, ShieldCheck, Truck, ChevronRight } from 'lucide-react';
-import { Product, formatPrice, calculateEffectiveUnitPrice } from '@swayari/shared';
+import { MIN_ORDER_FRAMES, Product, formatPrice, calculateEffectiveUnitPrice } from '@swayari/shared';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { toCartItem } from '../lib/products';
@@ -15,13 +15,13 @@ interface QuickViewModalProps {
 }
 
 export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose }) => {
-  const { addItem, openDrawer } = useCart();
+  const { addItem, openDrawer, itemCount } = useCart();
   const { user, initiateGoogleSignIn } = useAuth();
 
   const minQty = product?.minQuantity || 1;
   const incQty = product?.orderIncrement || 1;
   const [selectedImgIdx, setSelectedImgIdx] = useState(0);
-  const [quantity, setQuantity] = useState(minQty);
+  const [quantity, setQuantity] = useState(() => Math.max(minQty, itemCount < MIN_ORDER_FRAMES ? MIN_ORDER_FRAMES - itemCount : 10));
   const [added, setAdded] = useState(false);
   const [customNote, setCustomNote] = useState('');
   // Plays the exit animation first; the parent unmounts us via onClose once it has finished.
@@ -35,7 +35,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
 
   if (!product) return null;
 
-  const images = product.images && product.images.length > 0 ? product.images : ['/assets/products/venkateswara-frame-960.webp'];
+  const images = product.images && product.images.length > 0 ? product.images : ['/assets/products/gf-venkateswara-studio.webp'];
 
   // Calculate current applicable unit price based on quantity and bulk tiers
   const currentUnitPrice = calculateEffectiveUnitPrice(product.indicativePrice, product.bulkTiers, quantity);
@@ -118,7 +118,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.5, ease: EASE_LUXURY }}
-                    className="absolute inset-0 h-full w-full object-contain p-4"
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
                 </AnimatePresence>
                 <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
@@ -149,7 +149,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                         selectedImgIdx === idx ? 'border-burgundy shadow-[0_0_0_3px_rgba(94,26,40,0.12)]' : 'border-stone-deep opacity-70 hover:opacity-100'
                       }`}
                     >
-                      <img src={img} alt="" className="h-full w-full object-contain" />
+                      <img src={img} alt="" className="h-full w-full object-cover" />
                     </button>
                   ))}
                 </div>
@@ -189,7 +189,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                   </div>
                   <div className="flex justify-between gap-3 text-xs">
                     <dt className="text-ink-soft">Shipping:</dt>
-                    <dd className="font-medium italic text-gold-dark">to be confirmed by our team</dd>
+                    <dd className="font-medium italic text-gold-dark">extra · confirmed by our team</dd>
                   </div>
                 </dl>
               )}
@@ -240,7 +240,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
               </dl>
               <p className="mt-2 flex items-center gap-1.5 text-[0.75rem] text-ink-soft">
                 <Truck className="h-3.5 w-3.5 flex-shrink-0 text-gold" aria-hidden />
-                Shipping charged separately &amp; confirmed before dispatch
+                Shipping charges extra, confirmed before dispatch
               </p>
 
               {/* Quantity & add */}
@@ -249,7 +249,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                   <div>
                     <p className="text-sm font-semibold text-ink">Quantity</p>
                     <p className="text-[0.6875rem] text-ink-faint">
-                      {product.minQuantity > 1 ? `Min. ${product.minQuantity} pcs` : 'Bulk or single'}
+                      {`Order minimum ${MIN_ORDER_FRAMES} frames, any mix`}
                       {incQty > 1 ? ` · Step ${incQty}` : ''}
                     </p>
                   </div>

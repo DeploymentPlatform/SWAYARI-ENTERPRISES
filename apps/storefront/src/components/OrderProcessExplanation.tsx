@@ -8,7 +8,7 @@ const STEPS = [
   {
     icon: ShoppingBag,
     title: 'Choose frames and quantities',
-    body: 'Explore our devotional frames priced at ₹99 or less. Select your preferred deity designs and enter your event quantities.'
+    body: 'Pick from seven silver foil god frames at ₹99 each. Mix any designs — the minimum order is 25 frames in total.'
   },
   {
     icon: Send,

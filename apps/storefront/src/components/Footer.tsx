@@ -4,12 +4,13 @@ import { Mail, Phone, ShieldCheck, ArrowUpRight, ArrowUp } from 'lucide-react';
 import { LotusMark } from './ui';
 
 const COLLECTIONS = [
-  { label: 'All devotional frames', to: '/shop?category=devotional-frames' },
-  { label: 'Ganesha frames', to: '/shop?category=ganesha-frames' },
-  { label: 'Lakshmi frames', to: '/shop?category=lakshmi-frames' },
-  { label: 'Balaji frames', to: '/shop?category=balaji-frames' },
-  { label: 'Radha Krishna frames', to: '/shop?category=radha-krishna-frames' },
-  { label: 'Mini return-gift frames', to: '/shop?category=mini-return-gift-frames' }
+  { label: 'All god frames', to: '/shop?category=god-frames' },
+  { label: 'Balaji & Padmavathi', to: '/shop?deity=balaji' },
+  { label: 'Krishna', to: '/shop?deity=krishna' },
+  { label: 'Ram Darbar', to: '/shop?deity=ram' },
+  { label: 'Hanuman', to: '/shop?deity=hanuman' },
+  { label: 'Sai Baba', to: '/shop?deity=sai' },
+  { label: 'Wedding return gifts', to: '/shop?bulk=1' }
 ];
 
 const SUPPORT = [
@@ -44,7 +45,7 @@ export const Footer: React.FC = () => (
         <p className="mt-3 pl-[0.3em] font-wordmark text-[2.2rem] font-semibold tracking-[0.3em] text-ivory-light sm:text-[2.8rem]">SWAYARI</p>
         <p className="mt-2 text-[0.6875rem] font-semibold uppercase tracking-[0.42em] text-gold-light">Décor &amp; Gifting</p>
         <p className="mt-6 max-w-xl font-display text-[1.25rem] italic leading-snug text-ivory-light/80 sm:text-[1.45rem]">
-          Devotional god frames at ₹99 or less — auspicious return gifts for weddings, griha pravesh and family celebrations.
+          Silver foil god frames at ₹99 each — auspicious return gifts for weddings, griha pravesh and family celebrations.
         </p>
       </div>
 

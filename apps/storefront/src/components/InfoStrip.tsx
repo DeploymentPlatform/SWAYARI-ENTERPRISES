@@ -2,12 +2,12 @@ import React from 'react';
 import { BadgeIndianRupee, Users, Truck, ShieldCheck, Sparkles, HandHeart } from 'lucide-react';
 
 const ASSURANCES = [
-  { icon: BadgeIndianRupee, label: '₹99 or less per frame' },
-  { icon: Users, label: 'Bulk orders for weddings & functions' },
-  { icon: Truck, label: 'Shipping quoted for your location' },
+  { icon: BadgeIndianRupee, label: '₹99 per frame, every design' },
+  { icon: Users, label: 'Minimum 25 frames — mix any designs' },
+  { icon: Truck, label: 'Shipping charged extra' },
   { icon: ShieldCheck, label: 'No online payment — order by request' },
   { icon: HandHeart, label: 'Personally confirmed by our team' },
-  { icon: Sparkles, label: 'Gold-relief & teak finishes' }
+  { icon: Sparkles, label: 'Silver foil relief, table stand & wall hook' }
 ];
 
 /** Slow, endless ribbon of ordering assurances (pauses on hover; static for reduced motion). */

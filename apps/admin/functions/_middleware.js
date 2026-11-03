@@ -1,25 +1,25 @@
 export async function onRequest(context) {
-  const { request, next } = context;
+  const { request, next, env } = context;
 
-  // Origin check for state mutations
+  // CSRF: every state-changing request must come from this site's own origin.
+  // Browsers always send Origin on POST/PUT/PATCH/DELETE, so a missing or foreign Origin is refused.
+  // Local dev (Vite on :5173 proxying to :8788) is allowed only when ENVIRONMENT is 'development'.
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
-    const origin = request.headers.get('Origin');
-    const host = request.headers.get('Host');
-    if (origin && host) {
-      try {
-        const originUrl = new URL(origin);
-        if (originUrl.host !== host && !originUrl.host.includes('localhost') && !originUrl.host.includes('127.0.0.1')) {
-          return new Response(JSON.stringify({ error: 'CSRF Forbidden: Origin mismatch' }), {
-            status: 403,
-            headers: { 'Content-Type': 'application/json' }
-          });
-        }
-      } catch (err) {
-        return new Response(JSON.stringify({ error: 'Invalid origin header' }), {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        });
-      }
+    const allowedHosts = new Set([new URL(request.url).host]);
+    if (env?.ENVIRONMENT === 'development') {
+      for (const h of ['localhost:5173', '127.0.0.1:5173', 'localhost:5174', '127.0.0.1:5174', 'localhost:8788', '127.0.0.1:8788', 'localhost:8789', '127.0.0.1:8789']) allowedHosts.add(h);
+    }
+    let originHost = null;
+    try {
+      originHost = new URL(request.headers.get('Origin') || '').host;
+    } catch {
+      originHost = null;
+    }
+    if (!originHost || !allowedHosts.has(originHost)) {
+      return new Response(JSON.stringify({ error: 'Request blocked: it did not come from this site.' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
+      });
     }
   }
 
@@ -37,12 +37,16 @@ export async function onRequest(context) {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com",
+      "script-src 'self' https://accounts.google.com https://apis.google.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https://lh3.googleusercontent.com https://*.googleusercontent.com",
       "connect-src 'self' https://accounts.google.com/gsi/",
-      "frame-src https://accounts.google.com/gsi/"
+      "frame-src https://accounts.google.com/gsi/",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'"
     ].join('; ')
   );
 

@@ -93,12 +93,12 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
     title = sObj ? `${sObj.name} Frames` : `${frameSize} Frames`;
   } else if (budget) {
     const band = FRAME_PRICE_BANDS.find(b => b.id === budget);
-    title = band ? `Frames ${band.label}` : 'Devotional Frames ≤ ₹99';
+    title = band ? `Frames ${band.label}` : 'God Frames · ₹99';
   }
 
   usePageMeta(
     title,
-    'Devotional god frames priced at ₹99 or less per frame. Auspicious return gifts for weddings, griha pravesh and family celebrations. Shipping quoted separately.',
+    'No. 1 silver foil god frames at ₹99 each. Auspicious return gifts for weddings, griha pravesh and family celebrations. Minimum order 25 frames; shipping extra.',
     { noindex: isSearch }
   );
 
@@ -179,7 +179,7 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
             transition={{ duration: 0.8, ease: EASE_LUXURY }}
           >
             <div className="max-w-2xl">
-              <p className="eyebrow mb-4">{isSearch ? 'Search the collection' : '₹99 & under collection'}</p>
+              <p className="eyebrow mb-4">{isSearch ? 'Search the collection' : '₹99 each · any mix'}</p>
               <h1 className="display-title">
                 {isSearch || isBulk || deity || occasion || frameSize || budget ? (
                   title
@@ -190,8 +190,8 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
                 )}
               </h1>
               <p className="lede mt-4 max-w-xl">
-                Auspicious frames for weddings, griha pravesh and family poojas — every design priced at ₹99 or less per frame.
-                Shipping is quoted separately by our team.
+                Auspicious frames for weddings, griha pravesh and family poojas — every design is ₹99 per frame.
+                Minimum order 25 frames in any mix; shipping is charged extra.
               </p>
             </div>
 
@@ -285,7 +285,7 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
                     <span className="font-display text-[1.25rem] font-semibold text-ink lining-nums">{products.length}</span>{' '}
                     <span className="hidden sm:inline">{products.length === 1 ? 'frame design' : 'frame designs'}</span>
                     <span className="sm:hidden">{products.length === 1 ? 'design' : 'designs'}</span>
-                    <span className="hidden lg:inline"> · All priced at ₹99 or less · Shipping quoted separately</span>
+                    <span className="hidden lg:inline"> · ₹99 each · Minimum 25 frames · Shipping extra</span>
                   </>
                 ) : status === 'loading' ? (
                   <span className="text-ink-faint">Loading…</span>
@@ -354,7 +354,7 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
             <EmptyState
               eyebrow="Nothing here just yet"
               title="No devotional frames matched your filters"
-              body={<p>Try clearing one or more filters, or explore our full collection of frames priced at ₹99 or less.</p>}
+              body={<p>Try clearing one or more filters, or explore our full collection of ₹99 frames.</p>}
               action={{ to: '/shop', label: 'View All Frames' }}
             />
           )}
@@ -462,20 +462,6 @@ const FilterGroups: React.FC<{
       })}
     </FilterRow>
 
-    <FilterRow label="Price">
-      <Chip active={!budget} onClick={() => updateQuery({ budget: '' })}>
-        All (≤ ₹99)
-      </Chip>
-      {FRAME_PRICE_BANDS.filter(b => b.id !== 'all-99').map(band => {
-        const active = budget === band.id;
-        return (
-          <Chip key={band.id} active={active} onClick={() => updateQuery({ budget: active ? '' : band.id })}>
-            {band.label}
-          </Chip>
-        );
-      })}
-    </FilterRow>
-
     <FilterRow label="Occasion">
       <Chip active={!occasion && !isBulk} onClick={() => updateQuery({ occasion: '', bulk: false })}>
         Every occasion
@@ -494,8 +480,7 @@ const FilterGroups: React.FC<{
     </FilterRow>
 
     <FilterRow label="Format">
-      <div className="grid w-full grid-cols-2 gap-2 md:flex md:w-auto">
-        <SelectField id="filter-size" label="Frame size" value={frameSize} onChange={v => updateQuery({ frame_size: v })} options={FRAME_SIZES} />
+      <div className="grid w-full grid-cols-1 gap-2 md:flex md:w-auto">
         <SelectField id="filter-orientation" label="Orientation" value={orientation} onChange={v => updateQuery({ orientation: v })} options={ORIENTATIONS} />
       </div>
     </FilterRow>

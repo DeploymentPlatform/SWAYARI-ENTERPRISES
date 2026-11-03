@@ -1,13 +1,13 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ShoppingBag, Trash2, X } from 'lucide-react';
-import { formatPrice } from '@swayari/shared';
+import { MIN_ORDER_FRAMES, formatPrice } from '@swayari/shared';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Link, useRouter } from '../lib/router';
 import { productImageSources } from '../lib/media';
 import { EASE_LUXURY } from './motion';
-import { LotusMark, OrderDisclaimer, Picture, PriceText, QuantityStepper, useDialogBehaviour } from './ui';
+import { LotusMark, MinimumOrderMeter, Picture, PriceText, QuantityStepper, useDialogBehaviour } from './ui';
 
 export const CartDrawer: React.FC = () => {
   const { items, isDrawerOpen, closeDrawer, removeItem, updateQuantity, subtotal, hasUnpricedItems, itemCount } = useCart();
@@ -160,12 +160,16 @@ export const CartDrawer: React.FC = () => {
                   </div>
                   <div className="flex items-baseline justify-between text-xs text-ink-soft">
                     <span>Shipping</span>
-                    <span className="font-medium italic text-gold-dark">To be confirmed by our team</span>
+                    <span className="font-medium italic text-gold-dark">Extra · confirmed by our team</span>
                   </div>
-                  <OrderDisclaimer compact />
+                  <MinimumOrderMeter count={itemCount} />
                   <div className="grid gap-2.5 pb-2 pt-1">
-                    <button type="button" onClick={proceed} className="btn-primary w-full">
-                      {user ? 'Continue to request details' : 'Sign in to send request'}
+                    <button type="button" onClick={proceed} className="btn-primary w-full" disabled={itemCount < MIN_ORDER_FRAMES}>
+                      {itemCount < MIN_ORDER_FRAMES
+                        ? `Add ${MIN_ORDER_FRAMES - itemCount} more frames`
+                        : user
+                          ? 'Continue to request details'
+                          : 'Sign in to send request'}
                     </button>
                     <Link to="/cart" onClick={closeDrawer} className="btn-secondary btn-sm w-full">
                       View full bag

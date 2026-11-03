@@ -41,7 +41,7 @@ export async function onRequestPost(context) {
 
     await logAudit(env, 'auth', payload.sub, 'admin_google_login', payload.email);
 
-    const isProduction = env.ENVIRONMENT === 'production';
+    const isProduction = env.ENVIRONMENT !== 'development';
     const cookie = createAdminSessionCookie(sessionId, isProduction);
 
     return jsonResponse({
@@ -56,6 +56,6 @@ export async function onRequestPost(context) {
     }, 200, { 'Set-Cookie': cookie });
   } catch (err) {
     console.error('Admin Google Auth Error:', err.message);
-    return errorResponse(`Admin authentication failed: ${err.message}`, 403);
+    return errorResponse(`Sign-in failed. Only approved SWAYARI admin Google accounts can open this panel.`, 403);
   }
 }

@@ -75,6 +75,7 @@ export async function onRequestGet(context) {
       product
     });
   } catch (err) {
-    return errorResponse(`Failed to fetch product details: ${err.message}`, 500);
+    console.error(err);
+    return errorResponse(`Failed to fetch product details. Please try again.`, 500);
   }
 }

@@ -12,7 +12,7 @@ export async function onRequestPost(context) {
       await env.DB.prepare('DELETE FROM sessions WHERE id = ?').bind(sessionId).run();
     }
 
-    const isProduction = env.ENVIRONMENT === 'production';
+    const isProduction = env.ENVIRONMENT !== 'development';
     const cookie = clearCustomerSessionCookie(isProduction);
 
     return jsonResponse({
@@ -20,6 +20,7 @@ export async function onRequestPost(context) {
       message: 'Logged out successfully'
     }, 200, { 'Set-Cookie': cookie });
   } catch (err) {
-    return jsonResponse({ success: false, error: err.message }, 500);
+    console.error(err);
+    return jsonResponse({ success: false, error: 'Sign-out failed. Please try again.' }, 500);
   }
 }

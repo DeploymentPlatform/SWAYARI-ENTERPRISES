@@ -128,6 +128,7 @@ export async function onRequestGet(context) {
       }
     });
   } catch (err) {
-    return errorResponse(`Failed to fetch order: ${err.message}`, 500);
+    console.error(err);
+    return errorResponse(`Failed to fetch order. Please try again.`, 500);
   }
 }

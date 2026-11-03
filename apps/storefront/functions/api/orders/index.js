@@ -49,6 +49,54 @@ export async function onRequestPost(context) {
       return errorResponse('Order must contain at least one product item', 400);
     }
 
+    // Size limits keep one request from flooding the order queue or the database.
+    const TEXT_LIMITS = {
+      idempotencyKey: [idempotencyKey, 100],
+      customerName: [customerName, 100],
+      customerPhone: [customerPhone, 20],
+      deliveryAddress: [deliveryAddress, 500],
+      deliveryCity: [deliveryCity, 80],
+      deliveryState: [deliveryState, 80],
+      deliveryPincode: [deliveryPincode, 10],
+      customerNotes: [customerNotes, 1000],
+      occasion: [occasion, 100],
+      requiredDate: [requiredDate, 30]
+    };
+    for (const [field, [value, max]] of Object.entries(TEXT_LIMITS)) {
+      if (value !== undefined && value !== null && typeof value !== 'string' && !(field === 'customerPhone' && typeof value === 'number')) {
+        return errorResponse(`${field} must be text`, 400);
+      }
+      if (String(value ?? '').length > max) {
+        return errorResponse(`${field} is too long (maximum ${max} characters)`, 400);
+      }
+    }
+    if (!/^\d{6}$/.test(String(deliveryPincode).trim())) {
+      return errorResponse('Enter a valid 6-digit pincode', 400);
+    }
+    if (items.length > 50) {
+      return errorResponse('Too many lines in one request (maximum 50)', 400);
+    }
+    for (const item of items) {
+      if (String(item?.selectedVariant ?? '').length > 100 || String(item?.customisationNote ?? '').length > 300 || String(item?.productId ?? '').length > 100) {
+        return errorResponse('An item in this request has a value that is too long', 400);
+      }
+      if (Number(item?.quantity) > 100000) {
+        return errorResponse('Quantity is too large for one request. Please contact our team for very large orders.', 400);
+      }
+    }
+
+    // Rate limit: at most 5 new requests per customer per hour.
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const recent = await env.DB.prepare(
+      'SELECT COUNT(*) AS n FROM orders WHERE customer_id = ? AND created_at > ?'
+    ).bind(session.user.id, oneHourAgo).first();
+    if (recent && Number(recent.n) >= 5) {
+      const repeat = await env.DB.prepare('SELECT id FROM orders WHERE idempotency_key = ? AND customer_id = ?').bind(idempotencyKey, session.user.id).first();
+      if (!repeat) {
+        return errorResponse('You have sent several requests in the last hour. Please wait a little or contact our team.', 429);
+      }
+    }
+
     // 3. Idempotency Check: Return existing order if identical idempotency token submitted
     const existingOrder = await env.DB.prepare(`
       SELECT id, customer_id, status, initial_indicative_subtotal, created_at
@@ -109,6 +157,14 @@ export async function onRequestPost(context) {
     }
 
     const aggregatedItems = Array.from(aggregatedMap.values());
+
+    // Order-wide minimum: frames of every design count together (25, as in @swayari/shared).
+    // MIN_ORDER_FRAMES in env exists only so the legacy behaviour tests can use small quantities.
+    const MIN_ORDER_FRAMES = Number(env.MIN_ORDER_FRAMES) > 0 ? Number(env.MIN_ORDER_FRAMES) : 25;
+    const totalFrames = aggregatedItems.reduce((sum, it) => sum + it.quantity, 0);
+    if (totalFrames < MIN_ORDER_FRAMES) {
+      return errorResponse(`Minimum order is ${MIN_ORDER_FRAMES} frames (mix any designs). This request has ${totalFrames}.`, 400);
+    }
     const verifiedItems = [];
     let calculatedSubtotalPaise = 0;
     let hasUnpricedItem = false;
@@ -275,6 +331,6 @@ export async function onRequestPost(context) {
     }, 201);
   } catch (err) {
     console.error('Order Submission Error:', err);
-    return errorResponse(`Failed to submit order request: ${err.message}`, 500);
+    return errorResponse(`Failed to submit order request. Please try again.`, 500);
   }
 }

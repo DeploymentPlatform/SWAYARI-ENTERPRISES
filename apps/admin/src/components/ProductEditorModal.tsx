@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Check, X, AlertCircle, Upload, Image as ImageIcon, Star, ArrowUp, ArrowDown, Trash2, Plus } from 'lucide-react';
-import { Category, DEITIES, FRAME_SIZES, ORIENTATIONS, Product } from '@swayari/shared';
+import { Category, DEITIES, FRAME_SIZES, MIN_ORDER_FRAMES, ORIENTATIONS, Product } from '@swayari/shared';
 import { Drawer, ErrorBanner } from './ui';
 
 interface ProductEditorModalProps {
@@ -74,26 +74,26 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
     name: '',
     slug: '',
     description: '',
-    categoryId: '',
-    material: '',
+    categoryId: 'cat-god-frames',
+    material: 'Silver foil embossed artwork with colour highlights, cream mount and clear front cover',
     dimensions: '',
-    indicativePrice: '',
+    indicativePrice: '99',
     priceType: 'piece' as 'piece' | 'set',
     setContents: '',
     minQuantity: '1',
     orderIncrement: '1',
     isQuoteOnly: false,
-    shippingInfo: '',
+    shippingInfo: 'Shipping charges are extra and confirmed by our team for your quantity and delivery PIN code.',
     supportsIndividual: true,
     supportsBulk: true,
     customisationInfo: '',
-    availabilityLabel: 'Available on request',
+    availabilityLabel: 'Ready to order',
     status: 'draft' as Product['status'],
     isDemo: false,
     deity: '',
-    frameSize: '',
+    frameSize: 'No. 1',
     orientation: 'portrait' as 'portrait' | 'landscape' | 'square',
-    borderFinish: ''
+    borderFinish: 'Maroon frame with gold floral border'
   });
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
   const [bulkTiersText, setBulkTiersText] = useState('');
@@ -249,7 +249,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
 
     // Strict ₹99 rule: Frame price cannot exceed ₹99
     if (f.indicativePrice !== '' && Number(f.indicativePrice) > 99) {
-      setError('Devotional frames must be priced at ₹99 or less per frame as per confirmed business direction.');
+      setError('God frames are sold at ₹99 each. Enter a price of ₹99 or less.');
       return;
     }
 
@@ -312,7 +312,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
       onClose={onClose}
       width="max-w-[760px]"
       title={editing ? `Edit ${f.name || 'product'}` : 'New Devotional Frame'}
-      subtitle={editing ? f.sku : 'Devotional frames strictly priced at ₹99 or less per frame. Shipping quoted separately.'}
+      subtitle={editing ? f.sku : 'God frames at ₹99 each. Minimum order 25 frames in total; shipping extra.'}
       footer={
         <div className="flex items-center justify-between gap-2 sm:justify-end">
           <button type="button" className="adm-btn-quiet" onClick={onClose}>
@@ -542,7 +542,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                   className="adm-input"
                   value={f.deity}
                   onChange={set('deity')}
-                  placeholder="e.g. Balaji, Ganesha, Lakshmi, Radha Krishna"
+                  placeholder="e.g. Balaji, Sai Baba, Radha Krishna, Hanuman"
                 />
               </label>
               <label>
@@ -551,7 +551,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                   className="adm-input"
                   value={f.frameSize}
                   onChange={set('frameSize')}
-                  placeholder="e.g. Classic 4&quot;×6&quot;, Mini 3&quot;×3&quot;, Royal 5&quot;×7&quot;"
+                  placeholder="e.g. No. 1"
                 />
               </label>
             </div>
@@ -571,7 +571,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
                   className="adm-input"
                   value={f.borderFinish}
                   onChange={set('borderFinish')}
-                  placeholder="e.g. Antique Gold Foil, Temple Teak"
+                  placeholder="e.g. Maroon frame with gold floral border"
                 />
               </label>
               <label>
@@ -607,11 +607,11 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
           </Section>
 
           {/* Strict <= 99 Pricing Section */}
-          <Section step={4} title="Strict ₹99 Price Ceiling & Bulk Tiers">
+          <Section step={4} title="Price & Quantity">
             <div className="flex items-start gap-3 rounded-xl border border-gold/40 bg-gold-pale/50 px-4 py-3 text-[0.8125rem] leading-relaxed text-gold-dark">
               <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-gold" />
               <span>
-                <strong>Strict Business Rule:</strong> Every purchasable frame and volume tier must be priced at <strong>₹99 or less</strong>. Shipping is quoted separately.
+                <strong>Business rule:</strong> frames are priced at <strong>₹99</strong> (never more). Customers must order at least <strong>{MIN_ORDER_FRAMES} frames in total</strong>, mixing any designs; shipping is charged extra.
               </span>
             </div>
 
@@ -644,7 +644,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
 
             <div className="grid gap-4 sm:grid-cols-2">
               <label>
-                <span className="adm-label">Minimum order quantity (MOQ)</span>
+                <span className="adm-label">Minimum of this design (usually 1)</span>
                 <input type="number" min={1} className="adm-input" value={f.minQuantity} onChange={set('minQuantity')} />
               </label>
               <label>
@@ -654,14 +654,14 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
             </div>
 
             <div>
-              <span className="adm-label">Volume pricing tiers (one per line: MinQty: UnitPrice, e.g. 50: 69)</span>
-              <p className="adm-hint">All tier prices must be ≤ ₹99 per frame.</p>
+              <span className="adm-label">Volume discounts (optional — leave empty for one flat price)</span>
+              <p className="adm-hint">One per line as MinQty: UnitPrice, e.g. 100: 95. Every price must be ≤ ₹99.</p>
               <textarea
                 className="adm-textarea font-mono text-xs"
                 rows={3}
                 value={bulkTiersText}
                 onChange={e => setBulkTiersText(e.target.value)}
-                placeholder="25: 79&#10;50: 69&#10;100: 59"
+                placeholder="Leave empty for flat ₹99"
               />
             </div>
           </Section>

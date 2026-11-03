@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronLeft, ChevronRight, MessageCircle, PackageCheck, ShoppingBag, Sparkles, Truck } from 'lucide-react';
-import { Product, formatPrice, calculateEffectiveUnitPrice } from '@swayari/shared';
+import { MIN_ORDER_FRAMES, Product, formatPrice, calculateEffectiveUnitPrice } from '@swayari/shared';
+import { useCart } from '../context/CartContext';
 import { Link } from '../lib/router';
 import { usePageMeta, useStructuredData } from '../lib/meta';
 import { useAddToBag, useProducts } from '../lib/products';
@@ -13,7 +14,7 @@ import { OrderDisclaimer, QuantityStepper, SampleTag } from '../components/ui';
 
 type Status = 'loading' | 'ready' | 'notfound' | 'error';
 
-const FALLBACK_IMAGE = '/assets/products/venkateswara-frame-960.webp';
+const FALLBACK_IMAGE = '/assets/products/gf-venkateswara-studio.webp';
 
 /** Some listings carry the same photograph twice (.webp and .jpg); show each picture once. */
 function uniqueImages(images: string[] | undefined): string[] {
@@ -36,6 +37,10 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
   const [quantity, setQuantity] = useState(1);
   const [note, setNote] = useState('');
   const { add, canRequest } = useAddToBag();
+  const { itemCount } = useCart();
+  // Suggest whatever still completes the order-wide minimum; once it is met, a sensible default.
+  const suggestedQty = useRef(0);
+  suggestedQty.current = itemCount < MIN_ORDER_FRAMES ? MIN_ORDER_FRAMES - itemCount : 10;
   const formActionsRef = useRef<HTMLDivElement>(null);
   const [showStickyBar, setShowStickyBar] = useState(false);
 
@@ -57,7 +62,7 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
         const p: Product = data.product;
         setProduct(p);
         setActiveImage(0);
-        setQuantity(p.minQuantity || 1);
+        setQuantity(Math.max(p.minQuantity || 1, suggestedQty.current));
         setVariant(p.hasVariants && p.variants?.length ? p.variants[0].name : null);
         setStatus('ready');
       })
@@ -199,7 +204,10 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
     {
       id: 'shipping',
       title: 'Shipping & ordering',
-      rows: [['Shipping', 'Quoted separately based on order size and delivery PIN'] as [string, string]],
+      rows: [
+        ['Shipping', 'Extra — quoted for your quantity and delivery PIN code'] as [string, string],
+        ['Minimum order', `${MIN_ORDER_FRAMES} frames in total, any mix of designs`] as [string, string]
+      ],
       text: product.shippingInfo || undefined
     }
   ].filter(d => d.rows.length > 0 || d.text);
@@ -291,14 +299,12 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
 
             <p className="lede mt-5 whitespace-pre-line">{product.description}</p>
 
-            {/* Minimum quantity and bulk conditions */}
-            {product.minQuantity > 1 && (
-              <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold-pale/50 px-3.5 py-1.5 text-[0.8125rem] font-semibold text-gold-dark">
-                <PackageCheck className="h-4 w-4" aria-hidden />
-                Bulk order frame · Minimum quantity: {product.minQuantity} frames
-                {product.orderIncrement > 1 ? ` · Multiples of ${product.orderIncrement}` : ''}
-              </p>
-            )}
+            {/* Order-wide minimum */}
+            <p className="mt-5 inline-flex flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-gold/40 bg-gold-pale/50 px-3.5 py-1.5 text-[0.8125rem] font-semibold text-gold-dark">
+              <PackageCheck className="h-4 w-4" aria-hidden />
+              Minimum order {MIN_ORDER_FRAMES} frames · mix any designs
+              {product.minQuantity > 1 ? ` · at least ${product.minQuantity} of this design` : ''}
+            </p>
 
             {/* Bulk volume tiers */}
             {tiers.length > 0 && (
@@ -347,7 +353,7 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
                 </div>
                 <div className="flex justify-between gap-4 text-xs text-ink-soft">
                   <dt>Shipping:</dt>
-                  <dd className="font-medium italic text-gold-dark">to be confirmed by our team</dd>
+                  <dd className="font-medium italic text-gold-dark">extra · confirmed by our team</dd>
                 </div>
               </dl>
             )}
@@ -404,7 +410,7 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
               </li>
               <li className="flex flex-col items-center gap-2 rounded-2xl border border-stone-deep/70 bg-white/60 px-2 py-3.5">
                 <Truck className="h-4 w-4 text-gold" aria-hidden />
-                Shipping quoted separately
+                Shipping charges extra
               </li>
               <li className="flex flex-col items-center gap-2 rounded-2xl border border-stone-deep/70 bg-white/60 px-2 py-3.5">
                 <MessageCircle className="h-4 w-4 text-gold" aria-hidden />
@@ -523,7 +529,7 @@ const Gallery: React.FC<{ images: string[]; name: string; active: number; onChan
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.6, ease: EASE_LUXURY }}
-              className="absolute inset-0 h-full w-full object-contain p-6 sm:p-10"
+              className="absolute inset-0 h-full w-full object-cover"
               draggable={false}
             />
           </AnimatePresence>
@@ -566,7 +572,7 @@ const Gallery: React.FC<{ images: string[]; name: string; active: number; onChan
                 active === i ? 'border-burgundy shadow-[0_0_0_3px_rgba(94,26,40,0.12)]' : 'border-stone-deep opacity-70 hover:border-gold hover:opacity-100'
               }`}
             >
-              <img src={src} alt="" className="h-full w-full object-contain" />
+              <img src={src} alt="" className="h-full w-full object-cover" />
             </button>
           ))}
         </div>

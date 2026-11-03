@@ -13,12 +13,12 @@ const SECTIONS = [
     body: 'Your request is saved to your account with a reference beginning “SW-”. Our team reviews it and contacts you on the mobile number or email you provided to confirm availability, final pricing, shipping charges and delivery details. You can see each request and its status under “Your requests”.'
   },
   {
-    title: 'Prices',
-    body: 'Where a price is shown it is indicative. Many pieces are listed as “Price on request”. The final price is confirmed by our team. If we send you a quotation, it appears in your account; any later revision is added as a new version rather than changing the original request.'
+    title: 'Prices and minimum order',
+    body: 'Every No. 1 devotional frame is ₹99. The minimum order is 25 frames in total, and you can mix any designs to reach it. The final amount is confirmed by our team. If we send you a quotation, it appears in your account; any later revision is added as a new version rather than changing the original request.'
   },
   {
     title: 'Delivery',
-    body: 'Requests can be sent for delivery addresses in India (a 6-digit PIN code is required). Packing, courier, charges and timing are discussed and confirmed with you for each request.'
+    body: 'Requests can be sent for delivery addresses in India (a 6-digit PIN code is required). Shipping charges are extra: our team works them out for your quantity and PIN code and confirms them, with packing and timing, before dispatch.'
   },
   {
     title: 'Changing or cancelling a request',

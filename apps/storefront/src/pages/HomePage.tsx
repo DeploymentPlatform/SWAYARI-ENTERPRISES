@@ -13,16 +13,16 @@ import { useProducts } from '../lib/products';
 import { Product, BRAND_TAGLINES } from '@swayari/shared';
 import { productCardImage, uniqueProductImages } from '../lib/media';
 
-const DEITIES = [
-  { key: 'ganesha', label: 'Ganesha', href: '/shop?deity=ganesha' },
-  { key: 'lakshmi', label: 'Lakshmi', href: '/shop?deity=lakshmi' },
-  { key: 'venkateswara', label: 'Balaji', href: '/shop?deity=balaji' },
-  { key: 'radha', label: 'Radha Krishna', href: '/shop?deity=radha-krishna' },
-  { key: 'hanuman', label: 'Hanuman', href: '/shop?deity=hanuman' },
-  { key: 'shiva', label: 'Shiva Parvati', href: '/shop?deity=shiva' },
-  { key: 'saraswati', label: 'Saraswati', href: '/shop?deity=saraswati' },
-  { key: 'sai', label: 'Sai Baba', href: '/shop?deity=sai' }
-];
+// Short names for the "Shop by deity" row; one tile per frame in the catalogue.
+const DEITY_LABELS: Record<string, string> = {
+  balaji: 'Balaji',
+  'balaji padmavathi': 'Padmavathi Srinivasa',
+  'sai baba': 'Sai Baba',
+  'radha krishna': 'Radha Krishna',
+  'bal krishna': 'Bal Krishna',
+  'ram darbar': 'Ram Darbar',
+  hanuman: 'Hanuman'
+};
 
 const SkeletonCard: React.FC = () => (
   <div className="overflow-hidden rounded-card border border-stone-deep/70 bg-white">
@@ -39,7 +39,7 @@ const SkeletonCard: React.FC = () => (
 export const HomePage: React.FC = () => {
   usePageMeta(
     BRAND_TAGLINES.headline,
-    `${BRAND_TAGLINES.supporting} Devotional god frames in gold and teak finishes for wedding return gifts, griha pravesh and auspicious celebrations. Shipping quoted separately.`
+    `${BRAND_TAGLINES.supporting} No. 1 silver foil god frames at ₹99 each for wedding return gifts, griha pravesh and poojas. Minimum order 25 frames; shipping extra.`
   );
 
   const { products, status } = useProducts();
@@ -65,15 +65,18 @@ export const HomePage: React.FC = () => {
   const eligibleFrames = products.filter(p => p.indicativePrice !== null && p.indicativePrice <= 99);
   const featuredFrames = (eligibleFrames.length > 0 ? eligibleFrames : products).slice(0, 8);
 
-  // One representative photograph per deity, taken from the live catalogue.
+  // One tile per frame, linking straight to that design.
   const deityTiles = useMemo(
     () =>
-      DEITIES.map(d => {
-        const match = products.find(
-          p => (p.deity || '').toLowerCase().includes(d.key) || p.name.toLowerCase().includes(d.key)
-        );
-        return { ...d, image: uniqueProductImages(match?.images)[0] };
-      }).filter(d => d.image),
+      products
+        .map(p => ({
+          key: p.id,
+          label: DEITY_LABELS[(p.deity || '').toLowerCase()] || p.deity || p.name,
+          href: `/product/${p.slug}`,
+          image: uniqueProductImages(p.images)[0]
+        }))
+        .filter(d => d.image)
+        .slice(0, 8),
     [products]
   );
 
@@ -98,19 +101,19 @@ export const HomePage: React.FC = () => {
                 }
               />
             </Reveal>
-            <StaggerGroup className="scrollbar-none -mx-4 mt-10 flex snap-x gap-5 overflow-x-auto px-4 pb-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-8 sm:overflow-visible sm:px-0 lg:grid-cols-8">
+            <StaggerGroup className="scrollbar-none -mx-4 mt-10 flex snap-x gap-5 overflow-x-auto px-4 pb-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-8 sm:overflow-visible sm:px-0 lg:grid-cols-7">
               {deityTiles.map(d => (
                 <StaggerItem key={d.key} className="w-[104px] flex-shrink-0 snap-start sm:w-auto">
                   <Link to={d.href} className="group flex flex-col items-center text-center">
                     <span className="relative block aspect-square w-full rounded-full p-[3px] transition-all duration-700 ease-luxury [background:conic-gradient(from_180deg,#E3CC9A,#8C6B2E,#E3CC9A,#B8924A,#E3CC9A)] group-hover:rotate-[10deg] group-hover:shadow-gold">
-                      <span className="block h-full w-full overflow-hidden rounded-full bg-gradient-to-b from-ivory-light to-stone p-3">
+                      <span className="block h-full w-full overflow-hidden rounded-full bg-gradient-to-b from-ivory-light to-stone">
                         <img
                           {...productCardImage(d.image!)}
                           sizes="(min-width: 1024px) 120px, (min-width: 640px) 160px, 104px"
                           alt=""
                           loading="lazy"
                           decoding="async"
-                          className="h-full w-full object-contain transition-transform duration-700 ease-luxury group-hover:-rotate-[10deg] group-hover:scale-110"
+                          className="h-full w-full scale-[1.35] object-cover transition-transform duration-700 ease-luxury group-hover:-rotate-[10deg] group-hover:scale-[1.5]"
                         />
                       </span>
                     </span>
@@ -132,10 +135,10 @@ export const HomePage: React.FC = () => {
               eyebrow="The devotional collection"
               title={
                 <>
-                  Devotional frames <em>₹99 &amp; under</em>
+                  Silver foil god frames <em>₹99 each</em>
                 </>
               }
-              intro="Auspicious god frames in gold-relief and teak finishes. Choose designs and quantities for your celebrations."
+              intro="Silver foil relief with hand-applied colour, in a maroon and gold frame that stands on a table or hangs on a wall. Mix any designs — minimum 25 frames per order."
               action={
                 <Link to="/shop" className="btn-secondary hidden md:inline-flex">
                   Explore all frames <ArrowRight className="h-4 w-4" />
@@ -174,10 +177,10 @@ export const HomePage: React.FC = () => {
               <div className="absolute -inset-3 rounded-t-full border border-gold/40 sm:-inset-5" aria-hidden />
               <div className="relative overflow-hidden rounded-t-full shadow-dialog">
                 <img
-                  src="/assets/editorial/hero-devotional-collection-desktop.webp"
-                  srcSet="/assets/editorial/hero-devotional-collection-mobile.webp 900w, /assets/editorial/hero-devotional-collection-desktop.webp 1440w"
+                  src="/assets/editorial/hero-god-frames-desktop.webp"
+                  srcSet="/assets/editorial/hero-god-frames-mobile.webp 900w, /assets/editorial/hero-god-frames-desktop.webp 1376w"
                   sizes="(min-width: 1024px) 460px, 420px"
-                  alt="Gold-relief devotional frames arranged for a celebration"
+                  alt="Devotional frames arranged for a celebration"
                   loading="lazy"
                   decoding="async"
                   className="aspect-[4/5] w-full object-cover transition-transform duration-[2000ms] ease-luxury hover:scale-105"
@@ -185,7 +188,7 @@ export const HomePage: React.FC = () => {
               </div>
               <div className="absolute -bottom-6 -right-2 hidden rounded-2xl border border-gold/30 bg-ivory-light/95 px-6 py-5 shadow-card backdrop-blur sm:block lg:-right-8">
                 <p className="font-display text-4xl text-burgundy">₹99</p>
-                <p className="mt-1 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-gold-dark">Price ceiling on every frame</p>
+                <p className="mt-1 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-gold-dark">Every frame, every design</p>
               </div>
             </div>
           </Reveal>
@@ -196,12 +199,12 @@ export const HomePage: React.FC = () => {
               Devotion, <em>thoughtfully</em> given
             </h2>
             <p className="lede mt-6">
-              SWAYARI curates devotional god frames that families are proud to hand to every guest. Each piece is chosen for its finish, its presence on a home altar, and a price that lets you be generous with every invitation.
+              SWAYARI brings you devotional god frames that families are proud to hand to every guest. Each one has silver foil relief with colour work, a cream mount and a carved-look maroon and gold border — at a price that lets you be generous with every invitation.
             </p>
             <ul className="mt-8 grid gap-5 sm:grid-cols-3">
               {[
-                { icon: Flower2, title: 'Auspicious designs', body: 'Ganesha to Sai Baba' },
-                { icon: PackageCheck, title: 'Bulk ready', body: 'Mix designs freely' },
+                { icon: Flower2, title: 'Seven designs', body: 'Balaji to Sai Baba' },
+                { icon: PackageCheck, title: 'From 25 frames', body: 'Mix designs freely' },
                 { icon: HandHeart, title: 'Personal service', body: 'We confirm every detail' }
               ].map(item => (
                 <li key={item.title} className="rounded-2xl border border-stone-deep/70 bg-ivory-light/70 p-4">

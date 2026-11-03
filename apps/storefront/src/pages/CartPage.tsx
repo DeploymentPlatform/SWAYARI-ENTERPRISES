@@ -1,7 +1,7 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Trash2 } from 'lucide-react';
-import { formatPrice } from '@swayari/shared';
+import { MIN_ORDER_FRAMES, formatPrice } from '@swayari/shared';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Link, useRouter } from '../lib/router';
@@ -9,7 +9,7 @@ import { productImageSources } from '../lib/media';
 import { usePageMeta } from '../lib/meta';
 import { EmptyState, PageIntro, RequestSteps } from '../components/States';
 import { EASE_LUXURY } from '../components/motion';
-import { OrderDisclaimer, Picture, PriceText, QuantityStepper } from '../components/ui';
+import { MinimumOrderMeter, OrderDisclaimer, Picture, PriceText, QuantityStepper } from '../components/ui';
 
 export const CartPage: React.FC = () => {
   const { items, updateQuantity, removeItem, subtotal, hasUnpricedItems, itemCount } = useCart();
@@ -128,7 +128,7 @@ export const CartPage: React.FC = () => {
             </h2>
             <dl className="mt-5 space-y-3.5 text-[0.9375rem]">
               <div className="flex justify-between">
-                <dt className="text-ink-soft">Pieces</dt>
+                <dt className="text-ink-soft">Frames</dt>
                 <dd className="font-medium tabular-nums">{itemCount}</dd>
               </div>
               <div className="flex items-baseline justify-between gap-4 border-t border-stone-deep/70 pt-3.5">
@@ -140,16 +140,22 @@ export const CartPage: React.FC = () => {
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-ink-soft">Shipping</dt>
-                <dd className="text-right font-medium italic text-gold-dark">To be confirmed by our team</dd>
+                <dd className="text-right font-medium italic text-gold-dark">Extra · confirmed by our team</dd>
               </div>
             </dl>
-            <OrderDisclaimer className="mt-6" compact />
+            <MinimumOrderMeter count={itemCount} className="mt-6" />
+            <OrderDisclaimer className="mt-3" compact />
             <button
               type="button"
               className="btn-primary mt-6 w-full"
+              disabled={itemCount < MIN_ORDER_FRAMES}
               onClick={() => (user ? navigate('/checkout') : initiateGoogleSignIn(undefined, 'checkout'))}
             >
-              {user ? 'Continue to request details' : 'Sign in to send request'}
+              {itemCount < MIN_ORDER_FRAMES
+                ? `Add ${MIN_ORDER_FRAMES - itemCount} more frames`
+                : user
+                  ? 'Continue to request details'
+                  : 'Sign in to send request'}
             </button>
             <p className="mt-4 text-center text-xs text-ink-faint">No payment is taken online.</p>
           </motion.div>

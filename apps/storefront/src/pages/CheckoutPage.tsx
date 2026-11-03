@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Lock, Mail } from 'lucide-react';
-import { formatPrice, OCCASIONS, validateOrderSubmission } from '@swayari/shared';
+import { formatPrice, MIN_ORDER_FRAMES, OCCASIONS, validateOrderSubmission } from '@swayari/shared';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Link, useRouter } from '../lib/router';
@@ -102,6 +102,23 @@ export const CheckoutPage: React.FC = () => {
     return (
       <div className="container-content">
         <EmptyState title="Your bag is empty" body={<p>Add pieces to your bag before sending a request.</p>} action={{ to: '/shop', label: 'Explore the Collection' }} />
+      </div>
+    );
+  }
+
+  const frameCount = items.reduce((sum, it) => sum + it.quantity, 0);
+  if (frameCount < MIN_ORDER_FRAMES) {
+    return (
+      <div className="container-content">
+        <EmptyState
+          title={`Minimum order is ${MIN_ORDER_FRAMES} frames`}
+          body={
+            <p>
+              Your bag has {frameCount} {frameCount === 1 ? 'frame' : 'frames'}. Add {MIN_ORDER_FRAMES - frameCount} more — you can mix any designs — and then send your request.
+            </p>
+          }
+          action={{ to: '/shop', label: 'Add more frames' }}
+        />
       </div>
     );
   }
@@ -359,7 +376,7 @@ export const CheckoutPage: React.FC = () => {
               <span>
                 <span className="font-semibold text-ink">This is a bulk or return gifting request</span>
                 <span className="mt-0.5 block text-[0.8125rem] text-ink-soft">
-                  Our team will check special volume packaging, customized tags, and tiered pricing for your celebration.
+                  Our team will plan packing and delivery timing around your function date.
                 </span>
               </span>
             </label>
@@ -441,7 +458,7 @@ export const CheckoutPage: React.FC = () => {
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-ink-soft">Shipping</dt>
-                <dd className="text-right font-medium italic text-gold-dark">To be confirmed by our team</dd>
+                <dd className="text-right font-medium italic text-gold-dark">Extra · confirmed by our team</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-ink-soft">Payment</dt>

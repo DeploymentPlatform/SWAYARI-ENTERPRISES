@@ -27,6 +27,16 @@ export async function onRequestPut(context) {
       isActive
     } = body;
 
+    // Links and images must stay on this site: no javascript:, no outside redirects.
+    const isInternalPath = v => typeof v === 'string' && /^\/(?![\/\\])[^\s<>"']*$/.test(v) && v.length <= 300;
+    const isSiteImage = v => typeof v === 'string' && /^\/assets\/[a-zA-Z0-9/_.-]+\.(webp|jpe?g|png|avif)$/.test(v);
+    if (ctaHref !== undefined && !isInternalPath(ctaHref)) {
+      return errorResponse('Button link must be a page on this site, for example /shop', 400);
+    }
+    if ((desktopImage !== undefined && !isSiteImage(desktopImage)) || (mobileImage !== undefined && !isSiteImage(mobileImage))) {
+      return errorResponse('Banner images must be images from this site (/assets/...)', 400);
+    }
+
     const existing = await env.DB.prepare('SELECT * FROM campaign_banners WHERE id = ?').bind(bannerId).first();
     if (!existing) {
       return errorResponse('Campaign banner not found', 404);
@@ -65,13 +75,7 @@ export async function onRequestPut(context) {
       bannerId
     ).run();
 
-    await logAudit(env, {
-      userId: session.userId,
-      action: 'update_banner',
-      resourceType: 'campaign_banner',
-      resourceId: bannerId,
-      details: { headline, isActive }
-    });
+    await logAudit(env, 'campaign_banner', bannerId, 'admin_update_banner', session.user.email, { headline, isActive });
 
     return jsonResponse({
       success: true,
@@ -101,12 +105,7 @@ export async function onRequestDelete(context) {
 
     await env.DB.prepare('DELETE FROM campaign_banners WHERE id = ?').bind(bannerId).run();
 
-    await logAudit(env, {
-      userId: session.userId,
-      action: 'delete_banner',
-      resourceType: 'campaign_banner',
-      resourceId: bannerId
-    });
+    await logAudit(env, 'campaign_banner', bannerId, 'admin_delete_banner', session.user.email);
 
     return jsonResponse({
       success: true,

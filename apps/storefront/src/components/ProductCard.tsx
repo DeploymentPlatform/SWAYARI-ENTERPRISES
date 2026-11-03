@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Eye, ShoppingBag, Check, ArrowUpRight } from 'lucide-react';
-import { Product, formatPrice } from '@swayari/shared';
+import { MIN_ORDER_FRAMES, Product, formatPrice } from '@swayari/shared';
 import { Link } from '../lib/router';
 import { toCartItem } from '../lib/products';
 import { useCart } from '../context/CartContext';
@@ -15,7 +15,7 @@ interface ProductCardProps {
   sizes?: string;
 }
 
-const FALLBACK_IMAGE = '/assets/products/venkateswara-frame-960.webp';
+const FALLBACK_IMAGE = '/assets/products/gf-venkateswara-studio.webp';
 
 export const ProductImage: React.FC<{ product: Product; sizes?: string; priority?: boolean; className?: string }> = ({
   product,
@@ -26,21 +26,21 @@ export const ProductImage: React.FC<{ product: Product; sizes?: string; priority
   const primaryImg = uniqueProductImages(product.images)[0] || FALLBACK_IMAGE;
 
   return (
-    <div className={`relative flex aspect-square w-full items-center justify-center overflow-hidden bg-gradient-to-b from-ivory-light to-stone p-4 ${className}`}>
+    <div className={`relative flex aspect-square w-full items-center justify-center overflow-hidden bg-gradient-to-b from-ivory-light to-stone ${className}`}>
       <img
         {...productCardImage(primaryImg)}
         alt={product.name}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
         sizes={sizes || PRODUCT_CARD_SIZES}
-        className="h-full w-full object-contain drop-shadow-[0_14px_18px_rgba(46,12,20,0.18)] transition-transform duration-700 ease-luxury group-hover:scale-[1.06]"
+        className="h-full w-full object-cover transition-transform duration-700 ease-luxury group-hover:scale-[1.06]"
       />
     </div>
   );
 };
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, sizes }) => {
-  const { addItem, openDrawer } = useCart();
+  const { addItem, openDrawer, itemCount } = useCart();
   const { user, initiateGoogleSignIn } = useAuth();
 
   const [quickViewOpen, setQuickViewOpen] = useState(false);
@@ -58,8 +58,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, siz
     e.preventDefault();
     e.stopPropagation();
 
-    const minQ = product.minQuantity || 1;
-    const item = toCartItem(product, minQ);
+    // Fill what the order-wide minimum still needs; once met, add a modest default.
+    const item = toCartItem(product, itemCount < MIN_ORDER_FRAMES ? MIN_ORDER_FRAMES - itemCount : 10);
     if (!user) {
       initiateGoogleSignIn(item, 'add');
       return;
@@ -85,16 +85,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, siz
         onPointerEnter={e => e.pointerType === 'mouse' && setHovered(true)}
         className="group relative flex h-full flex-col overflow-hidden rounded-card border border-stone-deep/80 bg-white shadow-card transition-all duration-500 ease-luxury hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-card-hover">
         {/* Image stage */}
-        <div className="relative aspect-[4/5] w-full overflow-hidden bg-gradient-to-b from-ivory-light via-ivory to-stone sm:aspect-square">
-          <div className="pointer-events-none absolute inset-x-6 bottom-3 h-6 rounded-[50%] bg-burgundy-deep/10 blur-xl transition-all duration-700 group-hover:inset-x-10 group-hover:bg-burgundy-deep/15" />
-          <Link to={href} className="absolute inset-0 block p-4 sm:p-6" tabIndex={-1} aria-hidden>
+        <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-b from-ivory-light via-ivory to-stone">
+          <Link to={href} className="absolute inset-0 block" tabIndex={-1} aria-hidden>
             <img
               {...productCardImage(primaryImg)}
               sizes={sizes || PRODUCT_CARD_SIZES}
               alt={product.name}
               loading={priority ? 'eager' : 'lazy'}
               decoding="async"
-              className={`h-full w-full object-contain drop-shadow-[0_16px_20px_rgba(46,12,20,0.2)] transition-all duration-700 ease-luxury group-hover:scale-[1.06] ${
+              className={`h-full w-full object-cover transition-all duration-700 ease-luxury group-hover:scale-[1.06] ${
                 secondaryReady ? 'group-hover:opacity-0' : ''
               }`}
             />
@@ -105,7 +104,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, siz
                 onLoad={() => setSecondaryReady(true)}
                 alt=""
                 loading="lazy"
-                className="absolute inset-0 h-full w-full scale-[1.02] object-contain p-4 opacity-0 transition-all duration-700 ease-luxury group-hover:scale-100 group-hover:opacity-100 sm:p-6"
+                className="absolute inset-0 h-full w-full scale-[1.02] object-cover opacity-0 transition-all duration-700 ease-luxury group-hover:scale-100 group-hover:opacity-100"
               />
             )}
           </Link>

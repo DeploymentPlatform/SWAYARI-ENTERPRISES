@@ -12,18 +12,18 @@ interface BulkReturnGiftsSectionProps {
 const PILLARS = [
   {
     icon: CheckCircle2,
-    title: 'Auspicious deity selection',
-    body: 'Choose Ganesha, Lakshmi, Balaji, Radha Krishna and Hanuman frames. Mix designs freely across your request.'
+    title: 'Seven auspicious designs',
+    body: 'Balaji, Padmavathi Srinivasa, Sai Baba, Radha Krishna, Bal Krishna, Ram Darbar and Hanuman. Mix them freely.'
   },
   {
     icon: Sparkles,
-    title: 'Strict ₹99 price ceiling',
-    body: 'Every frame and variant is ₹99 or less, with quantity pricing tiers from ₹49 for mass favours.'
+    title: 'One simple price: ₹99',
+    body: 'Every frame is ₹99. Minimum order is 25 frames in total, in any mix of designs.'
   },
   {
     icon: Truck,
-    title: 'Separate shipping quote',
-    body: 'Shipping calculated for your order volume and destination PIN code. No hidden fees.'
+    title: 'Shipping charged extra',
+    body: 'Shipping is worked out for your quantity and delivery PIN code, and confirmed before dispatch.'
   }
 ];
 
@@ -36,7 +36,7 @@ export const BulkReturnGiftsSection: React.FC<BulkReturnGiftsSectionProps> = ({ 
         <Reveal>
           <div className="relative overflow-hidden rounded-[28px] bg-burgundy-deep text-ivory-light shadow-dialog">
             <img
-              src="/assets/editorial/hero-slide-1-moments-desktop.webp"
+              src="/assets/editorial/hero-return-gifts-desktop.webp"
               alt=""
               loading="lazy"
               className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-luminosity"
@@ -53,7 +53,7 @@ export const BulkReturnGiftsSection: React.FC<BulkReturnGiftsSectionProps> = ({ 
                   A blessing in every guest’s hands, <span className="italic text-gold-light">beautifully framed.</span>
                 </h2>
                 <p className="mt-5 max-w-xl text-[0.95rem] leading-relaxed text-ivory-light/80 sm:text-base">
-                  Planning a wedding, griha pravesh or family celebration? Choose auspicious devotional frames at ₹99 or less. Mix designs or pick one deity, tell us your quantity, and our team handles personal confirmation and safe dispatch.
+                  Planning a wedding, griha pravesh or family celebration? Choose silver foil god frames at ₹99 each. Mix designs or pick one deity, tell us your quantity (25 frames or more), and our team handles personal confirmation and safe dispatch.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link to="/shop?bulk=1" className="btn-gold">

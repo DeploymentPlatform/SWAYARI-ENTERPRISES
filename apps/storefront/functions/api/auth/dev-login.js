@@ -48,6 +48,7 @@ export async function onRequestPost(context) {
       }
     }, 200, { 'Set-Cookie': cookie });
   } catch (err) {
-    return errorResponse(`Dev login error: ${err.message}`, 500);
+    console.error(err);
+    return errorResponse(`Dev login error. Please try again.`, 500);
   }
 }

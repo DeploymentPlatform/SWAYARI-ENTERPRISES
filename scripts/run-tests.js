@@ -31,6 +31,7 @@ import * as admProductDetails from '../apps/admin/functions/api/admin/products/[
 import * as admCategoriesList from '../apps/admin/functions/api/admin/categories/index.js';
 import * as admAuthConfig from '../apps/admin/functions/api/auth/config.js';
 import * as admAssets from '../apps/admin/functions/api/admin/assets.js';
+import * as admBannersList from '../apps/admin/functions/api/admin/banners/index.js';
 import {
   calculateEffectiveUnitPrice,
   calculateLineSubtotal,
@@ -76,8 +77,9 @@ console.log('SWAYARI ENTERPRISES - Two-Portal System Test Suite');
 console.log('====================================================');
 
 const env = {
-  DB: createMockD1(),
+  DB: createMockD1({ legacyFixtures: true }),
   ENVIRONMENT: 'development',
+  MIN_ORDER_FRAMES: '1', // legacy tests use small quantities; the 25-frame rule has its own tests
   ADMIN_EMAILS: 'swayarienterprises@gmail.com',
   GOOGLE_STOREFRONT_CLIENT_ID: 'storefront-client.apps.googleusercontent.com',
   GOOGLE_ADMIN_CLIENT_ID: 'admin-client.apps.googleusercontent.com',
@@ -1093,29 +1095,109 @@ await test('39. Sample data is strictly isolated when ENVIRONMENT is missing, em
   }
 });
 
-await test('40. Authentic devotional frame photographs and hero banners exist on disk and have non-zero file sizes', async () => {
-  const assetsDir = path.join(process.cwd(), 'public', 'assets');
-  const requiredAssets = [
-    'products/venkateswara-frame-960.webp',
-    'products/ganesha-frame-800.webp',
-    'products/lakshmi-frame-800.webp',
-    'products/radha-krishna-frame-960.webp',
-    'products/saraswati-frame-800.webp',
-    'products/shiva-parvati-frame-800.webp',
-    'products/murugan-frame-800.webp',
-    'products/sai-baba-frame-800.webp',
-    'products/placeholder-devotional-frame-800.webp',
-    'editorial/hero-devotional-collection-desktop.webp',
-    'editorial/hero-wedding-favors-desktop.webp',
-    'editorial/hero-bulk-process-desktop.webp'
-  ];
+// GOD FRAMES CATALOGUE (all migrations, no legacy fixtures)
+const liveDb = createMockD1();
+const liveRows = sql => liveDb._rawDb.prepare(sql).all();
 
-  for (const rel of requiredAssets) {
-    const fullPath = path.join(assetsDir, rel);
-    assert.ok(fs.existsSync(fullPath), `Asset ${rel} must exist in public/assets`);
-    const stats = fs.statSync(fullPath);
-    assert.ok(stats.size > 5000, `Asset ${rel} size (${stats.size} bytes) must be > 5,000 bytes`);
+await test('40. Live catalogue is exactly the seven No. 1 god frames at ₹99 under one God Frames category', async () => {
+  const products = liveRows("SELECT * FROM products WHERE status = 'published' AND is_demo = 0");
+  assert.equal(products.length, 7, 'Exactly seven frames are for sale');
+  for (const p of products) {
+    assert.equal(p.indicative_price, 99, `${p.name} must cost ₹99`);
+    assert.equal(p.category_id, 'cat-god-frames', `${p.name} must be under God Frames`);
+    assert.ok(p.name.endsWith('Silver Foil Frame'), `${p.name} must be named as a silver foil frame`);
   }
+  const categories = liveRows('SELECT * FROM categories');
+  assert.deepEqual(categories.map(c => c.name), ['God Frames']);
+});
+
+await test('41. "Silver" never appears on its own in catalogue or banner text', async () => {
+  const texts = [
+    ...liveRows('SELECT name, slug, description, material, set_contents, customisation_info FROM products'),
+    ...liveRows('SELECT name, slug, description FROM categories'),
+    ...liveRows('SELECT badge, headline, emphasis, supporting, alt FROM campaign_banners WHERE is_active = 1')
+  ].flatMap(r => Object.values(r)).filter(v => typeof v === 'string');
+  for (const t of texts) {
+    const loose = t.toLowerCase().replace(/silver[ -]foil/g, '');
+    assert.ok(!loose.includes('silver'), `Plain "silver" found in: ${t}`);
+  }
+});
+
+await test('42. Every product and active banner image exists on disk', async () => {
+  const assetsRoot = path.join(process.cwd(), 'public');
+  const paths = new Set();
+  for (const p of liveRows("SELECT images FROM products WHERE status = 'published'")) {
+    const imgs = JSON.parse(p.images);
+    assert.equal(imgs.length, 3, 'Each frame has studio, in-use and back photos');
+    imgs.forEach(i => paths.add(i));
+  }
+  for (const b of liveRows('SELECT desktop_image, mobile_image FROM campaign_banners WHERE is_active = 1')) {
+    paths.add(b.desktop_image);
+    paths.add(b.mobile_image);
+  }
+  for (const rel of paths) {
+    const full = path.join(assetsRoot, rel);
+    assert.ok(fs.existsSync(full), `${rel} must exist`);
+    assert.ok(fs.statSync(full).size > 5000, `${rel} must not be empty`);
+  }
+});
+
+await test('43. Orders under 25 frames are refused; 25 frames in any mix are accepted', async () => {
+  const realEnv = { ...env, MIN_ORDER_FRAMES: undefined };
+  const login = await sfDevLogin.onRequestPost(makeContext(makeRequest('http://storefront/api/auth/dev-login', {
+    method: 'POST', body: { customEmail: 'min.order@example.com', customName: 'Min Order' }
+  }), realEnv));
+  const cookie = `swayari_customer_session=${login.headers.get('Set-Cookie').match(/swayari_customer_session=([^;]+)/)[1]}`;
+  const productId = env.DB._rawDb.prepare("SELECT id FROM products WHERE status = 'published' AND min_quantity <= 1 AND order_increment = 1 LIMIT 1").get().id;
+  const order = (key, qty) => sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+    method: 'POST', cookie,
+    body: {
+      idempotencyKey: key, customerName: 'Min Order', customerPhone: '9876543210',
+      deliveryAddress: '12 Temple Street', deliveryCity: 'Tirupati', deliveryState: 'Andhra Pradesh', deliveryPincode: '517501',
+      items: [{ productId, quantity: qty }]
+    }
+  }), realEnv));
+  const small = await order('min-order-24-' + Date.now(), 24);
+  assert.equal(small.status, 400);
+  assert.ok((await small.json()).error.includes('25'));
+  const ok = await order('min-order-25-' + Date.now(), 25);
+  assert.equal(ok.status, 201);
+});
+
+await test('44. Order requests with oversized fields are refused', async () => {
+  const res = await sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+    method: 'POST', cookie: customerCookie,
+    body: {
+      idempotencyKey: 'too-long-' + Date.now(), customerName: 'Ananya Sharma', customerPhone: '9876543210',
+      deliveryAddress: 'x'.repeat(5000), deliveryCity: 'Hyderabad', deliveryState: 'Telangana', deliveryPincode: '500034',
+      items: [{ productId: createdProdId, quantity: 30 }]
+    }
+  }), env));
+  assert.equal(res.status, 400);
+});
+
+await test('45. Middleware refuses state changes from foreign or missing origins', async () => {
+  const prodEnv = { ...env, ENVIRONMENT: 'production' };
+  const call = (mw, url, origin) => mw.onRequest(makeContext(makeRequest(url, {
+    method: 'POST', headers: origin ? { Origin: origin } : {}, body: {}
+  }), prodEnv));
+  for (const [mw, url] of [[sfMiddleware, 'https://swayari-store.pages.dev/api/auth/google'], [admMiddleware, 'https://swayari-admin.pages.dev/api/auth/google']]) {
+    assert.equal((await call(mw, url, 'https://localhost.evil.com')).status, 403, 'Look-alike localhost origin must be refused');
+    assert.equal((await call(mw, url, 'https://evil.example')).status, 403, 'Foreign origin must be refused');
+    assert.equal((await call(mw, url, null)).status, 403, 'Missing origin must be refused');
+    assert.equal((await call(mw, url, new URL(url).origin)).status, 200, 'Same origin must pass');
+  }
+});
+
+await test('46. Banner buttons can only link to pages on this site', async () => {
+  const res = await admBannersList.onRequestPost(makeContext(makeRequest('http://admin/api/admin/banners', {
+    method: 'POST', cookie: adminCookie,
+    body: {
+      headline: 'Test', ctaText: 'Go', ctaHref: 'javascript:alert(1)',
+      desktopImage: '/assets/editorial/hero-god-frames-desktop.webp', mobileImage: '/assets/editorial/hero-god-frames-mobile.webp'
+    }
+  }), env));
+  assert.equal(res.status, 400);
 });
 
 console.log('====================================================');

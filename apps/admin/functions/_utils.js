@@ -53,12 +53,12 @@ export function createAdminSessionCookie(sessionId, isProduction = true) {
   const maxAge = 7 * 24 * 60 * 60; // 7 days for staff sessions
   const secureFlag = isProduction ? '; Secure' : '';
   // Host-only cookie: No Domain attribute
-  return `${ADMIN_COOKIE_NAME}=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secureFlag}`;
+  return `${ADMIN_COOKIE_NAME}=${sessionId}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secureFlag}`;
 }
 
 export function clearAdminSessionCookie(isProduction = true) {
   const secureFlag = isProduction ? '; Secure' : '';
-  return `${ADMIN_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT${secureFlag}`;
+  return `${ADMIN_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT${secureFlag}`;
 }
 
 export function generateCryptoId(bytes = 32) {
@@ -70,12 +70,10 @@ export function generateCryptoId(bytes = 32) {
 export function isAllowedAdminEmail(email, env) {
   if (!email) return false;
   const normalized = email.trim().toLowerCase();
-  if (normalized === 'swayarienterprises@gmail.com') return true;
-  if (env && env.ADMIN_EMAILS) {
-    const list = String(env.ADMIN_EMAILS).split(',').map(e => e.trim().toLowerCase());
-    return list.includes(normalized);
-  }
-  return false;
+  // ADMIN_EMAILS (wrangler.toml) is the source of truth; the owner address is only a fallback when it is unset.
+  const configured = env && env.ADMIN_EMAILS ? String(env.ADMIN_EMAILS) : 'swayarienterprises@gmail.com';
+  const list = configured.split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+  return list.includes(normalized);
 }
 
 export async function verifyAdminGoogleToken(idToken, env) {

@@ -20,32 +20,32 @@ const CONFIRMED_SLIDES: Slide[] = [
   {
     id: 'devotional-99',
     badge: 'Auspicious Celebrations',
-    headline: 'Devotional frames',
-    emphasis: '₹99 & under',
-    supporting: 'Thoughtful return gifts for your special celebrations. Pure devotion, beautifully framed.',
-    desktopImage: '/assets/editorial/hero-devotional-collection-desktop.webp',
-    mobileImage: '/assets/editorial/hero-devotional-collection-mobile.webp',
-    alt: 'Devotional sanctum frames for weddings and celebrations'
+    headline: 'Silver foil god frames',
+    emphasis: '₹99 each',
+    supporting: 'Balaji, Padmavathi Srinivasa, Sai Baba, Radha Krishna, Bal Krishna, Ram Darbar and Hanuman. Mix any designs in one order.',
+    desktopImage: '/assets/editorial/hero-god-frames-desktop.webp',
+    mobileImage: '/assets/editorial/hero-god-frames-mobile.webp',
+    alt: 'Five silver foil god frames on a pooja table with brass diyas and marigolds'
   },
   {
     id: 'thoughtful-thank-you',
     badge: 'Cherished Keepsakes',
     headline: 'A thoughtful thank-you',
     emphasis: 'for every guest.',
-    supporting: 'Blessings of Ganesha, Lakshmi, Balaji & Radha Krishna. Quoted separately for bulk shipping.',
-    desktopImage: '/assets/editorial/hero-wedding-favors-desktop.webp',
-    mobileImage: '/assets/editorial/hero-wedding-favors-mobile.webp',
-    alt: 'Auspicious wedding return gift frames'
+    supporting: 'Silver foil frames that stand on a table or hang on a wall. Minimum order 25 frames; shipping charged extra.',
+    desktopImage: '/assets/editorial/hero-return-gifts-desktop.webp',
+    mobileImage: '/assets/editorial/hero-return-gifts-mobile.webp',
+    alt: 'Rows of silver foil god frames tied with ribbon on a wedding return-gift table'
   },
   {
     id: 'bulk-quantity-choice',
     badge: 'Seamless Bulk Requests',
     headline: 'Choose your frames.',
     emphasis: 'Tell us your quantity.',
-    supporting: 'Select your preferred designs. Our team contacts you to confirm availability, packing and dispatch.',
-    desktopImage: '/assets/editorial/hero-bulk-process-desktop.webp',
-    mobileImage: '/assets/editorial/hero-bulk-process-mobile.webp',
-    alt: 'Bulk devotional return gifts'
+    supporting: 'Pick your designs, tell us how many, and our team calls you to confirm stock, packing and shipping.',
+    desktopImage: '/assets/editorial/hero-bulk-order-desktop.webp',
+    mobileImage: '/assets/editorial/hero-bulk-order-mobile.webp',
+    alt: 'Silver foil god frames packed in gift boxes for a bulk order'
   }
 ];
 

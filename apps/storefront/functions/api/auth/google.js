@@ -41,7 +41,7 @@ export async function onRequestPost(context) {
 
     await logAudit(env, 'auth', payload.sub, 'customer_google_login', payload.email);
 
-    const isProduction = env.ENVIRONMENT === 'production';
+    const isProduction = env.ENVIRONMENT !== 'development';
     const cookie = createCustomerSessionCookie(sessionId, isProduction);
 
     return jsonResponse({
@@ -56,6 +56,6 @@ export async function onRequestPost(context) {
     }, 200, { 'Set-Cookie': cookie });
   } catch (err) {
     console.error('Storefront Google Auth Error:', err.message);
-    return errorResponse(`Authentication failed: ${err.message}`, 401);
+    return errorResponse(`Authentication failed. Please try again.`, 401);
   }
 }

@@ -137,6 +137,6 @@ export async function onRequestGet(context) {
     });
   } catch (err) {
     console.error('Products List Error:', err);
-    return errorResponse(`Failed to fetch products: ${err.message}`, 500);
+    return errorResponse(`Failed to fetch products. Please try again.`, 500);
   }
 }

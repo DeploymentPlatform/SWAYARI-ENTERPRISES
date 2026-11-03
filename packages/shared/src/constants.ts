@@ -24,6 +24,9 @@ export const BRAND = {
 export const MAX_FRAME_PRICE = 99;
 export const MAX_FRAME_PRICE_PAISE = 9900;
 
+/** Smallest order we accept, counted across every design in one request. */
+export const MIN_ORDER_FRAMES = 25;
+
 export const ORDER_DISCLAIMER_TEXT =
   'Our team will contact you to confirm availability, final pricing, shipping charges and delivery details. Submitting this request does not confirm a purchase or reserve stock.';
 
@@ -43,11 +46,11 @@ export const SESSION_COOKIE_NAMES = {
 } as const;
 
 export const BRAND_TAGLINES = {
-  headline: 'Devotional frames ₹99 & under',
+  headline: 'Silver foil god frames at ₹99',
   supporting: 'Thoughtful return gifts for your special celebrations.',
-  proposition: 'Devotional frames ₹99 & under',
-  entryLevel: '₹49 & under',
-  shippingNote: 'Shipping is charged separately and confirmed by our team.'
+  proposition: 'Silver foil god frames at ₹99',
+  minimumOrder: 'Minimum order 25 frames — mix any designs',
+  shippingNote: 'Shipping charges are extra and confirmed by our team.'
 } as const;
 
 export interface FramePriceBandDefinition {
@@ -62,35 +65,11 @@ export interface FramePriceBandDefinition {
 export const FRAME_PRICE_BANDS: FramePriceBandDefinition[] = [
   {
     id: 'all-99',
-    label: 'All Frames (≤ ₹99)',
-    shortLabel: 'All ≤ ₹99',
+    label: 'All frames · ₹99',
+    shortLabel: '₹99',
     minPrice: 0,
     maxPrice: 99,
-    description: 'Devotional god frames in gold & teak finishes strictly under ₹99'
-  },
-  {
-    id: 'under-49',
-    label: 'Pocket & Mini (≤ ₹49)',
-    shortLabel: 'Under ₹49',
-    minPrice: 0,
-    maxPrice: 49,
-    description: 'Pocket prayer frames and mini Ganesha & Balaji favors from ₹49'
-  },
-  {
-    id: '50-79',
-    label: 'Classic 4"×6" (₹50–₹79)',
-    shortLabel: '₹50–₹79',
-    minPrice: 50,
-    maxPrice: 79,
-    description: 'Bala Krishna, Hanuman and Saraswati Devi frames in ornate borders'
-  },
-  {
-    id: '80-99',
-    label: 'Royal & Sanctum (₹80–₹99)',
-    shortLabel: '₹80–₹99',
-    minPrice: 80,
-    maxPrice: 99,
-    description: 'Sri Venkateswara and Radha Krishna gold-foil sanctum frames'
+    description: 'Every No. 1 god frame is ₹99'
   }
 ];
 
@@ -100,25 +79,16 @@ export type BudgetBandDefinition = FramePriceBandDefinition;
 
 export const DEITIES = [
   { id: 'all', name: 'All Deities' },
-  { id: 'ganesha', name: 'Ganesha' },
-  { id: 'lakshmi', name: 'Lakshmi' },
-  { id: 'balaji', name: 'Balaji (Venkateswara)' },
-  { id: 'radha-krishna', name: 'Radha Krishna' },
-  { id: 'krishna', name: 'Bala Krishna' },
-  { id: 'shiva-parvati', name: 'Shiva Parvati' },
-  { id: 'saraswati', name: 'Saraswati' },
-  { id: 'hanuman', name: 'Hanuman' },
-  { id: 'murugan', name: 'Murugan' },
-  { id: 'sai-baba', name: 'Sai Baba' }
+  { id: 'balaji', name: 'Balaji & Padmavathi' },
+  { id: 'sai', name: 'Sai Baba' },
+  { id: 'krishna', name: 'Krishna' },
+  { id: 'ram', name: 'Ram Darbar' },
+  { id: 'hanuman', name: 'Hanuman' }
 ] as const;
 
 export const FRAME_SIZES = [
   { id: 'all', name: 'All Sizes' },
-  { id: 'pocket', name: 'Pocket 2.5"×3.5"' },
-  { id: 'mini', name: 'Mini 3"×3"' },
-  { id: 'classic', name: 'Classic 4"×6"' },
-  { id: 'royal', name: 'Royal 5"×7"' },
-  { id: 'wide', name: 'Wide 6"×4"' }
+  { id: 'no. 1', name: 'No. 1' }
 ] as const;
 
 export const ORIENTATIONS = [
@@ -139,13 +109,13 @@ export const OCCASIONS = [
     id: 'housewarming',
     name: 'Griha Pravesh & Housewarming',
     badge: 'New Beginnings',
-    description: 'Sacred Ganesha and Balaji sanctum frames for new home blessings'
+    description: 'Balaji, Padmavathi Srinivasa and Ram Darbar frames for new home blessings'
   },
   {
     id: 'navratri-haldi',
     name: 'Navratri & Haldi Kumkum',
     badge: 'Sacred Blessings',
-    description: 'Goddess Lakshmi, Saraswati and Radha Krishna mini return favors'
+    description: 'Radha Krishna and Bal Krishna frames for haldi kumkum and festive gatherings'
   },
   {
     id: 'family-celebrations',

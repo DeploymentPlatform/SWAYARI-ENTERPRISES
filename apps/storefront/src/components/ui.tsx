@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { Minus, Plus, Info } from 'lucide-react';
-import { ORDER_DISCLAIMER_TEXT, formatPrice } from '@swayari/shared';
+import { Minus, Plus, Info, PackageCheck } from 'lucide-react';
+import { MIN_ORDER_FRAMES, ORDER_DISCLAIMER_TEXT, formatPrice } from '@swayari/shared';
 import { ImageSources } from '../lib/media';
 
 /* ------------------------------------------------------------------ Brand */
@@ -124,6 +124,35 @@ export const OrderDisclaimer: React.FC<{ className?: string; compact?: boolean }
     <p className={`${compact ? 'text-[0.8125rem]' : 'text-sm'} leading-relaxed text-ink-soft`}>{ORDER_DISCLAIMER_TEXT}</p>
   </div>
 );
+
+/** Progress towards the order-wide minimum (frames of any design count together). */
+export const MinimumOrderMeter: React.FC<{ count: number; className?: string }> = ({ count, className = '' }) => {
+  const reached = count >= MIN_ORDER_FRAMES;
+  const pct = Math.min(100, Math.round((count / MIN_ORDER_FRAMES) * 100));
+  return (
+    <div className={`rounded-2xl border px-4 py-3 ${reached ? 'border-emerald-700/25 bg-emerald-50/70' : 'border-gold/35 bg-gold-pale/40'} ${className}`} role="status">
+      <p className="flex items-start gap-2.5 text-[0.8125rem] leading-snug text-ink">
+        <PackageCheck className={`mt-0.5 h-4 w-4 flex-shrink-0 ${reached ? 'text-emerald-700' : 'text-gold-dark'}`} aria-hidden />
+        {reached ? (
+          <span>
+            <strong className="font-semibold">Minimum order reached</strong> — {count} frames in your bag.
+          </span>
+        ) : (
+          <span>
+            Minimum order is <strong className="font-semibold">{MIN_ORDER_FRAMES} frames</strong> (mix any designs). Add{' '}
+            <strong className="font-semibold">{MIN_ORDER_FRAMES - count} more</strong> to send your request.
+          </span>
+        )}
+      </p>
+      <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/80" aria-hidden>
+        <div
+          className={`h-full rounded-full transition-[width] duration-700 ease-luxury ${reached ? 'bg-emerald-600' : 'bg-gradient-to-r from-gold to-gold-dark'}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+};
 
 export const PriceText: React.FC<{ value: number | null | undefined; className?: string }> = ({ value, className = '' }) => (
   <span className={className}>{value === null || value === undefined ? 'Price on request' : formatPrice(value)}</span>

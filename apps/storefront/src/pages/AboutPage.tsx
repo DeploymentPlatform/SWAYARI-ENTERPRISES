@@ -9,8 +9,8 @@ import { LotusMark, Picture } from '../components/ui';
 
 const PRINCIPLES = [
   {
-    title: 'Pieces for living with',
-    text: 'We choose décor and gifts that suit everyday homes and special occasions alike — prayer corners, entrance tables, festive gatherings.'
+    title: 'Blessings to give',
+    text: 'Seven much-loved deities in silver foil relief, framed to stand on a table or hang on a wall — for pooja rooms, griha pravesh and every wedding guest.'
   },
   {
     title: 'Only what we can confirm',
@@ -25,7 +25,7 @@ const PRINCIPLES = [
 const NUMERALS = ['I', 'II', 'III'];
 
 export const AboutPage: React.FC = () => {
-  usePageMeta('Our Story', 'SWAYARI brings together décor and gifting for homes and special occasions, with personal assistance for every order request.');
+  usePageMeta('Our Story', 'SWAYARI makes silver foil god frames at ₹99 each, with personal assistance for every order of 25 frames or more.');
 
   return (
     <>
@@ -43,13 +43,13 @@ export const AboutPage: React.FC = () => {
           >
             <p className="eyebrow mb-5 text-gold-light before:bg-gold-light">Our story</p>
             <h1 className="font-display text-[2.75rem] font-medium leading-[1.02] text-ivory sm:text-display-lg lg:text-display-xl">
-              Décor to live with.
+              Devotion to share.
               <br />
               <em className="text-gold-light">Gifts to remember.</em>
             </h1>
             <p className="mt-7 max-w-lg text-[1.0625rem] leading-relaxed text-ivory/80">
-              SWAYARI — Décor &amp; Gifting brings together decorative pieces and gifting ideas for homes and special occasions, from
-              everyday spaces to festivals, housewarmings and celebrations.
+              SWAYARI brings you silver foil god frames at ₹99 each — Balaji, Padmavathi Srinivasa, Sai Baba, Radha Krishna, Bal
+              Krishna, Ram Darbar and Hanuman — chosen for wedding return gifts, housewarmings, poojas and celebrations.
             </p>
           </motion.div>
           <motion.div
@@ -85,11 +85,11 @@ export const AboutPage: React.FC = () => {
           </Reveal>
           <Reveal className="space-y-5 text-[1.0625rem] leading-[1.8] text-ink-soft md:col-span-7 md:col-start-6 md:text-lg" delay={0.1}>
             <p className="first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-display first-letter:text-[3.6rem] first-letter:font-semibold first-letter:leading-[0.8] first-letter:text-burgundy">
-              SWAYARI is run by SWAYARI ENTERPRISES. Rather than an automated checkout, we work on order requests: you choose the pieces
+              SWAYARI is run by SWAYARI ENTERPRISES. Rather than an automated checkout, we work on order requests: you choose the frames
               you like, send them to us in one short form, and our team contacts you personally.
             </p>
             <p>
-              That conversation is where we confirm what matters — whether a piece is available, its final price, how it will be packed
+              That conversation is where we confirm what matters — whether your designs are in stock, its final price, how it will be packed
               and sent, and when it can reach you. No payment is taken on this website.
             </p>
           </Reveal>

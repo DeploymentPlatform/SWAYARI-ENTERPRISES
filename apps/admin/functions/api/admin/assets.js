@@ -4,17 +4,24 @@ import path from 'node:path';
 
 // Primary devotional product photographs available in catalogue.
 const FALLBACK = [
-  { path: '/assets/products/venkateswara-frame-960.webp', name: 'Sri Venkateswara Frame — studio (960px)', category: 'products', type: 'image/webp' },
-  { path: '/assets/products/bala-krishna-frame-960.webp', name: 'Bala Krishna Frame — studio (960px)', category: 'products', type: 'image/webp' },
-  { path: '/assets/products/radha-krishna-frame-960.webp', name: 'Radha Krishna Frame — studio (960px)', category: 'products', type: 'image/webp' },
-  { path: '/assets/products/hanuman-frame-960.webp', name: 'Veera Hanuman Frame — studio (960px)', category: 'products', type: 'image/webp' },
-  { path: '/assets/products/ganesha-frame-800.webp', name: 'Lord Ganesha Temple Frame (800px)', category: 'products', type: 'image/webp' },
-  { path: '/assets/products/lakshmi-frame-800.webp', name: 'Goddess Lakshmi Blessings Frame (800px)', category: 'products', type: 'image/webp' },
-  { path: '/assets/products/saraswati-frame-800.webp', name: 'Goddess Saraswati Wisdom Frame (800px)', category: 'products', type: 'image/webp' },
-  { path: '/assets/products/shiva-parvati-frame-800.webp', name: 'Shiva Parvati Kalyanam Frame (800px)', category: 'products', type: 'image/webp' },
-  { path: '/assets/products/murugan-frame-800.webp', name: 'Lord Murugan Vel Frame (800px)', category: 'products', type: 'image/webp' },
-  { path: '/assets/products/sai-baba-frame-800.webp', name: 'Shirdi Sai Baba Frame (800px)', category: 'products', type: 'image/webp' },
-  { path: '/assets/products/placeholder-devotional-frame.webp', name: 'Neutral Devotional Frame Placeholder', category: 'products', type: 'image/webp' }
+  { path: '/assets/products/gf-venkateswara-studio.webp', name: 'Sri Venkateswara — studio', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-venkateswara-lifestyle.webp', name: 'Sri Venkateswara — in use', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-padmavathi-srinivasa-studio.webp', name: 'Padmavathi Srinivasa — studio', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-padmavathi-srinivasa-lifestyle.webp', name: 'Padmavathi Srinivasa — in use', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-sai-baba-studio.webp', name: 'Shirdi Sai Baba — studio', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-sai-baba-lifestyle.webp', name: 'Shirdi Sai Baba — in use', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-radha-krishna-studio.webp', name: 'Radha Krishna — studio', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-radha-krishna-lifestyle.webp', name: 'Radha Krishna — in use', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-bal-krishna-studio.webp', name: 'Bal Krishna — studio', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-bal-krishna-lifestyle.webp', name: 'Bal Krishna — in use', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-ram-darbar-studio.webp', name: 'Ram Darbar — studio', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-ram-darbar-lifestyle.webp', name: 'Ram Darbar — in use', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-hanuman-studio.webp', name: 'Sanjeevani Hanuman — studio', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-hanuman-lifestyle.webp', name: 'Sanjeevani Hanuman — in use', category: 'products', type: 'image/webp' },
+  { path: '/assets/products/gf-back-stand.webp', name: 'Frame back — table stand and wall hook', category: 'products', type: 'image/webp' },
+  { path: '/assets/editorial/hero-god-frames-desktop.webp', name: 'Hero — god frames on display', category: 'editorial', type: 'image/webp' },
+  { path: '/assets/editorial/hero-return-gifts-desktop.webp', name: 'Hero — wedding return gifts', category: 'editorial', type: 'image/webp' },
+  { path: '/assets/editorial/hero-bulk-order-desktop.webp', name: 'Hero — bulk order packing', category: 'editorial', type: 'image/webp' },
 ];
 
 function label(filename) {
@@ -97,17 +104,10 @@ export async function onRequestPost(context) {
       const match = rawData.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
       if (match) {
         buffer = Buffer.from(match[2], 'base64');
-        const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
-        const baseName = (body.filename || body.fileName || 'devotional-frame')
-          .replace(/\.[^.]+$/, '')
-          .toLowerCase()
-          .replace(/[^a-z0-9_-]/g, '-');
-        filename = `${baseName}-${Date.now()}.${ext}`;
       } else {
         buffer = Buffer.from(rawData, 'base64');
-        const ext = (body.filename || body.fileName || '').endsWith('.png') ? 'png' : (body.filename || body.fileName || '').endsWith('.webp') ? 'webp' : 'jpg';
-        filename = `upload-${Date.now()}.${ext}`;
       }
+      filename = String(body.filename || body.fileName || 'god-frame');
     } else if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
       const file = formData.get('file');
@@ -116,10 +116,7 @@ export async function onRequestPost(context) {
       }
       const rawBuf = await file.arrayBuffer();
       buffer = Buffer.from(rawBuf);
-      const safeName = (file.name || 'devotional-frame.jpg')
-        .toLowerCase()
-        .replace(/[^a-z0-9_.-]/g, '-');
-      filename = `upload-${Date.now()}-${safeName}`;
+      filename = String(file.name || 'god-frame');
     } else {
       return errorResponse('Unsupported media content type. Use multipart/form-data or application/json', 415);
     }
@@ -142,6 +139,17 @@ export async function onRequestPost(context) {
     if (!isJpeg && !isPng && !isWebp) {
       return errorResponse('Invalid image file format: magic bytes do not match authentic JPEG, PNG or WebP', 400);
     }
+
+    // The saved name comes only from a cleaned base name plus the extension the file bytes prove.
+    const ext = isPng ? 'png' : isWebp ? 'webp' : 'jpg';
+    const baseName = filename
+      .replace(/\.[^.]*$/, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 60) || 'god-frame';
+    filename = `${baseName}-${Date.now()}.${ext}`;
 
     // Free-first durable storage:
     // Write to canonical public/assets/products/ directory and synchronize to portal origins
@@ -167,6 +175,7 @@ export async function onRequestPost(context) {
       sizeBytes: buffer.length
     }, 201);
   } catch (err) {
-    return errorResponse(`Upload failed: ${err.message}`, 500);
+    console.error(err);
+    return errorResponse(`Upload failed. Please try again.`, 500);
   }
 }

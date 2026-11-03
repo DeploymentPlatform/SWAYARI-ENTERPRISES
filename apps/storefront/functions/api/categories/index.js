@@ -29,6 +29,7 @@ export async function onRequestGet(context) {
       categories
     });
   } catch (err) {
-    return errorResponse(`Failed to fetch categories: ${err.message}`, 500);
+    console.error(err);
+    return errorResponse(`Failed to fetch categories. Please try again.`, 500);
   }
 }

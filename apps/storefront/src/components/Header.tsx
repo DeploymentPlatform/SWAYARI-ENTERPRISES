@@ -22,17 +22,15 @@ const NAV_LINKS = [
 ];
 
 const DEITY_SHORTCUTS = [
-  { slug: 'ganesha', label: 'Ganesha', href: '/shop?deity=ganesha' },
-  { slug: 'lakshmi', label: 'Lakshmi', href: '/shop?deity=lakshmi' },
-  { slug: 'balaji', label: 'Balaji', href: '/shop?deity=balaji' },
-  { slug: 'radha-krishna', label: 'Radha Krishna', href: '/shop?deity=radha-krishna' },
-  { slug: 'hanuman', label: 'Hanuman', href: '/shop?deity=hanuman' },
-  { slug: 'shiva-parvati', label: 'Shiva Parvati', href: '/shop?deity=shiva' },
-  { slug: 'under-49', label: 'Pocket Favours ≤ ₹49', href: '/shop?budget=under-49' }
+  { slug: 'balaji', label: 'Balaji & Padmavathi', href: '/shop?deity=balaji' },
+  { slug: 'sai', label: 'Sai Baba', href: '/shop?deity=sai' },
+  { slug: 'krishna', label: 'Krishna', href: '/shop?deity=krishna' },
+  { slug: 'ram', label: 'Ram Darbar', href: '/shop?deity=ram' },
+  { slug: 'hanuman', label: 'Hanuman', href: '/shop?deity=hanuman' }
 ];
 
 const ANNOUNCEMENTS = [
-  'Devotional frames ₹99 & under — thoughtful return gifts for every celebration',
+  'Silver foil god frames at ₹99 each — thoughtful return gifts for every celebration',
   'Bulk quantities for weddings, griha pravesh & festivals — personally coordinated',
   'Send your request — our team confirms availability, packing & shipping'
 ];
@@ -146,7 +144,7 @@ const SearchOverlay: React.FC<{ open: boolean; onClose: () => void; products: Pr
                   type="search"
                   value={query}
                   onChange={e => setQuery(e.target.value)}
-                  placeholder="Ganesha, Lakshmi, teak frame…"
+                  placeholder="Balaji, Sai Baba, Krishna…"
                   aria-label="Search god frames and return gifts"
                   autoComplete="off"
                   className="w-full border-0 border-b border-stone-shade bg-transparent py-4 pl-10 pr-4 font-display text-[1.75rem] text-ink placeholder:text-ink-faint/60 focus:border-gold focus:outline-none focus:ring-0 sm:text-[2.5rem]"
@@ -172,7 +170,7 @@ const SearchOverlay: React.FC<{ open: boolean; onClose: () => void; products: Pr
                           className="group flex w-full items-center gap-4 rounded-2xl border border-transparent p-2.5 text-left transition-all duration-300 hover:border-stone-deep hover:bg-white hover:shadow-soft"
                         >
                           <img
-                            {...productCardImage(uniqueProductImages(p.images)[0] || '/assets/products/venkateswara-frame-600.webp')}
+                            {...productCardImage(uniqueProductImages(p.images)[0] || '/assets/products/gf-venkateswara-studio.webp')}
                             sizes="64px"
                             alt=""
                             className="h-16 w-16 flex-shrink-0 rounded-xl border border-stone-deep bg-ivory object-contain"
@@ -193,7 +191,7 @@ const SearchOverlay: React.FC<{ open: boolean; onClose: () => void; products: Pr
                   </ul>
                 )}
                 {q && suggestions.length === 0 && (
-                  <p className="text-sm text-ink-soft">No frames match “{query}”. Try a deity name such as Ganesha or Lakshmi.</p>
+                  <p className="text-sm text-ink-soft">No frames match “{query}”. Try a deity name such as Balaji or Krishna.</p>
                 )}
                 {!q && (
                   <div className="flex flex-wrap items-center gap-2">
@@ -533,7 +531,7 @@ export const Header: React.FC = () => {
 
                 <div className="mx-4 mt-8 rounded-2xl border border-gold/30 bg-gold-pale/50 p-4 text-[0.8125rem] leading-relaxed text-ink-soft">
                   <p className="font-display text-lg text-burgundy">Planning a celebration?</p>
-                  All frames ₹99 &amp; under. Send your request and our team will personally confirm quantities, packing and shipping.
+                  Every frame ₹99 · minimum 25 frames. Send your request and our team will personally confirm quantities, packing and shipping.
                   <Link to="/contact" className="text-link mt-3 flex">
                     <Phone className="h-3.5 w-3.5" /> Talk to us
                   </Link>

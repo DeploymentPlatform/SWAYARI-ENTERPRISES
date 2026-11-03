@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { CartItem, Category, Product, calculateEffectiveUnitPrice } from '@swayari/shared';
+import { CartItem, Category, MIN_ORDER_FRAMES, Product, calculateEffectiveUnitPrice } from '@swayari/shared';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { previewCountOverride, withPreview } from './preview';
@@ -112,13 +112,15 @@ export function toCartItem(product: Product, quantity?: number, extra: Partial<C
  */
 export function useAddToBag() {
   const { user, initiateGoogleSignIn, config } = useAuth();
-  const { addItem } = useCart();
+  const { addItem, itemCount } = useCart();
 
   const canRequest = (product: Product) => !product.isDemo || config.devLoginAvailable;
 
   const add = (product: Product, quantity?: number, extra?: Partial<CartItem>) => {
     if (!canRequest(product)) return;
-    const item = toCartItem(product, quantity, extra);
+    // Quick adds (no quantity chosen) fill what is still needed for the order-wide minimum.
+    const qty = quantity ?? (itemCount < MIN_ORDER_FRAMES ? MIN_ORDER_FRAMES - itemCount : 10);
+    const item = toCartItem(product, qty, extra);
     if (!user) initiateGoogleSignIn(item, 'add');
     else addItem(item);
   };

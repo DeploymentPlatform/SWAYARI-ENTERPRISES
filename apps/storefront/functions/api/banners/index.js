@@ -35,6 +35,7 @@ export async function onRequestGet(context) {
       banners
     });
   } catch (err) {
-    return errorResponse(`Failed to fetch campaign banners: ${err.message}`, 500);
+    console.error(err);
+    return errorResponse(`Failed to fetch campaign banners. Please try again.`, 500);
   }
 }

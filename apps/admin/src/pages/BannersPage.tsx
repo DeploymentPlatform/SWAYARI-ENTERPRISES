@@ -7,24 +7,19 @@ import { EASE_LUXURY, Stagger, StaggerItem } from '../components/motion';
 
 const PRESET_BANNERS = [
   {
-    name: 'Slide 1 — Moments (Festive Lamps & Gifts)',
-    desktop: '/assets/editorial/hero-slide-1-moments-desktop.webp',
-    mobile: '/assets/editorial/hero-slide-1-moments-mobile.webp'
+    name: 'God frames on display (pooja table)',
+    desktop: '/assets/editorial/hero-god-frames-desktop.webp',
+    mobile: '/assets/editorial/hero-god-frames-mobile.webp'
   },
   {
-    name: 'Slide 2 — Devotional (Sanctum Frames)',
-    desktop: '/assets/editorial/hero-slide-2-devotional-desktop.webp',
-    mobile: '/assets/editorial/hero-slide-2-devotional-mobile.webp'
+    name: 'Wedding return-gift table',
+    desktop: '/assets/editorial/hero-return-gifts-desktop.webp',
+    mobile: '/assets/editorial/hero-return-gifts-mobile.webp'
   },
   {
-    name: 'Slide 3 — Lighting (Artisanal Brass Lamps)',
-    desktop: '/assets/editorial/hero-slide-3-decor-desktop.webp',
-    mobile: '/assets/editorial/hero-slide-3-decor-mobile.webp'
-  },
-  {
-    name: 'Slide 4 — Urulis & Gifting (Celebration Urulis)',
-    desktop: '/assets/editorial/hero-slide-4-gifting-desktop.webp',
-    mobile: '/assets/editorial/hero-slide-4-gifting-mobile.webp'
+    name: 'Bulk order packing',
+    desktop: '/assets/editorial/hero-bulk-order-desktop.webp',
+    mobile: '/assets/editorial/hero-bulk-order-mobile.webp'
   }
 ];
 

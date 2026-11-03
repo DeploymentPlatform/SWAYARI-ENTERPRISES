@@ -136,9 +136,7 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
 
     const qs = p.toString();
     // Keep the visitor's scroll position while refining filters.
-    const y = window.scrollY;
-    navigate(`/shop${qs ? `?${qs}` : ''}`);
-    window.scrollTo({ top: y });
+    navigate(`/shop${qs ? `?${qs}` : ''}`, { keepScroll: true });
   }
 
   const activeChips: { key: string; label: string; clear: () => void }[] = [];

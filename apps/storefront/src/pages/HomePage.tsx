@@ -218,13 +218,13 @@ export const HomePage: React.FC = () => {
               <div className="absolute -inset-3 rounded-t-full border border-gold/40 sm:-inset-5" aria-hidden />
               <div className="relative overflow-hidden rounded-t-full shadow-dialog">
                 <img
-                  src="/assets/editorial/hero-god-frames-desktop.webp"
-                  srcSet="/assets/editorial/hero-god-frames-mobile.webp 900w, /assets/editorial/hero-god-frames-desktop.webp 1376w"
+                  src="/assets/editorial/hero-housewarming-desktop.webp"
+                  srcSet="/assets/editorial/hero-housewarming-mobile.webp 900w, /assets/editorial/hero-housewarming-desktop.webp 1376w"
                   sizes="(min-width: 1024px) 460px, 420px"
-                  alt="Silver foil god frames arranged for a celebration"
+                  alt="A silver foil Balaji and Padmavathi wall frame between brass lamps"
                   loading="lazy"
                   decoding="async"
-                  className="aspect-[4/5] w-full object-cover object-[80%_50%] transition-transform duration-[2000ms] ease-luxury hover:scale-105"
+                  className="aspect-[4/5] w-full object-cover object-[78%_50%] transition-transform duration-[2000ms] ease-luxury hover:scale-105"
                 />
               </div>
               <div className="absolute -bottom-6 -right-2 hidden rounded-2xl border border-gold/30 bg-ivory-light/95 px-6 py-5 shadow-card backdrop-blur sm:block lg:-right-8">

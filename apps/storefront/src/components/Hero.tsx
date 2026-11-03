@@ -26,9 +26,9 @@ const CONFIRMED_SLIDES: Slide[] = [
     supporting: 'Balaji, Lakshmi, Ganesh, Sai Baba and more in carved frames — from ₹329, bulk prices from ₹249.',
     ctaText: 'Shop god frames',
     ctaHref: '/shop?category=god-frames',
-    desktopImage: '/assets/editorial/hero-god-frames-desktop.webp',
-    mobileImage: '/assets/editorial/hero-god-frames-mobile.webp',
-    alt: 'Silver foil god frames on a pooja table with brass diyas and marigolds'
+    desktopImage: '/assets/editorial/hero-signature-desktop.webp',
+    mobileImage: '/assets/editorial/hero-signature-mobile.webp',
+    alt: 'A stotram book in a gold box, a framed Ganesh and a Ganesh stand in silver foil on maroon silk with a brass diya'
   },
   {
     id: 'banner-wedding-guest',
@@ -38,9 +38,9 @@ const CONFIRMED_SLIDES: Slide[] = [
     supporting: 'Silver foil stotram cards from ₹39 and god stands from ₹49 in bulk. Mix designs to reach a slab.',
     ctaText: 'Shop return gifts',
     ctaHref: '/shop?occasion=wedding-return-gifts',
-    desktopImage: '/assets/editorial/hero-return-gifts-desktop.webp',
-    mobileImage: '/assets/editorial/hero-return-gifts-mobile.webp',
-    alt: 'Silver foil gifts tied with ribbon on a wedding return-gift table'
+    desktopImage: '/assets/editorial/hero-wedding-desktop.webp',
+    mobileImage: '/assets/editorial/hero-wedding-mobile.webp',
+    alt: 'God stands and stotram cards in red envelopes among marigolds, jasmine and brass lamps'
   },
   {
     id: 'banner-bulk-process',
@@ -50,9 +50,9 @@ const CONFIRMED_SLIDES: Slide[] = [
     supporting: 'Send your cart as a request — no payment online. We call to confirm stock, packing and delivery at actual cost.',
     ctaText: 'How ordering works',
     ctaHref: '/ordering-policy',
-    desktopImage: '/assets/editorial/hero-bulk-order-desktop.webp',
-    mobileImage: '/assets/editorial/hero-bulk-order-mobile.webp',
-    alt: 'Silver foil gifts packed in gift boxes for a bulk order'
+    desktopImage: '/assets/editorial/hero-corporate-desktop.webp',
+    mobileImage: '/assets/editorial/hero-corporate-mobile.webp',
+    alt: 'Maroon velvet gift boxes tied with a cream satin ribbon'
   }
 ];
 

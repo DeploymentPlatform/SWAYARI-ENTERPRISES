@@ -36,7 +36,7 @@ export const BulkReturnGiftsSection: React.FC<BulkReturnGiftsSectionProps> = ({ 
         <Reveal>
           <div className="relative overflow-hidden rounded-[28px] bg-burgundy-deep text-ivory-light shadow-dialog">
             <img
-              src="/assets/editorial/hero-return-gifts-desktop.webp"
+              src="/assets/editorial/hero-wedding-desktop.webp"
               alt=""
               loading="lazy"
               className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-luminosity"

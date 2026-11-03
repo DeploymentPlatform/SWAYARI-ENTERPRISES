@@ -29,10 +29,11 @@ const DEITY_SHORTCUTS = [
   { slug: 'hanuman', label: 'Hanuman', href: '/shop?deity=hanuman' }
 ];
 
+// `short` fits one line on a phone; `full` is shown from the small breakpoint up.
 const ANNOUNCEMENTS = [
-  'Everything under ₹999 — silver foil god frames from just ₹99',
-  'Bulk quantities for weddings, griha pravesh & festivals — personally coordinated',
-  'Send your request — our team confirms availability, packing & shipping'
+  { full: 'Everything under ₹999 — silver foil god frames from just ₹149', short: 'Everything under ₹999 · Frames ₹149' },
+  { full: 'Bulk quantities for weddings, griha pravesh & festivals — personally coordinated', short: 'Bulk orders for every celebration' },
+  { full: 'Send your request — our team confirms availability, packing & shipping', short: 'We confirm stock, packing & shipping' }
 ];
 
 function useScrolled(threshold = 24) {
@@ -267,7 +268,8 @@ export const Header: React.FC = () => {
               transition={{ duration: 0.5, ease: EASE_LUXURY }}
               className="truncate text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-gold-light sm:text-[0.72rem]"
             >
-              {ANNOUNCEMENTS[announcement]}
+              <span className="sm:hidden">{ANNOUNCEMENTS[announcement].short}</span>
+              <span className="hidden sm:inline">{ANNOUNCEMENTS[announcement].full}</span>
             </motion.p>
           </AnimatePresence>
         </div>
@@ -521,7 +523,7 @@ export const Header: React.FC = () => {
 
                 <div className="mx-4 mt-8 rounded-2xl border border-gold/30 bg-gold-pale/50 p-4 text-[0.8125rem] leading-relaxed text-ink-soft">
                   <p className="font-display text-lg text-burgundy">Planning a celebration?</p>
-                  Everything under ₹999 · god frames ₹99 · minimum 25 frames. Send your request and our team will personally confirm quantities, packing and shipping.
+                  Everything under ₹999 · god frames ₹149 · minimum 25 frames. Send your request and our team will personally confirm quantities, packing and shipping.
                   <Link to="/contact" className="text-link mt-3 flex">
                     <Phone className="h-3.5 w-3.5" /> Talk to us
                   </Link>

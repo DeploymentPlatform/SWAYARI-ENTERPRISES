@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Pause, Play, Sparkles, ArrowRight, MessageSquareQuote } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play, ArrowRight, MessageSquareQuote } from 'lucide-react';
 import { Link } from '../lib/router';
 
 interface Slide {
@@ -21,7 +21,7 @@ const CONFIRMED_SLIDES: Slide[] = [
     id: 'devotional-99',
     badge: 'Auspicious Celebrations',
     headline: 'Silver foil god frames',
-    emphasis: '₹99 each',
+    emphasis: '₹149 each',
     supporting: 'Balaji, Padmavathi Srinivasa, Sai Baba, Radha Krishna, Bal Krishna, Ram Darbar and Hanuman. Mix any designs in one order.',
     desktopImage: '/assets/editorial/hero-god-frames-desktop.webp',
     mobileImage: '/assets/editorial/hero-god-frames-mobile.webp',
@@ -53,6 +53,31 @@ const heroItem = {
   hidden: { opacity: 0, y: 26 },
   show: { opacity: 1, y: 0, transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } }
 };
+
+// The store-wide promise. It stays put while the slides change, so "under ₹999" is always the hero's headline.
+const GOLD_TEXT =
+  'bg-[linear-gradient(110deg,#B8924A_15%,#F4EAD3_38%,#E3CC9A_52%,#B8924A_72%)] bg-[length:200%_100%] bg-clip-text text-transparent motion-safe:animate-shimmer [animation-duration:8s]';
+
+const PricePromise: React.FC = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 22 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+  >
+    <p className="flex items-center gap-3 text-[0.625rem] font-semibold uppercase tracking-[0.32em] text-gold-light sm:text-[0.6875rem]">
+      <span className="h-px w-8 bg-gradient-to-r from-transparent to-gold-light/70" aria-hidden />
+      The SWAYARI promise
+    </p>
+    <h1 className="mt-3 font-display font-medium text-ivory-light sm:mt-4">
+      <span className="block text-[1.75rem] leading-none tracking-[-0.01em] sm:text-[2.4rem] lg:text-[2.9rem]">Everything under</span>
+      <span
+        className={`-ml-1 block pb-1 text-[4.75rem] font-semibold leading-[0.95] tracking-[-0.035em] [filter:drop-shadow(0_8px_28px_rgba(227,204,154,0.28))] sm:text-[6.25rem] lg:text-[7.5rem] ${GOLD_TEXT}`}
+      >
+        ₹999
+      </span>
+    </h1>
+  </motion.div>
+);
 
 export const Hero: React.FC = () => {
   const [slides, setSlides] = useState<Slide[]>(CONFIRMED_SLIDES);
@@ -182,7 +207,7 @@ export const Hero: React.FC = () => {
                 src={slide.desktopImage}
                 alt={slide.alt || 'Devotional frame'}
                 loading={current === 0 ? 'eager' : 'lazy'}
-                className={`h-full w-full object-cover object-center ${reduceMotion ? '' : 'animate-ken-burns'}`}
+                className={`h-full w-full object-cover object-[72%_50%] ${reduceMotion ? '' : 'animate-ken-burns'}`}
               />
             </picture>
           </motion.div>
@@ -196,63 +221,61 @@ export const Hero: React.FC = () => {
         {/* Copy */}
         <div className="absolute inset-0 z-10 flex items-center">
           <div className="container-content w-full">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={slide.id}
-                className="max-w-[620px] pb-16 sm:pb-10"
-                initial="hidden"
-                animate="show"
-                exit="exit"
-                variants={{
-                  hidden: {},
-                  show: { transition: { staggerChildren: 0.12, delayChildren: 0.25 } },
-                  exit: { opacity: 0, y: -10, transition: { duration: 0.35 } }
-                }}
-              >
-                <motion.p
-                  variants={heroItem}
-                  className="inline-flex items-center gap-2 rounded-full border border-gold-light/30 bg-white/5 px-3.5 py-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.22em] text-gold-light backdrop-blur-md"
+            <div className="max-w-[640px] pb-16 sm:pb-10">
+              <PricePromise />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={slide.id}
+                  initial="hidden"
+                  animate="show"
+                  exit="exit"
+                  variants={{
+                    hidden: {},
+                    show: { transition: { staggerChildren: 0.12, delayChildren: 0.25 } },
+                    exit: { opacity: 0, y: -10, transition: { duration: 0.35 } }
+                  }}
                 >
-                  <Sparkles className="h-3.5 w-3.5" aria-hidden />
-                  {slide.badge}
-                </motion.p>
-                <motion.h1
-                  variants={heroItem}
-                  className="mt-5 font-display text-[2.6rem] font-medium leading-[0.98] tracking-[-0.02em] text-ivory-light sm:text-[3.6rem] lg:text-[4.6rem]"
-                >
-                  {slide.headline}
-                  <span className="mt-1 block font-display italic text-gold-light">{slide.emphasis}</span>
-                </motion.h1>
-                <motion.div variants={heroItem} className="ornament mt-6 justify-start text-gold-light before:hidden" aria-hidden>
-                  <span className="block h-1.5 w-1.5 rotate-45 bg-gold-light" />
-                </motion.div>
-                <motion.p variants={heroItem} className="mt-5 max-w-[480px] text-[0.95rem] leading-relaxed text-ivory-light/85 sm:text-[1.0625rem]">
-                  {slide.supporting}
-                </motion.p>
-                <motion.div variants={heroItem} className="mt-8 flex flex-wrap items-center gap-3">
-                  <Link
-                    to={slide.ctaHref || '/shop'}
-                    onClick={e => {
-                      if (isDragging) e.preventDefault();
-                    }}
-                    className="btn-gold"
+                  <motion.div variants={heroItem} className="mt-6 flex items-center gap-3 sm:mt-7" aria-hidden>
+                    <span className="block h-1.5 w-1.5 rotate-45 bg-gold-light" />
+                    <span className="h-px w-16 bg-gradient-to-r from-gold-light/70 to-transparent" />
+                  </motion.div>
+                  <motion.p variants={heroItem} className="mt-4 text-[0.625rem] font-semibold uppercase tracking-[0.24em] text-gold-light/85 sm:text-[0.6875rem]">
+                    {slide.badge}
+                  </motion.p>
+                  <motion.h2
+                    variants={heroItem}
+                    className="mt-2 font-display text-[1.6rem] font-medium leading-[1.08] tracking-[-0.01em] text-ivory-light sm:text-[2rem] lg:text-[2.35rem]"
                   >
-                    {slide.ctaText || 'Explore frames'}
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                  <Link
-                    to="/shop?bulk=1"
-                    onClick={e => {
-                      if (isDragging) e.preventDefault();
-                    }}
-                    className="btn-ghost-light"
-                  >
-                    <MessageSquareQuote className="h-4 w-4 text-gold-light" />
-                    Bulk quote
-                  </Link>
+                    {slide.headline} <span className="italic text-gold-light">{slide.emphasis}</span>
+                  </motion.h2>
+                  <motion.p variants={heroItem} className="mt-3 max-w-[480px] text-[0.9rem] leading-relaxed text-ivory-light/80 sm:text-[1rem]">
+                    {slide.supporting}
+                  </motion.p>
+                  <motion.div variants={heroItem} className="mt-7 flex flex-wrap items-center gap-3">
+                    <Link
+                      to={slide.ctaHref || '/shop'}
+                      onClick={e => {
+                        if (isDragging) e.preventDefault();
+                      }}
+                      className="btn-gold"
+                    >
+                      {slide.ctaText || 'Explore frames'}
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                    <Link
+                      to="/shop?bulk=1"
+                      onClick={e => {
+                        if (isDragging) e.preventDefault();
+                      }}
+                      className="btn-ghost-light"
+                    >
+                      <MessageSquareQuote className="h-4 w-4 text-gold-light" />
+                      Bulk quote
+                    </Link>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            </AnimatePresence>
+              </AnimatePresence>
+            </div>
           </div>
         </div>
 

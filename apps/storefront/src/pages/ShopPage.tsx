@@ -98,7 +98,7 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
 
   usePageMeta(
     title,
-    'Devotional gifts under ₹999, including No. 1 silver foil god frames at ₹99 each. Auspicious return gifts for weddings, griha pravesh and family celebrations. Minimum order 25 frames; shipping extra.',
+    'Devotional gifts under ₹999, including No. 1 silver foil god frames at ₹149 each. Auspicious return gifts for weddings, griha pravesh and family celebrations. Minimum order 25 frames; shipping extra.',
     { noindex: isSearch }
   );
 
@@ -191,7 +191,7 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
               </h1>
               <p className="lede mt-4 max-w-xl">
                 Auspicious god frames and gifts for weddings, griha pravesh and family poojas — everything is ₹999 or less, and our
-                god frames are just ₹99 each. Minimum order 25 frames in any mix; shipping is charged extra.
+                god frames are just ₹149 each. Minimum order 25 frames in any mix; shipping is charged extra.
               </p>
             </div>
 

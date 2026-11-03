@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 const SITE = 'SWAYARI — Silver Foil God Frames';
 const DEFAULT_DESCRIPTION =
-  'Devotional gifts under ₹999 — No. 1 silver foil god frames at ₹99 each for wedding return gifts, griha pravesh and poojas. Minimum 25 frames, shipping extra.';
+  'Devotional gifts under ₹999 — No. 1 silver foil god frames at ₹149 each for wedding return gifts, griha pravesh and poojas. Minimum 25 frames, shipping extra.';
 
 function setMeta(selector: string, attr: 'name' | 'property', key: string, value: string) {
   let el = document.head.querySelector<HTMLMetaElement>(selector);

@@ -24,6 +24,9 @@ const DEITY_LABELS: Record<string, string> = {
   hanuman: 'Hanuman'
 };
 
+// Featured cards wrap in a centred row, so an odd last row sits in the middle instead of leaving a gap.
+const FEATURED_CELL = 'w-[calc(50%-0.4375rem)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1.125rem)]';
+
 const SkeletonCard: React.FC = () => (
   <div className="overflow-hidden rounded-card border border-stone-deep/70 bg-white">
     <div className="skeleton aspect-[4/5] rounded-none sm:aspect-square" />
@@ -39,7 +42,7 @@ const SkeletonCard: React.FC = () => (
 export const HomePage: React.FC = () => {
   usePageMeta(
     BRAND_TAGLINES.headline,
-    `${BRAND_TAGLINES.supporting} Everything under ₹999, including No. 1 silver foil god frames at ₹99 each for wedding return gifts, griha pravesh and poojas. Minimum order 25 frames; shipping extra.`
+    `${BRAND_TAGLINES.supporting} Everything under ₹999, including No. 1 silver foil god frames at ₹149 each for wedding return gifts, griha pravesh and poojas. Minimum order 25 frames; shipping extra.`
   );
 
   const { products, status } = useProducts();
@@ -135,7 +138,7 @@ export const HomePage: React.FC = () => {
               eyebrow="The devotional collection"
               title={
                 <>
-                  Silver foil god frames <em>₹99 each</em>
+                  Silver foil god frames <em>₹149 each</em>
                 </>
               }
               intro="Silver foil relief with hand-applied colour, in a maroon and gold frame that stands on a table or hangs on a wall. Mix any designs — minimum 25 frames per order."
@@ -147,15 +150,15 @@ export const HomePage: React.FC = () => {
             />
           </Reveal>
 
-          <StaggerGroup className="mt-10 grid grid-cols-2 gap-3.5 sm:gap-6 lg:grid-cols-4">
+          <StaggerGroup className="mt-10 flex flex-wrap justify-center gap-3.5 sm:gap-6">
             {loading && products.length === 0
               ? Array.from({ length: 8 }).map((_, i) => (
-                  <StaggerItem key={i}>
+                  <StaggerItem key={i} className={FEATURED_CELL}>
                     <SkeletonCard />
                   </StaggerItem>
                 ))
               : featuredFrames.map((prod, idx) => (
-                  <StaggerItem key={prod.id}>
+                  <StaggerItem key={prod.id} className={FEATURED_CELL}>
                     <ProductCard product={prod} priority={idx < 2} />
                   </StaggerItem>
                 ))}
@@ -183,7 +186,7 @@ export const HomePage: React.FC = () => {
                   alt="Devotional frames arranged for a celebration"
                   loading="lazy"
                   decoding="async"
-                  className="aspect-[4/5] w-full object-cover transition-transform duration-[2000ms] ease-luxury hover:scale-105"
+                  className="aspect-[4/5] w-full object-cover object-[80%_50%] transition-transform duration-[2000ms] ease-luxury hover:scale-105"
                 />
               </div>
               <div className="absolute -bottom-6 -right-2 hidden rounded-2xl border border-gold/30 bg-ivory-light/95 px-6 py-5 shadow-card backdrop-blur sm:block lg:-right-8">
@@ -201,16 +204,20 @@ export const HomePage: React.FC = () => {
             <p className="lede mt-6">
               SWAYARI brings you devotional god frames that families are proud to hand to every guest. Each one has silver foil relief with colour work, a cream mount and a carved-look maroon and gold border — at a price that lets you be generous with every invitation.
             </p>
-            <ul className="mt-8 grid gap-5 sm:grid-cols-3">
+            <ul className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-5">
               {[
                 { icon: Flower2, title: 'Seven designs', body: 'Balaji to Sai Baba' },
                 { icon: PackageCheck, title: 'From 25 frames', body: 'Mix designs freely' },
                 { icon: HandHeart, title: 'Personal service', body: 'We confirm every detail' }
               ].map(item => (
-                <li key={item.title} className="rounded-2xl border border-stone-deep/70 bg-ivory-light/70 p-4">
-                  <item.icon className="h-5 w-5 text-gold-dark" strokeWidth={1.5} />
-                  <p className="mt-3 font-display text-[1.2rem] leading-tight text-ink">{item.title}</p>
-                  <p className="mt-1 text-[0.8125rem] text-ink-soft">{item.body}</p>
+                <li key={item.title} className="flex items-center gap-4 rounded-2xl border border-stone-deep/70 bg-ivory-light/70 p-4 sm:block">
+                  <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full border border-gold/30 bg-gold-pale/40 sm:h-auto sm:w-auto sm:place-items-start sm:border-0 sm:bg-transparent">
+                    <item.icon className="h-5 w-5 text-gold-dark" strokeWidth={1.5} />
+                  </span>
+                  <span className="block">
+                    <span className="block font-display text-[1.2rem] leading-tight text-ink sm:mt-3">{item.title}</span>
+                    <span className="mt-1 block text-[0.8125rem] text-ink-soft">{item.body}</span>
+                  </span>
                 </li>
               ))}
             </ul>

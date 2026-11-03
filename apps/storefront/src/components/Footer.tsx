@@ -43,7 +43,7 @@ export const Footer: React.FC = () => (
       <div className="flex flex-col items-center text-center">
         <img src={LOGO_ON_DARK} alt="SWAYARI — Décor & Gifting" width={825} height={304} loading="lazy" className="h-24 w-auto sm:h-32" draggable={false} />
         <p className="mt-6 max-w-xl font-display text-[1.25rem] italic leading-snug text-ivory-light/80 sm:text-[1.45rem]">
-          Devotional gifts under ₹999 — silver foil god frames from ₹99, auspicious return gifts for weddings, griha pravesh and family celebrations.
+          Devotional gifts under ₹999 — silver foil god frames from ₹149, auspicious return gifts for weddings, griha pravesh and family celebrations.
         </p>
       </div>
 

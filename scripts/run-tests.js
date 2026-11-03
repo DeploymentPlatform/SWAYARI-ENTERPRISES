@@ -1084,11 +1084,11 @@ await test('39. Sample data is strictly isolated when ENVIRONMENT is missing, em
 const liveDb = createMockD1();
 const liveRows = sql => liveDb._rawDb.prepare(sql).all();
 
-await test('40. Live catalogue is exactly the seven No. 1 god frames at ₹99 under one God Frames category', async () => {
+await test('40. Live catalogue is exactly the seven No. 1 god frames at ₹149 under one God Frames category', async () => {
   const products = liveRows("SELECT * FROM products WHERE status = 'published' AND is_demo = 0");
   assert.equal(products.length, 7, 'Exactly seven frames are for sale');
   for (const p of products) {
-    assert.equal(p.indicative_price, 99, `${p.name} must cost ₹99`);
+    assert.equal(p.indicative_price, 149, `${p.name} must cost ₹149`);
     assert.equal(p.category_id, 'cat-god-frames', `${p.name} must be under God Frames`);
     assert.ok(p.name.endsWith('Silver Foil Frame'), `${p.name} must be named as a silver foil frame`);
   }

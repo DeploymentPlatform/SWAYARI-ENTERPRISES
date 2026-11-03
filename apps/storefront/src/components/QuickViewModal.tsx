@@ -189,7 +189,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                   </div>
                   <div className="flex justify-between gap-3 text-xs">
                     <dt className="text-ink-soft">Shipping:</dt>
-                    <dd className="font-medium italic text-gold-dark">extra · confirmed by our team</dd>
+                    <dd className="font-medium italic text-gold-dark">extra · at actual cost</dd>
                   </div>
                 </dl>
               )}

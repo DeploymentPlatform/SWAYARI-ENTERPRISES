@@ -110,9 +110,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, siz
           </Link>
 
           {/* Badges */}
-          <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-1.5">
+          <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-3.75rem)] flex-col items-start gap-1.5 sm:max-w-[calc(100%-1.5rem)]">
             {product.deity && (
-              <span className="rounded-full border border-white/70 bg-white/85 px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-burgundy shadow-subtle backdrop-blur">
+              <span className="max-w-full truncate rounded-full border border-white/70 bg-white/85 px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-burgundy shadow-subtle backdrop-blur">
                 {product.deity}
               </span>
             )}
@@ -152,13 +152,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, siz
             {product.dimensions || product.frameSize || 'Devotional frame'}
             {product.orientation ? <span className="text-ink-faint"> · {product.orientation}</span> : null}
           </p>
-          <h3 className="mt-1.5 line-clamp-2 min-h-[2.5em] font-display text-[1.125rem] font-medium leading-[1.15] text-ink transition-colors duration-300 group-hover:text-burgundy sm:text-[1.3rem]">
+          <h3 className="mt-1.5 line-clamp-2 min-h-[2.5em] font-display text-[1.05rem] font-medium leading-[1.15] text-ink transition-colors duration-300 group-hover:text-burgundy sm:text-[1.3rem]">
             <Link to={href} className="after:absolute after:inset-0 after:content-[''] focus:outline-none">
               {product.name}
             </Link>
           </h3>
 
-          <div className="mt-3 flex items-end justify-between gap-2">
+          <div className="mt-auto flex items-end justify-between gap-2 pt-3">
             <div>
               <p className="flex items-baseline gap-1">
                 {product.indicativePrice === null ? (
@@ -181,7 +181,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, siz
             type="button"
             onClick={handleQuickAdd}
             disabled={added}
-            className={`relative z-10 mt-4 flex h-11 w-full items-center justify-center gap-2 overflow-hidden rounded-full text-[0.6875rem] font-semibold uppercase tracking-[0.14em] transition-all duration-500 ease-luxury sm:text-[0.75rem] ${
+            className={`relative z-10 mt-4 flex h-11 w-full items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-full text-[0.625rem] font-semibold uppercase tracking-[0.08em] transition-all duration-500 ease-luxury sm:text-[0.75rem] sm:tracking-[0.14em] ${
               added
                 ? 'bg-emerald-700 text-white'
                 : 'border border-burgundy/15 bg-burgundy-soft text-burgundy hover:border-burgundy hover:bg-burgundy hover:text-ivory-light hover:shadow-[0_10px_24px_-12px_rgba(94,26,40,0.7)]'

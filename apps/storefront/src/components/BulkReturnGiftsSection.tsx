@@ -18,7 +18,7 @@ const PILLARS = [
   {
     icon: Sparkles,
     title: 'Everything under ₹999',
-    body: 'God frames are just ₹99 each. Minimum order is 25 frames in total, in any mix of designs.'
+    body: 'God frames are just ₹149 each. Minimum order is 25 frames in total, in any mix of designs.'
   },
   {
     icon: Truck,
@@ -47,13 +47,14 @@ export const BulkReturnGiftsSection: React.FC<BulkReturnGiftsSectionProps> = ({ 
             <div className="relative grid gap-10 p-7 sm:p-12 lg:grid-cols-[1.2fr_1fr] lg:p-16">
               <div>
                 <p className="inline-flex items-center gap-2 rounded-full border border-gold-light/30 bg-white/5 px-3.5 py-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-gold-light">
-                  <Heart className="h-3.5 w-3.5" /> Wedding &amp; celebration return gifts
+                  <Heart className="h-3.5 w-3.5" /> <span className="sm:hidden">Return gifts</span>
+                  <span className="hidden sm:inline">Wedding &amp; celebration return gifts</span>
                 </p>
                 <h2 id="wedding-return-title" className="mt-5 text-ivory-light font-display text-[2.2rem] font-medium leading-[1.02] sm:text-[3rem] lg:text-[3.4rem]">
                   A blessing in every guest’s hands, <span className="italic text-gold-light">beautifully framed.</span>
                 </h2>
                 <p className="mt-5 max-w-xl text-[0.95rem] leading-relaxed text-ivory-light/80 sm:text-base">
-                  Planning a wedding, griha pravesh or family celebration? Choose silver foil god frames at ₹99 each — everything here is under ₹999. Mix designs or pick one deity, tell us your quantity (25 frames or more), and our team handles personal confirmation and safe dispatch.
+                  Planning a wedding, griha pravesh or family celebration? Choose silver foil god frames at ₹149 each — everything here is under ₹999. Mix designs or pick one deity, tell us your quantity (25 frames or more), and our team handles personal confirmation and safe dispatch.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link to="/shop?bulk=1" className="btn-gold">

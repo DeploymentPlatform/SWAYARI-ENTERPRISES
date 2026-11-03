@@ -160,7 +160,7 @@ export const CartDrawer: React.FC = () => {
                   </div>
                   <div className="flex items-baseline justify-between text-xs text-ink-soft">
                     <span>Shipping</span>
-                    <span className="font-medium italic text-gold-dark">Extra · confirmed by our team</span>
+                    <span className="font-medium italic text-gold-dark">Extra · at actual cost</span>
                   </div>
                   <MinimumOrderMeter count={itemCount} />
                   <div className="grid gap-2.5 pb-2 pt-1">

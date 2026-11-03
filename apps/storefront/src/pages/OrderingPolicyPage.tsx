@@ -14,11 +14,11 @@ const SECTIONS = [
   },
   {
     title: 'Prices and minimum order',
-    body: 'Everything on SWAYARI is priced at ₹999 or less, and every No. 1 god frame is ₹99. The minimum order is 25 frames in total, and you can mix any designs to reach it. The final amount is confirmed by our team. If we send you a quotation, it appears in your account; any later revision is added as a new version rather than changing the original request.'
+    body: 'Everything on SWAYARI is priced at ₹999 or less, and every No. 1 god frame is ₹149. The minimum order is 25 frames in total, and you can mix any designs to reach it. The final amount is confirmed by our team. If we send you a quotation, it appears in your account; any later revision is added as a new version rather than changing the original request.'
   },
   {
     title: 'Delivery',
-    body: 'Requests can be sent for delivery addresses in India (a 6-digit PIN code is required). Shipping charges are extra: our team works them out for your quantity and PIN code and confirms them, with packing and timing, before dispatch.'
+    body: 'Requests can be sent for delivery addresses in India (a 6-digit PIN code is required). Shipping is extra and charged at the actual courier cost for your quantity and PIN code. Our team confirms it, with packing and timing, before dispatch.'
   },
   {
     title: 'Changing or cancelling a request',

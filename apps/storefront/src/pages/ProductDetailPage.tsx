@@ -353,7 +353,7 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
                 </div>
                 <div className="flex justify-between gap-4 text-xs text-ink-soft">
                   <dt>Shipping:</dt>
-                  <dd className="font-medium italic text-gold-dark">extra · confirmed by our team</dd>
+                  <dd className="font-medium italic text-gold-dark">extra · at actual cost</dd>
                 </div>
               </dl>
             )}

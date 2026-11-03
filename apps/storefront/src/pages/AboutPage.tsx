@@ -1,11 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from '../lib/router';
-import { editorialSources } from '../lib/media';
 import { usePageMeta } from '../lib/meta';
 import { Ornament } from '../components/States';
 import { EASE_LUXURY, Reveal, StaggerGroup, StaggerItem } from '../components/motion';
-import { LotusMark, Picture } from '../components/ui';
+import { LotusMark } from '../components/ui';
 
 const PRINCIPLES = [
   {
@@ -25,7 +24,7 @@ const PRINCIPLES = [
 const NUMERALS = ['I', 'II', 'III'];
 
 export const AboutPage: React.FC = () => {
-  usePageMeta('Our Story', 'SWAYARI brings you devotional gifts under ₹999 — silver foil god frames at ₹99 each — with personal assistance for every order.');
+  usePageMeta('Our Story', 'SWAYARI brings you devotional gifts under ₹999 — silver foil god frames at ₹149 each — with personal assistance for every order.');
 
   return (
     <>
@@ -48,7 +47,7 @@ export const AboutPage: React.FC = () => {
               <em className="text-gold-light">Gifts to remember.</em>
             </h1>
             <p className="mt-7 max-w-lg text-[1.0625rem] leading-relaxed text-ivory/80">
-              SWAYARI brings you devotional gifts under ₹999, starting with silver foil god frames at ₹99 each — Balaji, Padmavathi Srinivasa, Sai Baba, Radha Krishna, Bal
+              SWAYARI brings you devotional gifts under ₹999, starting with silver foil god frames at ₹149 each — Balaji, Padmavathi Srinivasa, Sai Baba, Radha Krishna, Bal
               Krishna, Ram Darbar and Hanuman — chosen for wedding return gifts, housewarmings, poojas and celebrations.
             </p>
           </motion.div>
@@ -60,17 +59,19 @@ export const AboutPage: React.FC = () => {
           >
             <div className="relative">
               <div aria-hidden className="absolute -inset-3 rounded-[26px] border border-gold/30 sm:-inset-4" />
-              <Picture
-                sources={editorialSources('marigold-garlands', [600, 900])}
+              <img
+                src="/assets/products/gf-padmavathi-srinivasa-lifestyle.webp"
+                srcSet="/assets/products/thumbs/gf-padmavathi-srinivasa-lifestyle.webp 480w, /assets/products/gf-padmavathi-srinivasa-lifestyle.webp 1024w"
                 sizes="(min-width: 768px) 40vw, 100vw"
-                width={900}
-                height={1125}
-                priority
-                alt="Marigold garlands spilling from a turned wooden vase"
-                className="relative aspect-editorial w-full rounded-card object-cover shadow-dialog"
+                width={1024}
+                height={1024}
+                fetchPriority="high"
+                decoding="async"
+                alt="A bride holding a Padmavathi Srinivasa silver foil frame to give as a return gift"
+                className="relative aspect-editorial w-full rounded-card object-cover object-[40%_50%] shadow-dialog"
               />
             </div>
-            <p className="mt-5 text-right text-[0.6875rem] uppercase tracking-[0.16em] text-ivory/55">Styling inspiration</p>
+            <p className="mt-5 text-right text-[0.6875rem] uppercase tracking-[0.16em] text-ivory/55">Padmavathi Srinivasa · No. 1 silver foil frame</p>
           </motion.div>
         </div>
       </section>
@@ -112,15 +113,18 @@ export const AboutPage: React.FC = () => {
       <section className="relative overflow-hidden bg-stone">
         <div className="container-content grid items-center gap-10 py-16 md:grid-cols-12 md:py-24">
           <Reveal className="md:col-span-7">
-            <Picture
-              sources={editorialSources('assist-brass-diyas', [900, 1600])}
+            <img
+              src="/assets/products/gf-radha-krishna-lifestyle.webp"
+              srcSet="/assets/products/thumbs/gf-radha-krishna-lifestyle.webp 480w, /assets/products/gf-radha-krishna-lifestyle.webp 1024w"
               sizes="(min-width: 768px) 58vw, 100vw"
-              width={1600}
-              height={1068}
-              alt="Brass diyas among pink and white flowers on a wooden surface"
-              className="aspect-wide w-full rounded-card object-cover shadow-card"
+              width={1024}
+              height={1024}
+              loading="lazy"
+              decoding="async"
+              alt="Radha Krishna silver foil frames tied with ribbon on a wedding return-gift table"
+              className="aspect-[4/3] w-full rounded-card object-cover object-[50%_60%] shadow-card"
             />
-            <p className="mt-3 text-[0.75rem] uppercase tracking-[0.14em] text-ink-faint">Styling inspiration</p>
+            <p className="mt-3 text-[0.75rem] uppercase tracking-[0.14em] text-ink-faint">Wedding return-gift table</p>
           </Reveal>
           <Reveal className="md:col-span-4 md:col-start-9" delay={0.1}>
             <LotusMark className="h-6 w-10 text-gold" />
@@ -128,7 +132,7 @@ export const AboutPage: React.FC = () => {
               Looking for something <em className="text-burgundy">particular?</em>
             </h2>
             <p className="mt-4 leading-relaxed text-ink-soft">Tell us the occasion, the person or the space. We will reply with what we can offer.</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row md:flex-col xl:flex-row">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row md:flex-col">
               <Link to="/shop" className="btn-primary">
                 Explore the Collection
               </Link>

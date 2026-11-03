@@ -77,13 +77,13 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
     categoryId: 'cat-god-frames',
     material: 'Silver foil embossed artwork with colour highlights, cream mount and clear front cover',
     dimensions: '',
-    indicativePrice: '99',
+    indicativePrice: '149',
     priceType: 'piece' as 'piece' | 'set',
     setContents: '',
     minQuantity: '1',
     orderIncrement: '1',
     isQuoteOnly: false,
-    shippingInfo: 'Shipping charges are extra and confirmed by our team for your quantity and delivery PIN code.',
+    shippingInfo: 'Shipping is extra, charged at the actual courier cost for your quantity and delivery PIN code.',
     supportsIndividual: true,
     supportsBulk: true,
     customisationInfo: '',
@@ -312,7 +312,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
       onClose={onClose}
       width="max-w-[760px]"
       title={editing ? `Edit ${f.name || 'product'}` : 'New Devotional Frame'}
-      subtitle={editing ? f.sku : 'Everything is ₹999 or less (god frames are ₹99). Minimum order 25 frames in total; shipping extra.'}
+      subtitle={editing ? f.sku : 'Everything is ₹999 or less (god frames are ₹149). Minimum order 25 frames in total; shipping extra.'}
       footer={
         <div className="flex items-center justify-between gap-2 sm:justify-end">
           <button type="button" className="adm-btn-quiet" onClick={onClose}>
@@ -611,7 +611,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
             <div className="flex items-start gap-3 rounded-xl border border-gold/40 bg-gold-pale/50 px-4 py-3 text-[0.8125rem] leading-relaxed text-gold-dark">
               <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-gold" />
               <span>
-                <strong>Business rule:</strong> every item must be priced at <strong>₹{MAX_FRAME_PRICE} or less</strong> (god frames are ₹99). Customers must order at least <strong>{MIN_ORDER_FRAMES} frames in total</strong>, mixing any designs; shipping is charged extra.
+                <strong>Business rule:</strong> every item must be priced at <strong>₹{MAX_FRAME_PRICE} or less</strong> (god frames are ₹149). Customers must order at least <strong>{MIN_ORDER_FRAMES} frames in total</strong>, mixing any designs; shipping is charged extra.
               </span>
             </div>
 

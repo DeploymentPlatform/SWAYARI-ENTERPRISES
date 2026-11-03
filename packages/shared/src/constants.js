@@ -49,9 +49,9 @@ export const SESSION_COOKIE_NAMES = {
 export const BRAND_TAGLINES = {
   headline: 'Devotional gifts under ₹999',
   supporting: 'Thoughtful return gifts for your special celebrations.',
-  proposition: 'Everything under ₹999 — silver foil god frames from ₹99',
+  proposition: 'Everything under ₹999 — silver foil god frames from ₹149',
   minimumOrder: 'Minimum order 25 frames — mix any designs',
-  shippingNote: 'Shipping charges are extra and confirmed by our team.'
+  shippingNote: 'Shipping is extra, charged at the actual courier cost.'
 };
 
 export const FRAME_PRICE_BANDS = [
@@ -61,7 +61,7 @@ export const FRAME_PRICE_BANDS = [
     shortLabel: '< ₹199',
     minPrice: 0,
     maxPrice: 199,
-    description: 'Return gifts for every guest, including our ₹99 god frames'
+    description: 'Return gifts for every guest, including our ₹149 god frames'
   },
   {
     id: '200-499',

@@ -458,7 +458,7 @@ export const CheckoutPage: React.FC = () => {
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-ink-soft">Shipping</dt>
-                <dd className="text-right font-medium italic text-gold-dark">Extra · confirmed by our team</dd>
+                <dd className="text-right font-medium italic text-gold-dark">Extra · at actual cost</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-ink-soft">Payment</dt>

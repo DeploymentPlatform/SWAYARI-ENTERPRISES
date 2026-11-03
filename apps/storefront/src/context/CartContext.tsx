@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { CartItem, calculateEffectiveUnitPrice, calculateCartTotals } from '@swayari/shared';
+import { CartItem, Product, calculateEffectiveUnitPrice, calculateCartTotals } from '@swayari/shared';
 import { useAuth } from './AuthContext';
+import { withPreview } from '../lib/preview';
 
 interface CartContextType {
   items: CartItem[];
@@ -51,6 +52,40 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       /* storage unavailable — bag still works for this visit */
     }
   }, [items]);
+
+  // A saved bag can outlive a price change or a retired design: refresh it from the live catalogue once per visit.
+  useEffect(() => {
+    if (items.length === 0) return;
+    let cancelled = false;
+    fetch(withPreview('/api/products'))
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        const live: Product[] | undefined = data?.products;
+        if (cancelled || !Array.isArray(live) || live.length === 0) return;
+        const byId = new Map(live.map(p => [p.id, p]));
+        setItems(prev =>
+          prev
+            .filter(it => byId.has(it.productId))
+            .map(it => {
+              const p = byId.get(it.productId)!;
+              const base = p.indicativePrice;
+              return {
+                ...it,
+                name: p.name,
+                slug: p.slug,
+                image: p.images?.[0] || it.image,
+                basePrice: base,
+                bulkTiers: p.bulkTiers,
+                indicativePrice: calculateEffectiveUnitPrice(base, p.bulkTiers, it.quantity)
+              };
+            })
+        );
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Resume the add the visitor intended before signing in — exactly once.
   useEffect(() => {

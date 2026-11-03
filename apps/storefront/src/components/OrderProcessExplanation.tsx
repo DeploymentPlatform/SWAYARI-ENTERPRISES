@@ -8,7 +8,7 @@ const STEPS = [
   {
     icon: ShoppingBag,
     title: 'Choose frames and quantities',
-    body: 'Pick from our silver foil god frames at ₹99 each — everything on SWAYARI is under ₹999. Mix any designs; the minimum order is 25 frames in total.'
+    body: 'Pick from our silver foil god frames at ₹149 each — everything on SWAYARI is under ₹999. Mix any designs; the minimum order is 25 frames in total.'
   },
   {
     icon: Send,

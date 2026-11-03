@@ -12,12 +12,12 @@ export const Wordmark: React.FC<{ tone?: 'dark' | 'light'; caption?: string; siz
   caption = 'Staff portal',
   size = 'md'
 }) => {
-  // The real SWAYARI logo artwork: gold on dark surfaces, deeper gold on light ones.
-  const src = tone === 'dark' ? '/assets/brand/swayari-logo-light.webp' : '/assets/brand/swayari-logo-gold.webp';
+  // The SWAYARI logo (vector): bright gold on dark surfaces, deeper gold on light ones.
+  const src = tone === 'dark' ? '/assets/brand/swayari-logo-light.svg' : '/assets/brand/swayari-logo-gold.svg';
   const height = size === 'lg' ? 'h-20' : size === 'sm' ? 'h-9' : 'h-12';
   return (
     <span className="inline-flex flex-col items-center leading-none">
-      <img src={src} alt="SWAYARI — Décor & Gifting" width={825} height={304} className={`${height} w-auto select-none`} draggable={false} />
+      <img src={src} alt="SWAYARI — Décor & Gifting" width={1000} height={360} className={`${height} w-auto select-none`} draggable={false} />
       {caption && (
         <span className={`mt-1.5 flex items-center gap-2 text-[0.5625rem] font-semibold uppercase tracking-[0.32em] ${tone === 'dark' ? 'text-gold-dark' : 'text-gold-light'}`}>
           <span aria-hidden className="h-px w-3 bg-current opacity-70" />

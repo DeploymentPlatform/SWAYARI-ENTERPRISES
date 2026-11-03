@@ -19,9 +19,15 @@ export const LotusMark: React.FC<{ className?: string; title?: string }> = ({ cl
   </svg>
 );
 
-/** The SWAYARI logo artwork: gold lockup for dark backgrounds, the deeper-gold version for light ones. */
-export const LOGO_ON_LIGHT = '/assets/brand/swayari-logo-light.webp';
-export const LOGO_ON_DARK = '/assets/brand/swayari-logo-gold.webp';
+/**
+ * The SWAYARI logo, redrawn as vector (scripts/brand/make-logo-svg.py): bright gold with a glow for dark
+ * backgrounds, deeper gold with a soft shadow for light ones. The compact lockup drops the lotus rule.
+ */
+export const LOGO_ON_LIGHT = '/assets/brand/swayari-logo-light.svg';
+export const LOGO_ON_DARK = '/assets/brand/swayari-logo-gold.svg';
+export const LOGO_COMPACT_ON_LIGHT = '/assets/brand/swayari-logo-light-compact.svg';
+export const LOGO_SIZE = { width: 1000, height: 360 };
+export const LOGO_COMPACT_SIZE = { width: 1000, height: 270 };
 
 export const Wordmark: React.FC<{ tone?: 'dark' | 'light'; size?: 'sm' | 'md' | 'lg'; className?: string }> = ({
   tone = 'dark',
@@ -33,8 +39,7 @@ export const Wordmark: React.FC<{ tone?: 'dark' | 'light'; size?: 'sm' | 'md' | 
     <img
       src={tone === 'dark' ? LOGO_ON_LIGHT : LOGO_ON_DARK}
       alt="SWAYARI — Décor & Gifting"
-      width={825}
-      height={304}
+      {...LOGO_SIZE}
       decoding="async"
       className={`${height} w-auto select-none ${className}`}
       draggable={false}

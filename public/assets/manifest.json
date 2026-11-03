@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-03T09:44:33.504Z",
+  "generatedAt": "2026-11-03T10:08:34.109Z",
   "totalAssets": 107,
   "assets": [
     {
@@ -48,40 +48,40 @@
       "updatedAt": "2026-11-03T09:40:52.867Z"
     },
     {
-      "id": "brand_swayari-logo-gold_png",
-      "filename": "swayari-logo-gold.png",
-      "path": "/assets/brand/swayari-logo-gold.png",
+      "id": "brand_swayari-logo-gold-compact_svg",
+      "filename": "swayari-logo-gold-compact.svg",
+      "path": "/assets/brand/swayari-logo-gold-compact.svg",
+      "category": "brand",
+      "label": "swayari logo gold compact",
+      "sizeBytes": 56339,
+      "updatedAt": "2026-11-03T10:08:23.805Z"
+    },
+    {
+      "id": "brand_swayari-logo-gold_svg",
+      "filename": "swayari-logo-gold.svg",
+      "path": "/assets/brand/swayari-logo-gold.svg",
       "category": "brand",
       "label": "swayari logo gold",
-      "sizeBytes": 285704,
-      "updatedAt": "2026-11-03T09:40:47.156Z"
+      "sizeBytes": 56984,
+      "updatedAt": "2026-11-03T10:08:23.806Z"
     },
     {
-      "id": "brand_swayari-logo-gold_webp",
-      "filename": "swayari-logo-gold.webp",
-      "path": "/assets/brand/swayari-logo-gold.webp",
+      "id": "brand_swayari-logo-light-compact_svg",
+      "filename": "swayari-logo-light-compact.svg",
+      "path": "/assets/brand/swayari-logo-light-compact.svg",
       "category": "brand",
-      "label": "swayari logo gold",
-      "sizeBytes": 50734,
-      "updatedAt": "2026-11-03T09:40:47.037Z"
+      "label": "swayari logo light compact",
+      "sizeBytes": 56342,
+      "updatedAt": "2026-11-03T10:08:23.807Z"
     },
     {
-      "id": "brand_swayari-logo-light_png",
-      "filename": "swayari-logo-light.png",
-      "path": "/assets/brand/swayari-logo-light.png",
-      "category": "brand",
-      "label": "swayari logo light",
-      "sizeBytes": 273753,
-      "updatedAt": "2026-11-03T09:40:52.852Z"
-    },
-    {
-      "id": "brand_swayari-logo-light_webp",
-      "filename": "swayari-logo-light.webp",
-      "path": "/assets/brand/swayari-logo-light.webp",
+      "id": "brand_swayari-logo-light_svg",
+      "filename": "swayari-logo-light.svg",
+      "path": "/assets/brand/swayari-logo-light.svg",
       "category": "brand",
       "label": "swayari logo light",
-      "sizeBytes": 46502,
-      "updatedAt": "2026-11-03T09:40:52.698Z"
+      "sizeBytes": 56987,
+      "updatedAt": "2026-11-03T10:08:23.807Z"
     },
     {
       "id": "categories_cat-decorative-lamps_jpg",

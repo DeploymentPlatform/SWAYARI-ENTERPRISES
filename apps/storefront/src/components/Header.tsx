@@ -10,7 +10,7 @@ import { Link, useRouter } from '../lib/router';
 import { productCardImage, uniqueProductImages } from '../lib/media';
 import { useProducts } from '../lib/products';
 import { formatPrice, Product } from '@swayari/shared';
-import { LOGO_ON_DARK, LOGO_ON_LIGHT, useDialogBehaviour } from './ui';
+import { LOGO_COMPACT_ON_LIGHT, LOGO_COMPACT_SIZE, LOGO_ON_DARK, LOGO_SIZE, useDialogBehaviour } from './ui';
 import { EASE_LUXURY } from './motion';
 
 const NAV_LINKS = [
@@ -52,15 +52,14 @@ function useScrolled(threshold = 24) {
 const BrandLockup: React.FC<{ compact?: boolean }> = ({ compact }) => (
   <Link to="/" className="group flex items-center leading-none" aria-label="SWAYARI — home">
     <img
-      src={LOGO_ON_LIGHT}
+      src={LOGO_COMPACT_ON_LIGHT}
       alt="SWAYARI — Décor & Gifting"
-      width={825}
-      height={304}
+      {...LOGO_COMPACT_SIZE}
       fetchPriority="high"
       decoding="async"
       draggable={false}
       className={`w-auto select-none transition-all duration-500 ease-luxury group-hover:brightness-110 ${
-        compact ? 'h-10 sm:h-12' : 'h-12 sm:h-[4.5rem]'
+        compact ? 'h-10 sm:h-14' : 'h-12 sm:h-[4.75rem]'
       }`}
     />
   </Link>
@@ -480,7 +479,7 @@ export const Header: React.FC = () => {
               <div className="relative overflow-hidden bg-burgundy-deep px-6 pb-7 pt-6 text-ivory-light">
                 <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gold/20 blur-3xl" />
                 <div className="relative flex items-start justify-between">
-                  <img src={LOGO_ON_DARK} alt="SWAYARI — Décor & Gifting" width={825} height={304} className="h-14 w-auto" draggable={false} />
+                  <img src={LOGO_ON_DARK} alt="SWAYARI — Décor & Gifting" {...LOGO_SIZE} className="h-16 w-auto" draggable={false} />
                   <button
                     type="button"
                     onClick={() => setMenuOpen(false)}

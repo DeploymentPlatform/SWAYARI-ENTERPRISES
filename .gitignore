@@ -41,3 +41,4 @@ apps/*/public/assets/manifest.json
 
 # Temporary downloader cache
 .cache_img/
+apps/*/public/assets/fonts

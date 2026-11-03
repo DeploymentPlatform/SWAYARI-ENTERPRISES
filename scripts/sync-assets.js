@@ -13,8 +13,8 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 const source = path.join(projectRoot, 'public', 'assets');
 
 const TARGETS = {
-  storefront: { dir: 'apps/storefront/public/assets', folders: ['brand', 'products', 'demo', 'editorial', 'categories'] },
-  admin: { dir: 'apps/admin/public/assets', folders: ['brand', 'products', 'demo', 'editorial', 'categories'] }
+  storefront: { dir: 'apps/storefront/public/assets', folders: ['brand', 'fonts', 'products', 'demo', 'editorial', 'categories'] },
+  admin: { dir: 'apps/admin/public/assets', folders: ['brand', 'fonts', 'products', 'demo', 'editorial', 'categories'] }
 };
 
 function copyFolder(from, to) {

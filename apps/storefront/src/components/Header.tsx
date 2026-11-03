@@ -7,6 +7,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { Link, useRouter } from '../lib/router';
+import { productCardImage, uniqueProductImages } from '../lib/media';
 import { useProducts } from '../lib/products';
 import { formatPrice, Product } from '@swayari/shared';
 import { LotusMark, useDialogBehaviour } from './ui';
@@ -50,7 +51,7 @@ function useScrolled(threshold = 24) {
 /* ------------------------------------------------------------------ Brand lockup */
 
 const BrandLockup: React.FC<{ compact?: boolean }> = ({ compact }) => (
-  <Link to="/" className="group flex flex-col items-center leading-none" aria-label="SWAYARI home">
+  <Link to="/" className="group flex flex-col items-center leading-none">
     <LotusMark className={`text-gold transition-all duration-500 ease-luxury group-hover:text-gold-dark ${compact ? 'h-0 w-6 opacity-0' : 'mb-1 h-3.5 w-6 opacity-100'}`} />
     <span
       className={`font-wordmark font-semibold tracking-[0.24em] text-burgundy-deep transition-all duration-500 ease-luxury pl-[0.24em] ${
@@ -68,6 +69,7 @@ const BrandLockup: React.FC<{ compact?: boolean }> = ({ compact }) => (
       </span>
       <span className="h-px w-4 bg-gold/70 sm:w-6" />
     </span>
+    <span className="sr-only"> — home</span>
   </Link>
 );
 
@@ -170,7 +172,8 @@ const SearchOverlay: React.FC<{ open: boolean; onClose: () => void; products: Pr
                           className="group flex w-full items-center gap-4 rounded-2xl border border-transparent p-2.5 text-left transition-all duration-300 hover:border-stone-deep hover:bg-white hover:shadow-soft"
                         >
                           <img
-                            src={p.images?.[0] || '/assets/products/venkateswara-frame-600.webp'}
+                            {...productCardImage(uniqueProductImages(p.images)[0] || '/assets/products/venkateswara-frame-600.webp')}
+                            sizes="64px"
                             alt=""
                             className="h-16 w-16 flex-shrink-0 rounded-xl border border-stone-deep bg-ivory object-contain"
                           />
@@ -595,7 +598,7 @@ const MobileTabBar: React.FC<{
 }> = ({ path, itemCount, signedIn, onSearch, onCart, onAccount }) => {
   const item = 'flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 text-[0.625rem] font-semibold uppercase tracking-[0.12em] transition-colors';
   const on = 'text-burgundy';
-  const off = 'text-ink-faint';
+  const off = 'text-ink-soft';
   return (
     <nav
       aria-label="Quick navigation"

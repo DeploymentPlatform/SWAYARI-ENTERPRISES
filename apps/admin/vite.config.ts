@@ -23,6 +23,15 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    copyPublicDir: Boolean(process.env.CI)
+    copyPublicDir: Boolean(process.env.CI),
+    rollupOptions: {
+      output: {
+        // Libraries change rarely: keep them in their own long-cached chunks.
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          motion: ['framer-motion']
+        }
+      }
+    }
   }
 });

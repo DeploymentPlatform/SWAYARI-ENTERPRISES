@@ -30,7 +30,8 @@ function scanDir(dir, baseDir = '') {
   if (!fs.existsSync(dir)) return results;
   const list = fs.readdirSync(dir, { withFileTypes: true });
   for (const item of list) {
-    if (item.name.startsWith('.') || item.name === 'manifest.json') continue;
+    // thumbs/ holds generated card-size copies (scripts/generate-thumbnails.js), not library photos.
+    if (item.name.startsWith('.') || item.name === 'manifest.json' || item.name === 'thumbs') continue;
     const fullPath = path.join(dir, item.name);
     const relPath = path.join(baseDir, item.name);
     if (item.isDirectory()) {

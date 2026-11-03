@@ -23,8 +23,8 @@ const CONFIRMED_SLIDES: Slide[] = [
     headline: 'Devotional frames',
     emphasis: '₹99 & under',
     supporting: 'Thoughtful return gifts for your special celebrations. Pure devotion, beautifully framed.',
-    desktopImage: '/assets/editorial/hero-slide-2-devotional-desktop.webp',
-    mobileImage: '/assets/editorial/hero-slide-2-devotional-mobile.jpg',
+    desktopImage: '/assets/editorial/hero-devotional-collection-desktop.webp',
+    mobileImage: '/assets/editorial/hero-devotional-collection-mobile.webp',
     alt: 'Devotional sanctum frames for weddings and celebrations'
   },
   {
@@ -33,8 +33,8 @@ const CONFIRMED_SLIDES: Slide[] = [
     headline: 'A thoughtful thank-you',
     emphasis: 'for every guest.',
     supporting: 'Blessings of Ganesha, Lakshmi, Balaji & Radha Krishna. Quoted separately for bulk shipping.',
-    desktopImage: '/assets/editorial/hero-festive-lamps-1080.webp',
-    mobileImage: '/assets/editorial/hero-festive-lamps-mobile-900.webp',
+    desktopImage: '/assets/editorial/hero-wedding-favors-desktop.webp',
+    mobileImage: '/assets/editorial/hero-wedding-favors-mobile.webp',
     alt: 'Auspicious wedding return gift frames'
   },
   {
@@ -43,8 +43,8 @@ const CONFIRMED_SLIDES: Slide[] = [
     headline: 'Choose your frames.',
     emphasis: 'Tell us your quantity.',
     supporting: 'Select your preferred designs. Our team contacts you to confirm availability, packing and dispatch.',
-    desktopImage: '/assets/editorial/hero-slide-1-moments-desktop.webp',
-    mobileImage: '/assets/editorial/hero-slide-1-moments-mobile.webp',
+    desktopImage: '/assets/editorial/hero-bulk-process-desktop.webp',
+    mobileImage: '/assets/editorial/hero-bulk-process-mobile.webp',
     alt: 'Bulk devotional return gifts'
   }
 ];

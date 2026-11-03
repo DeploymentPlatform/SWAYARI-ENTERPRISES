@@ -24,6 +24,16 @@ export function usePageMeta(title: string | null, description?: string, options?
     setMeta('meta[property="og:title"]', 'property', 'og:title', fullTitle);
     setMeta('meta[property="og:description"]', 'property', 'og:description', desc);
     setMeta('meta[name="robots"]', 'name', 'robots', options?.noindex ? 'noindex, nofollow' : 'index, follow');
+    // Canonical URL follows the current page (query strings are filters, not separate pages).
+    const canonicalUrl = `${window.location.origin}${window.location.pathname}`;
+    setMeta('meta[property="og:url"]', 'property', 'og:url', canonicalUrl);
+    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = canonicalUrl;
   }, [title, description, options?.noindex]);
 }
 

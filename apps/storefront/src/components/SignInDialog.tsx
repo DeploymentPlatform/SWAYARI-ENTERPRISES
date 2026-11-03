@@ -13,7 +13,23 @@ const COPY = {
   account: { title: 'Sign in to SWAYARI', body: 'Keep your bag and order requests together in one place.' }
 };
 
-/** Waits for the async Google Identity Services script, then renders Google's own button. */
+const GSI_SRC = 'https://accounts.google.com/gsi/client';
+
+/** Loads Google Identity Services once, on demand, instead of on every page view. */
+function loadGoogleScript() {
+  if (typeof document === 'undefined' || document.querySelector(`script[src="${GSI_SRC}"]`)) return;
+  const script = document.createElement('script');
+  script.src = GSI_SRC;
+  script.async = true;
+  document.head.appendChild(script);
+}
+
+// Warm it up shortly after the page has loaded so the sign-in sheet opens instantly.
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', () => window.setTimeout(loadGoogleScript, 3500), { once: true });
+}
+
+/** Loads the Google Identity Services script if needed, waits for it, then renders Google's own button. */
 function useGoogleButton(clientId: string | null, open: boolean, onCredential: (credential: string) => void) {
   const ref = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<'idle' | 'loading' | 'ready' | 'unavailable'>('idle');
@@ -23,6 +39,7 @@ function useGoogleButton(clientId: string | null, open: boolean, onCredential: (
     let cancelled = false;
     let tries = 0;
     setState('loading');
+    loadGoogleScript();
     const attempt = () => {
       if (cancelled) return;
       if (window.google?.accounts?.id && ref.current) {
@@ -45,7 +62,7 @@ function useGoogleButton(clientId: string | null, open: boolean, onCredential: (
         setState('ready');
         return;
       }
-      if (++tries > 50) {
+      if (++tries > 120) {
         setState('unavailable');
         return;
       }

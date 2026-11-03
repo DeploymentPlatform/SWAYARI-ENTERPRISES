@@ -7,6 +7,7 @@ import { toCartItem } from '../lib/products';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { QuickViewModal } from './QuickViewModal';
+import { PRODUCT_CARD_SIZES, productCardImage, uniqueProductImages } from '../lib/media';
 
 interface ProductCardProps {
   product: Product;
@@ -22,31 +23,35 @@ export const ProductImage: React.FC<{ product: Product; sizes?: string; priority
   priority,
   className = ''
 }) => {
-  const primaryImg = product.images && product.images.length > 0 ? product.images[0] : FALLBACK_IMAGE;
+  const primaryImg = uniqueProductImages(product.images)[0] || FALLBACK_IMAGE;
 
   return (
     <div className={`relative flex aspect-square w-full items-center justify-center overflow-hidden bg-gradient-to-b from-ivory-light to-stone p-4 ${className}`}>
       <img
-        src={primaryImg}
+        {...productCardImage(primaryImg)}
         alt={product.name}
         loading={priority ? 'eager' : 'lazy'}
-        sizes={sizes}
+        decoding="async"
+        sizes={sizes || PRODUCT_CARD_SIZES}
         className="h-full w-full object-contain drop-shadow-[0_14px_18px_rgba(46,12,20,0.18)] transition-transform duration-700 ease-luxury group-hover:scale-[1.06]"
       />
     </div>
   );
 };
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, priority }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, sizes }) => {
   const { addItem, openDrawer } = useCart();
   const { user, initiateGoogleSignIn } = useAuth();
 
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [added, setAdded] = useState(false);
 
-  const images = product.images && product.images.length > 0 ? product.images : [FALLBACK_IMAGE];
-  const primaryImg = images[0];
-  const secondaryImg = images[1];
+  const images = uniqueProductImages(product.images);
+  const primaryImg = images[0] || FALLBACK_IMAGE;
+  // The hover photo is only fetched once a mouse actually hovers the card (never on touch screens).
+  const [hovered, setHovered] = useState(false);
+  const secondaryImg = hovered ? images[1] : undefined;
+  const [secondaryReady, setSecondaryReady] = useState(false);
   const href = `/product/${product.slug}`;
 
   function handleQuickAdd(e: React.MouseEvent) {
@@ -76,22 +81,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority }) =
 
   return (
     <>
-      <article className="group relative flex h-full flex-col overflow-hidden rounded-card border border-stone-deep/80 bg-white shadow-card transition-all duration-500 ease-luxury hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-card-hover">
+      <article
+        onPointerEnter={e => e.pointerType === 'mouse' && setHovered(true)}
+        className="group relative flex h-full flex-col overflow-hidden rounded-card border border-stone-deep/80 bg-white shadow-card transition-all duration-500 ease-luxury hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-card-hover">
         {/* Image stage */}
         <div className="relative aspect-[4/5] w-full overflow-hidden bg-gradient-to-b from-ivory-light via-ivory to-stone sm:aspect-square">
           <div className="pointer-events-none absolute inset-x-6 bottom-3 h-6 rounded-[50%] bg-burgundy-deep/10 blur-xl transition-all duration-700 group-hover:inset-x-10 group-hover:bg-burgundy-deep/15" />
           <Link to={href} className="absolute inset-0 block p-4 sm:p-6" tabIndex={-1} aria-hidden>
             <img
-              src={primaryImg}
+              {...productCardImage(primaryImg)}
+              sizes={sizes || PRODUCT_CARD_SIZES}
               alt={product.name}
               loading={priority ? 'eager' : 'lazy'}
+              decoding="async"
               className={`h-full w-full object-contain drop-shadow-[0_16px_20px_rgba(46,12,20,0.2)] transition-all duration-700 ease-luxury group-hover:scale-[1.06] ${
-                secondaryImg ? 'group-hover:opacity-0' : ''
+                secondaryReady ? 'group-hover:opacity-0' : ''
               }`}
             />
             {secondaryImg && (
               <img
-                src={secondaryImg}
+                {...productCardImage(secondaryImg)}
+                sizes={sizes || PRODUCT_CARD_SIZES}
+                onLoad={() => setSecondaryReady(true)}
                 alt=""
                 loading="lazy"
                 className="absolute inset-0 h-full w-full scale-[1.02] object-contain p-4 opacity-0 transition-all duration-700 ease-luxury group-hover:scale-100 group-hover:opacity-100 sm:p-6"

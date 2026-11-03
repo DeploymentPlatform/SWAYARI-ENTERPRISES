@@ -1,7 +1,16 @@
 {
-  "generatedAt": "2026-10-21T00:44:19.755Z",
-  "totalAssets": 215,
+  "generatedAt": "2026-11-03T05:42:07.738Z",
+  "totalAssets": 216,
   "assets": [
+    {
+      "id": "brand_apple-touch-icon_png",
+      "filename": "apple-touch-icon.png",
+      "path": "/assets/brand/apple-touch-icon.png",
+      "category": "brand",
+      "label": "apple touch icon",
+      "sizeBytes": 12470,
+      "updatedAt": "2026-11-03T05:34:02.508Z"
+    },
     {
       "id": "brand_favicon_svg",
       "filename": "favicon.svg",
@@ -9,7 +18,7 @@
       "category": "brand",
       "label": "SWAYARI lotus favicon",
       "sizeBytes": 1391,
-      "updatedAt": "2026-10-19T03:42:47.270Z"
+      "updatedAt": "2026-11-03T03:11:27.244Z"
     },
     {
       "id": "brand_swayari-logo_svg",
@@ -18,7 +27,7 @@
       "category": "brand",
       "label": "SWAYARI wordmark (SVG)",
       "sizeBytes": 2770,
-      "updatedAt": "2026-10-19T03:42:47.270Z"
+      "updatedAt": "2026-11-03T03:11:27.245Z"
     },
     {
       "id": "brand_swayari_brand_card_jpeg",
@@ -27,7 +36,7 @@
       "category": "brand",
       "label": "SWAYARI brand card (reference artwork)",
       "sizeBytes": 162991,
-      "updatedAt": "2026-10-19T03:42:47.272Z"
+      "updatedAt": "2026-11-03T03:11:27.245Z"
     },
     {
       "id": "categories_cat-decorative-lamps_jpg",
@@ -36,7 +45,7 @@
       "category": "categories",
       "label": "cat decorative lamps",
       "sizeBytes": 31063,
-      "updatedAt": "2026-10-19T05:31:12.042Z"
+      "updatedAt": "2026-11-03T03:11:37.649Z"
     },
     {
       "id": "categories_cat-decorative-lamps_webp",
@@ -45,7 +54,7 @@
       "category": "categories",
       "label": "cat decorative lamps",
       "sizeBytes": 31798,
-      "updatedAt": "2026-10-19T05:31:12.042Z"
+      "updatedAt": "2026-11-03T03:11:37.649Z"
     },
     {
       "id": "categories_cat-devotional-frames_jpg",
@@ -54,7 +63,7 @@
       "category": "categories",
       "label": "cat devotional frames",
       "sizeBytes": 15955,
-      "updatedAt": "2026-10-19T05:31:12.042Z"
+      "updatedAt": "2026-11-03T03:11:37.649Z"
     },
     {
       "id": "categories_cat-devotional-frames_webp",
@@ -63,7 +72,7 @@
       "category": "categories",
       "label": "cat devotional frames",
       "sizeBytes": 12988,
-      "updatedAt": "2026-10-19T05:31:12.042Z"
+      "updatedAt": "2026-11-03T03:11:37.649Z"
     },
     {
       "id": "categories_cat-festive-decor_jpg",
@@ -72,7 +81,7 @@
       "category": "categories",
       "label": "cat festive decor",
       "sizeBytes": 20474,
-      "updatedAt": "2026-10-19T05:31:12.043Z"
+      "updatedAt": "2026-11-03T03:11:37.649Z"
     },
     {
       "id": "categories_cat-festive-decor_webp",
@@ -81,7 +90,7 @@
       "category": "categories",
       "label": "cat festive decor",
       "sizeBytes": 18336,
-      "updatedAt": "2026-10-19T05:31:12.043Z"
+      "updatedAt": "2026-11-03T03:11:37.649Z"
     },
     {
       "id": "categories_cat-gift-sets_jpg",
@@ -90,7 +99,7 @@
       "category": "categories",
       "label": "cat gift sets",
       "sizeBytes": 14230,
-      "updatedAt": "2026-10-19T05:31:12.043Z"
+      "updatedAt": "2026-11-03T03:11:37.650Z"
     },
     {
       "id": "categories_cat-gift-sets_webp",
@@ -99,7 +108,7 @@
       "category": "categories",
       "label": "cat gift sets",
       "sizeBytes": 11380,
-      "updatedAt": "2026-10-19T05:31:12.043Z"
+      "updatedAt": "2026-11-03T03:11:37.650Z"
     },
     {
       "id": "categories_cat-home-accents_jpg",
@@ -108,7 +117,7 @@
       "category": "categories",
       "label": "cat home accents",
       "sizeBytes": 13018,
-      "updatedAt": "2026-10-19T05:31:12.043Z"
+      "updatedAt": "2026-11-03T03:11:37.650Z"
     },
     {
       "id": "categories_cat-home-accents_webp",
@@ -117,7 +126,7 @@
       "category": "categories",
       "label": "cat home accents",
       "sizeBytes": 10704,
-      "updatedAt": "2026-10-19T05:31:12.043Z"
+      "updatedAt": "2026-11-03T03:11:37.651Z"
     },
     {
       "id": "demo_sample_product_1_jpeg",
@@ -126,7 +135,7 @@
       "category": "demo",
       "label": "Radha Krishna framed relief — original photo",
       "sizeBytes": 335500,
-      "updatedAt": "2026-10-19T03:42:47.279Z"
+      "updatedAt": "2026-11-03T03:11:27.247Z"
     },
     {
       "id": "demo_sample_product_2_jpeg",
@@ -135,7 +144,7 @@
       "category": "demo",
       "label": "Bala Krishna framed relief — original photo",
       "sizeBytes": 315068,
-      "updatedAt": "2026-10-19T03:42:47.281Z"
+      "updatedAt": "2026-11-03T03:11:27.248Z"
     },
     {
       "id": "demo_sample_product_3_jpeg",
@@ -144,7 +153,7 @@
       "category": "demo",
       "label": "Sri Venkateswara framed relief — original photo",
       "sizeBytes": 322767,
-      "updatedAt": "2026-10-19T03:42:47.284Z"
+      "updatedAt": "2026-11-03T03:11:27.249Z"
     },
     {
       "id": "demo_sample_product_4_jpeg",
@@ -153,7 +162,7 @@
       "category": "demo",
       "label": "Hanuman framed relief — original photo",
       "sizeBytes": 331098,
-      "updatedAt": "2026-10-19T03:42:47.286Z"
+      "updatedAt": "2026-11-03T03:11:27.250Z"
     },
     {
       "id": "editorial_assist-brass-diyas-1600_jpg",
@@ -161,8 +170,8 @@
       "path": "/assets/editorial/assist-brass-diyas-1600.jpg",
       "category": "editorial",
       "label": "assist brass diyas (licensed stock — styling inspiration)",
-      "sizeBytes": 321379,
-      "updatedAt": "2026-10-19T05:31:12.044Z"
+      "sizeBytes": 272357,
+      "updatedAt": "2026-11-03T05:33:19.913Z"
     },
     {
       "id": "editorial_assist-brass-diyas-1600_webp",
@@ -170,8 +179,8 @@
       "path": "/assets/editorial/assist-brass-diyas-1600.webp",
       "category": "editorial",
       "label": "assist brass diyas (licensed stock — styling inspiration)",
-      "sizeBytes": 211680,
-      "updatedAt": "2026-10-19T05:31:12.046Z"
+      "sizeBytes": 179268,
+      "updatedAt": "2026-11-03T05:33:20.500Z"
     },
     {
       "id": "editorial_assist-brass-diyas-900_jpg",
@@ -180,7 +189,7 @@
       "category": "editorial",
       "label": "assist brass diyas (licensed stock — styling inspiration)",
       "sizeBytes": 127653,
-      "updatedAt": "2026-10-19T05:31:12.046Z"
+      "updatedAt": "2026-11-03T03:11:37.654Z"
     },
     {
       "id": "editorial_assist-brass-diyas-900_webp",
@@ -189,7 +198,7 @@
       "category": "editorial",
       "label": "assist brass diyas (licensed stock — styling inspiration)",
       "sizeBytes": 95494,
-      "updatedAt": "2026-10-19T05:31:12.046Z"
+      "updatedAt": "2026-11-03T03:11:37.654Z"
     },
     {
       "id": "editorial_brand-stone-arch-1000_jpg",
@@ -197,8 +206,8 @@
       "path": "/assets/editorial/brand-stone-arch-1000.jpg",
       "category": "editorial",
       "label": "brand stone arch (licensed stock — styling inspiration)",
-      "sizeBytes": 91982,
-      "updatedAt": "2026-10-19T05:31:12.047Z"
+      "sizeBytes": 70226,
+      "updatedAt": "2026-11-03T05:33:20.836Z"
     },
     {
       "id": "editorial_brand-stone-arch-1000_webp",
@@ -207,7 +216,7 @@
       "category": "editorial",
       "label": "brand stone arch (licensed stock — styling inspiration)",
       "sizeBytes": 23150,
-      "updatedAt": "2026-10-19T05:31:12.047Z"
+      "updatedAt": "2026-11-03T03:11:37.655Z"
     },
     {
       "id": "editorial_brand-stone-arch-600_jpg",
@@ -216,7 +225,7 @@
       "category": "editorial",
       "label": "brand stone arch (licensed stock — styling inspiration)",
       "sizeBytes": 31752,
-      "updatedAt": "2026-10-19T05:31:12.047Z"
+      "updatedAt": "2026-11-03T03:11:37.655Z"
     },
     {
       "id": "editorial_brand-stone-arch-600_webp",
@@ -225,7 +234,7 @@
       "category": "editorial",
       "label": "brand stone arch (licensed stock — styling inspiration)",
       "sizeBytes": 9582,
-      "updatedAt": "2026-10-19T05:31:12.047Z"
+      "updatedAt": "2026-11-03T03:11:37.656Z"
     },
     {
       "id": "editorial_hero-bulk-process-desktop_jpg",
@@ -233,8 +242,8 @@
       "path": "/assets/editorial/hero-bulk-process-desktop.jpg",
       "category": "editorial",
       "label": "hero bulk process desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 289485,
-      "updatedAt": "2026-10-20T23:48:46.600Z"
+      "sizeBytes": 207674,
+      "updatedAt": "2026-11-03T05:33:21.024Z"
     },
     {
       "id": "editorial_hero-bulk-process-desktop_webp",
@@ -242,8 +251,8 @@
       "path": "/assets/editorial/hero-bulk-process-desktop.webp",
       "category": "editorial",
       "label": "hero bulk process desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 222124,
-      "updatedAt": "2026-10-20T23:48:46.588Z"
+      "sizeBytes": 161444,
+      "updatedAt": "2026-11-03T05:33:21.551Z"
     },
     {
       "id": "editorial_hero-bulk-process-mobile_jpg",
@@ -251,8 +260,8 @@
       "path": "/assets/editorial/hero-bulk-process-mobile.jpg",
       "category": "editorial",
       "label": "hero bulk process mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 139848,
-      "updatedAt": "2026-10-20T23:48:46.643Z"
+      "sizeBytes": 101308,
+      "updatedAt": "2026-11-03T05:33:21.643Z"
     },
     {
       "id": "editorial_hero-bulk-process-mobile_webp",
@@ -260,8 +269,8 @@
       "path": "/assets/editorial/hero-bulk-process-mobile.webp",
       "category": "editorial",
       "label": "hero bulk process mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 118176,
-      "updatedAt": "2026-10-20T23:48:46.636Z"
+      "sizeBytes": 87078,
+      "updatedAt": "2026-11-03T05:33:21.957Z"
     },
     {
       "id": "editorial_hero-devotional-collection-desktop_jpg",
@@ -269,8 +278,8 @@
       "path": "/assets/editorial/hero-devotional-collection-desktop.jpg",
       "category": "editorial",
       "label": "hero devotional collection desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 308345,
-      "updatedAt": "2026-10-20T23:48:10.719Z"
+      "sizeBytes": 221441,
+      "updatedAt": "2026-11-03T05:33:22.176Z"
     },
     {
       "id": "editorial_hero-devotional-collection-desktop_webp",
@@ -278,8 +287,8 @@
       "path": "/assets/editorial/hero-devotional-collection-desktop.webp",
       "category": "editorial",
       "label": "hero devotional collection desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 255900,
-      "updatedAt": "2026-10-20T23:48:10.707Z"
+      "sizeBytes": 181770,
+      "updatedAt": "2026-11-03T05:33:22.775Z"
     },
     {
       "id": "editorial_hero-devotional-collection-mobile_jpg",
@@ -287,8 +296,8 @@
       "path": "/assets/editorial/hero-devotional-collection-mobile.jpg",
       "category": "editorial",
       "label": "hero devotional collection mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 143165,
-      "updatedAt": "2026-10-20T23:48:10.765Z"
+      "sizeBytes": 103232,
+      "updatedAt": "2026-11-03T05:33:22.866Z"
     },
     {
       "id": "editorial_hero-devotional-collection-mobile_webp",
@@ -296,8 +305,8 @@
       "path": "/assets/editorial/hero-devotional-collection-mobile.webp",
       "category": "editorial",
       "label": "hero devotional collection mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 124136,
-      "updatedAt": "2026-10-20T23:48:10.757Z"
+      "sizeBytes": 92904,
+      "updatedAt": "2026-11-03T05:33:23.083Z"
     },
     {
       "id": "editorial_hero-festive-lamps-1080_jpg",
@@ -306,7 +315,7 @@
       "category": "editorial",
       "label": "hero festive lamps (licensed stock — styling inspiration)",
       "sizeBytes": 51179,
-      "updatedAt": "2026-10-19T05:31:12.048Z"
+      "updatedAt": "2026-11-03T03:11:37.661Z"
     },
     {
       "id": "editorial_hero-festive-lamps-1080_webp",
@@ -314,8 +323,8 @@
       "path": "/assets/editorial/hero-festive-lamps-1080.webp",
       "category": "editorial",
       "label": "hero festive lamps (licensed stock — styling inspiration)",
-      "sizeBytes": 289884,
-      "updatedAt": "2026-10-20T23:48:43.656Z"
+      "sizeBytes": 205242,
+      "updatedAt": "2026-11-03T05:33:23.522Z"
     },
     {
       "id": "editorial_hero-festive-lamps-1600_jpg",
@@ -323,8 +332,8 @@
       "path": "/assets/editorial/hero-festive-lamps-1600.jpg",
       "category": "editorial",
       "label": "hero festive lamps (licensed stock — styling inspiration)",
-      "sizeBytes": 97292,
-      "updatedAt": "2026-10-19T05:31:12.048Z"
+      "sizeBytes": 80080,
+      "updatedAt": "2026-11-03T05:33:23.601Z"
     },
     {
       "id": "editorial_hero-festive-lamps-1600_webp",
@@ -333,7 +342,7 @@
       "category": "editorial",
       "label": "hero festive lamps (licensed stock — styling inspiration)",
       "sizeBytes": 47652,
-      "updatedAt": "2026-10-19T05:31:12.049Z"
+      "updatedAt": "2026-11-03T03:11:37.662Z"
     },
     {
       "id": "editorial_hero-festive-lamps-2400_jpg",
@@ -341,8 +350,8 @@
       "path": "/assets/editorial/hero-festive-lamps-2400.jpg",
       "category": "editorial",
       "label": "hero festive lamps (licensed stock — styling inspiration)",
-      "sizeBytes": 205572,
-      "updatedAt": "2026-10-19T05:31:12.050Z"
+      "sizeBytes": 165835,
+      "updatedAt": "2026-11-03T05:33:23.810Z"
     },
     {
       "id": "editorial_hero-festive-lamps-2400_webp",
@@ -350,8 +359,8 @@
       "path": "/assets/editorial/hero-festive-lamps-2400.webp",
       "category": "editorial",
       "label": "hero festive lamps (licensed stock — styling inspiration)",
-      "sizeBytes": 89576,
-      "updatedAt": "2026-10-19T05:31:12.050Z"
+      "sizeBytes": 68754,
+      "updatedAt": "2026-11-03T05:33:24.417Z"
     },
     {
       "id": "editorial_hero-festive-lamps-mobile-600_jpg",
@@ -360,7 +369,7 @@
       "category": "editorial",
       "label": "hero festive lamps mobile (licensed stock — styling inspiration)",
       "sizeBytes": 47571,
-      "updatedAt": "2026-10-19T05:31:12.051Z"
+      "updatedAt": "2026-11-03T03:11:37.665Z"
     },
     {
       "id": "editorial_hero-festive-lamps-mobile-600_webp",
@@ -369,7 +378,7 @@
       "category": "editorial",
       "label": "hero festive lamps mobile (licensed stock — styling inspiration)",
       "sizeBytes": 26818,
-      "updatedAt": "2026-10-19T05:31:12.051Z"
+      "updatedAt": "2026-11-03T03:11:37.665Z"
     },
     {
       "id": "editorial_hero-festive-lamps-mobile-900_jpg",
@@ -377,8 +386,8 @@
       "path": "/assets/editorial/hero-festive-lamps-mobile-900.jpg",
       "category": "editorial",
       "label": "hero festive lamps mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 95317,
-      "updatedAt": "2026-10-19T05:31:12.051Z"
+      "sizeBytes": 78079,
+      "updatedAt": "2026-11-03T05:33:24.546Z"
     },
     {
       "id": "editorial_hero-festive-lamps-mobile-900_webp",
@@ -386,8 +395,8 @@
       "path": "/assets/editorial/hero-festive-lamps-mobile-900.webp",
       "category": "editorial",
       "label": "hero festive lamps mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 143292,
-      "updatedAt": "2026-10-20T23:48:46.503Z"
+      "sizeBytes": 110140,
+      "updatedAt": "2026-11-03T05:33:24.811Z"
     },
     {
       "id": "editorial_hero-slide-1-moments-desktop_jpg",
@@ -395,8 +404,8 @@
       "path": "/assets/editorial/hero-slide-1-moments-desktop.jpg",
       "category": "editorial",
       "label": "hero slide 1 moments desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 67871,
-      "updatedAt": "2026-10-19T05:31:12.052Z"
+      "sizeBytes": 42766,
+      "updatedAt": "2026-11-03T05:33:24.878Z"
     },
     {
       "id": "editorial_hero-slide-1-moments-desktop_webp",
@@ -404,8 +413,8 @@
       "path": "/assets/editorial/hero-slide-1-moments-desktop.webp",
       "category": "editorial",
       "label": "hero slide 1 moments desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 222124,
-      "updatedAt": "2026-10-20T23:48:46.721Z"
+      "sizeBytes": 161444,
+      "updatedAt": "2026-11-03T05:33:25.435Z"
     },
     {
       "id": "editorial_hero-slide-1-moments-mobile_jpg",
@@ -414,7 +423,7 @@
       "category": "editorial",
       "label": "hero slide 1 moments mobile (licensed stock — styling inspiration)",
       "sizeBytes": 36032,
-      "updatedAt": "2026-10-19T05:31:12.052Z"
+      "updatedAt": "2026-11-03T03:11:37.667Z"
     },
     {
       "id": "editorial_hero-slide-1-moments-mobile_webp",
@@ -422,8 +431,8 @@
       "path": "/assets/editorial/hero-slide-1-moments-mobile.webp",
       "category": "editorial",
       "label": "hero slide 1 moments mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 118176,
-      "updatedAt": "2026-10-20T23:49:05.712Z"
+      "sizeBytes": 87078,
+      "updatedAt": "2026-11-03T05:33:25.675Z"
     },
     {
       "id": "editorial_hero-slide-2-devotional-desktop_jpg",
@@ -431,8 +440,8 @@
       "path": "/assets/editorial/hero-slide-2-devotional-desktop.jpg",
       "category": "editorial",
       "label": "hero slide 2 devotional desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 308345,
-      "updatedAt": "2026-10-20T23:48:18.845Z"
+      "sizeBytes": 221441,
+      "updatedAt": "2026-11-03T05:33:25.859Z"
     },
     {
       "id": "editorial_hero-slide-2-devotional-desktop_webp",
@@ -440,8 +449,8 @@
       "path": "/assets/editorial/hero-slide-2-devotional-desktop.webp",
       "category": "editorial",
       "label": "hero slide 2 devotional desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 255900,
-      "updatedAt": "2026-10-20T23:48:10.853Z"
+      "sizeBytes": 181770,
+      "updatedAt": "2026-11-03T05:33:26.323Z"
     },
     {
       "id": "editorial_hero-slide-2-devotional-mobile_jpg",
@@ -449,8 +458,8 @@
       "path": "/assets/editorial/hero-slide-2-devotional-mobile.jpg",
       "category": "editorial",
       "label": "hero slide 2 devotional mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 143165,
-      "updatedAt": "2026-10-20T23:48:43.408Z"
+      "sizeBytes": 103232,
+      "updatedAt": "2026-11-03T05:33:26.428Z"
     },
     {
       "id": "editorial_hero-slide-2-devotional-mobile_webp",
@@ -458,8 +467,8 @@
       "path": "/assets/editorial/hero-slide-2-devotional-mobile.webp",
       "category": "editorial",
       "label": "hero slide 2 devotional mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 124136,
-      "updatedAt": "2026-10-20T23:48:40.760Z"
+      "sizeBytes": 92904,
+      "updatedAt": "2026-11-03T05:33:26.675Z"
     },
     {
       "id": "editorial_hero-slide-3-decor-desktop_jpg",
@@ -467,8 +476,8 @@
       "path": "/assets/editorial/hero-slide-3-decor-desktop.jpg",
       "category": "editorial",
       "label": "hero slide 3 decor desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 156498,
-      "updatedAt": "2026-10-19T05:31:12.054Z"
+      "sizeBytes": 101964,
+      "updatedAt": "2026-11-03T05:33:26.755Z"
     },
     {
       "id": "editorial_hero-slide-3-decor-desktop_webp",
@@ -476,8 +485,8 @@
       "path": "/assets/editorial/hero-slide-3-decor-desktop.webp",
       "category": "editorial",
       "label": "hero slide 3 decor desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 121002,
-      "updatedAt": "2026-10-19T05:31:12.054Z"
+      "sizeBytes": 68462,
+      "updatedAt": "2026-11-03T05:33:27.041Z"
     },
     {
       "id": "editorial_hero-slide-3-decor-mobile_jpg",
@@ -485,8 +494,8 @@
       "path": "/assets/editorial/hero-slide-3-decor-mobile.jpg",
       "category": "editorial",
       "label": "hero slide 3 decor mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 93900,
-      "updatedAt": "2026-10-19T05:31:12.055Z"
+      "sizeBytes": 61102,
+      "updatedAt": "2026-11-03T05:33:27.100Z"
     },
     {
       "id": "editorial_hero-slide-3-decor-mobile_webp",
@@ -494,8 +503,8 @@
       "path": "/assets/editorial/hero-slide-3-decor-mobile.webp",
       "category": "editorial",
       "label": "hero slide 3 decor mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 94214,
-      "updatedAt": "2026-10-19T05:31:12.055Z"
+      "sizeBytes": 56836,
+      "updatedAt": "2026-11-03T05:33:27.241Z"
     },
     {
       "id": "editorial_hero-slide-4-gifting-desktop_jpg",
@@ -504,7 +513,7 @@
       "category": "editorial",
       "label": "hero slide 4 gifting desktop (licensed stock — styling inspiration)",
       "sizeBytes": 56369,
-      "updatedAt": "2026-10-19T05:31:12.056Z"
+      "updatedAt": "2026-11-03T03:11:37.671Z"
     },
     {
       "id": "editorial_hero-slide-4-gifting-desktop_webp",
@@ -513,7 +522,7 @@
       "category": "editorial",
       "label": "hero slide 4 gifting desktop (licensed stock — styling inspiration)",
       "sizeBytes": 28926,
-      "updatedAt": "2026-10-19T05:31:12.056Z"
+      "updatedAt": "2026-11-03T03:11:37.671Z"
     },
     {
       "id": "editorial_hero-slide-4-gifting-mobile_jpg",
@@ -522,7 +531,7 @@
       "category": "editorial",
       "label": "hero slide 4 gifting mobile (licensed stock — styling inspiration)",
       "sizeBytes": 39977,
-      "updatedAt": "2026-10-19T05:31:12.056Z"
+      "updatedAt": "2026-11-03T03:11:37.671Z"
     },
     {
       "id": "editorial_hero-slide-4-gifting-mobile_webp",
@@ -531,7 +540,7 @@
       "category": "editorial",
       "label": "hero slide 4 gifting mobile (licensed stock — styling inspiration)",
       "sizeBytes": 27864,
-      "updatedAt": "2026-10-19T05:31:12.056Z"
+      "updatedAt": "2026-11-03T03:11:37.671Z"
     },
     {
       "id": "editorial_hero-wedding-favors-desktop_jpg",
@@ -539,8 +548,8 @@
       "path": "/assets/editorial/hero-wedding-favors-desktop.jpg",
       "category": "editorial",
       "label": "hero wedding favors desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 337733,
-      "updatedAt": "2026-10-20T23:48:43.527Z"
+      "sizeBytes": 243485,
+      "updatedAt": "2026-11-03T05:33:27.463Z"
     },
     {
       "id": "editorial_hero-wedding-favors-desktop_webp",
@@ -548,8 +557,8 @@
       "path": "/assets/editorial/hero-wedding-favors-desktop.webp",
       "category": "editorial",
       "label": "hero wedding favors desktop (licensed stock — styling inspiration)",
-      "sizeBytes": 289884,
-      "updatedAt": "2026-10-20T23:48:43.516Z"
+      "sizeBytes": 205242,
+      "updatedAt": "2026-11-03T05:33:27.976Z"
     },
     {
       "id": "editorial_hero-wedding-favors-mobile_jpg",
@@ -557,8 +566,8 @@
       "path": "/assets/editorial/hero-wedding-favors-mobile.jpg",
       "category": "editorial",
       "label": "hero wedding favors mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 160564,
-      "updatedAt": "2026-10-20T23:48:43.572Z"
+      "sizeBytes": 114514,
+      "updatedAt": "2026-11-03T05:33:28.073Z"
     },
     {
       "id": "editorial_hero-wedding-favors-mobile_webp",
@@ -566,8 +575,8 @@
       "path": "/assets/editorial/hero-wedding-favors-mobile.webp",
       "category": "editorial",
       "label": "hero wedding favors mobile (licensed stock — styling inspiration)",
-      "sizeBytes": 143292,
-      "updatedAt": "2026-10-20T23:48:43.565Z"
+      "sizeBytes": 110140,
+      "updatedAt": "2026-11-03T05:33:28.248Z"
     },
     {
       "id": "editorial_marigold-garlands-600_jpg",
@@ -576,7 +585,7 @@
       "category": "editorial",
       "label": "marigold garlands (licensed stock — styling inspiration)",
       "sizeBytes": 65841,
-      "updatedAt": "2026-10-19T05:31:12.056Z"
+      "updatedAt": "2026-11-03T03:11:37.674Z"
     },
     {
       "id": "editorial_marigold-garlands-600_webp",
@@ -585,7 +594,7 @@
       "category": "editorial",
       "label": "marigold garlands (licensed stock — styling inspiration)",
       "sizeBytes": 45528,
-      "updatedAt": "2026-10-19T05:31:12.057Z"
+      "updatedAt": "2026-11-03T03:11:37.674Z"
     },
     {
       "id": "editorial_marigold-garlands-900_jpg",
@@ -594,7 +603,7 @@
       "category": "editorial",
       "label": "marigold garlands (licensed stock — styling inspiration)",
       "sizeBytes": 122546,
-      "updatedAt": "2026-10-19T05:31:12.057Z"
+      "updatedAt": "2026-11-03T03:11:37.675Z"
     },
     {
       "id": "editorial_marigold-garlands-900_webp",
@@ -603,7 +612,7 @@
       "category": "editorial",
       "label": "marigold garlands (licensed stock — styling inspiration)",
       "sizeBytes": 75902,
-      "updatedAt": "2026-10-19T05:31:12.058Z"
+      "updatedAt": "2026-11-03T03:11:37.675Z"
     },
     {
       "id": "editorial_occasion-celebrations-600_jpg",
@@ -611,8 +620,8 @@
       "path": "/assets/editorial/occasion-celebrations-600.jpg",
       "category": "editorial",
       "label": "occasion celebrations (licensed stock — styling inspiration)",
-      "sizeBytes": 70542,
-      "updatedAt": "2026-10-19T05:31:12.059Z"
+      "sizeBytes": 59911,
+      "updatedAt": "2026-11-03T05:33:28.795Z"
     },
     {
       "id": "editorial_occasion-celebrations-600_webp",
@@ -621,7 +630,7 @@
       "category": "editorial",
       "label": "occasion celebrations (licensed stock — styling inspiration)",
       "sizeBytes": 46114,
-      "updatedAt": "2026-10-19T05:31:12.059Z"
+      "updatedAt": "2026-11-03T03:11:37.677Z"
     },
     {
       "id": "editorial_occasion-celebrations-900_jpg",
@@ -629,8 +638,8 @@
       "path": "/assets/editorial/occasion-celebrations-900.jpg",
       "category": "editorial",
       "label": "occasion celebrations (licensed stock — styling inspiration)",
-      "sizeBytes": 132574,
-      "updatedAt": "2026-10-19T05:31:12.060Z"
+      "sizeBytes": 111487,
+      "updatedAt": "2026-11-03T05:33:28.906Z"
     },
     {
       "id": "editorial_occasion-celebrations-900_webp",
@@ -639,7 +648,7 @@
       "category": "editorial",
       "label": "occasion celebrations (licensed stock — styling inspiration)",
       "sizeBytes": 76432,
-      "updatedAt": "2026-10-19T05:31:12.061Z"
+      "updatedAt": "2026-11-03T03:11:37.678Z"
     },
     {
       "id": "editorial_occasion-gifting-600_jpg",
@@ -647,8 +656,8 @@
       "path": "/assets/editorial/occasion-gifting-600.jpg",
       "category": "editorial",
       "label": "occasion gifting (licensed stock — styling inspiration)",
-      "sizeBytes": 74791,
-      "updatedAt": "2026-10-19T05:31:12.061Z"
+      "sizeBytes": 62035,
+      "updatedAt": "2026-11-03T05:33:29.257Z"
     },
     {
       "id": "editorial_occasion-gifting-600_webp",
@@ -657,7 +666,7 @@
       "category": "editorial",
       "label": "occasion gifting (licensed stock — styling inspiration)",
       "sizeBytes": 51516,
-      "updatedAt": "2026-10-19T05:31:12.061Z"
+      "updatedAt": "2026-11-03T03:11:37.679Z"
     },
     {
       "id": "editorial_occasion-gifting-900_jpg",
@@ -665,8 +674,8 @@
       "path": "/assets/editorial/occasion-gifting-900.jpg",
       "category": "editorial",
       "label": "occasion gifting (licensed stock — styling inspiration)",
-      "sizeBytes": 167202,
-      "updatedAt": "2026-10-19T05:31:12.062Z"
+      "sizeBytes": 139793,
+      "updatedAt": "2026-11-03T05:33:29.397Z"
     },
     {
       "id": "editorial_occasion-gifting-900_webp",
@@ -674,8 +683,8 @@
       "path": "/assets/editorial/occasion-gifting-900.webp",
       "category": "editorial",
       "label": "occasion gifting (licensed stock — styling inspiration)",
-      "sizeBytes": 123300,
-      "updatedAt": "2026-10-19T05:31:12.063Z"
+      "sizeBytes": 103526,
+      "updatedAt": "2026-11-03T05:33:29.781Z"
     },
     {
       "id": "editorial_occasion-housewarming-600_jpg",
@@ -684,7 +693,7 @@
       "category": "editorial",
       "label": "occasion housewarming (licensed stock — styling inspiration)",
       "sizeBytes": 96225,
-      "updatedAt": "2026-10-19T05:31:12.063Z"
+      "updatedAt": "2026-11-03T03:11:37.680Z"
     },
     {
       "id": "editorial_occasion-housewarming-600_webp",
@@ -693,7 +702,7 @@
       "category": "editorial",
       "label": "occasion housewarming (licensed stock — styling inspiration)",
       "sizeBytes": 73662,
-      "updatedAt": "2026-10-19T05:31:12.064Z"
+      "updatedAt": "2026-11-03T03:11:37.681Z"
     },
     {
       "id": "editorial_occasion-housewarming-900_jpg",
@@ -702,7 +711,7 @@
       "category": "editorial",
       "label": "occasion housewarming (licensed stock — styling inspiration)",
       "sizeBytes": 191783,
-      "updatedAt": "2026-10-19T05:31:12.065Z"
+      "updatedAt": "2026-11-03T03:11:37.681Z"
     },
     {
       "id": "editorial_occasion-housewarming-900_webp",
@@ -711,7 +720,7 @@
       "category": "editorial",
       "label": "occasion housewarming (licensed stock — styling inspiration)",
       "sizeBytes": 131732,
-      "updatedAt": "2026-10-19T05:31:12.065Z"
+      "updatedAt": "2026-11-03T03:11:37.682Z"
     },
     {
       "id": "products_bala-krishna-frame-600_jpg",
@@ -719,8 +728,8 @@
       "path": "/assets/products/bala-krishna-frame-600.jpg",
       "category": "products",
       "label": "bala krishna frame",
-      "sizeBytes": 78376,
-      "updatedAt": "2026-10-19T05:31:12.066Z"
+      "sizeBytes": 59984,
+      "updatedAt": "2026-11-03T05:33:07.006Z"
     },
     {
       "id": "products_bala-krishna-frame-600_webp",
@@ -729,7 +738,7 @@
       "category": "products",
       "label": "bala krishna frame",
       "sizeBytes": 52666,
-      "updatedAt": "2026-10-19T05:31:12.066Z"
+      "updatedAt": "2026-11-03T03:11:37.683Z"
     },
     {
       "id": "products_bala-krishna-frame-960_jpg",
@@ -737,8 +746,8 @@
       "path": "/assets/products/bala-krishna-frame-960.jpg",
       "category": "products",
       "label": "bala krishna frame",
-      "sizeBytes": 181371,
-      "updatedAt": "2026-10-19T05:31:12.067Z"
+      "sizeBytes": 134149,
+      "updatedAt": "2026-11-03T05:33:07.081Z"
     },
     {
       "id": "products_bala-krishna-frame-960_webp",
@@ -746,8 +755,8 @@
       "path": "/assets/products/bala-krishna-frame-960.webp",
       "category": "products",
       "label": "bala krishna frame",
-      "sizeBytes": 108538,
-      "updatedAt": "2026-10-19T05:31:12.068Z"
+      "sizeBytes": 88538,
+      "updatedAt": "2026-11-03T05:33:07.234Z"
     },
     {
       "id": "products_bala-krishna-frame-photo-600_jpg",
@@ -755,8 +764,8 @@
       "path": "/assets/products/bala-krishna-frame-photo-600.jpg",
       "category": "products",
       "label": "bala krishna frame photo",
-      "sizeBytes": 123311,
-      "updatedAt": "2026-10-19T05:31:12.068Z"
+      "sizeBytes": 98959,
+      "updatedAt": "2026-11-03T05:33:07.289Z"
     },
     {
       "id": "products_bala-krishna-frame-photo-600_webp",
@@ -765,7 +774,7 @@
       "category": "products",
       "label": "bala krishna frame photo",
       "sizeBytes": 100948,
-      "updatedAt": "2026-10-19T05:31:12.068Z"
+      "updatedAt": "2026-11-03T03:11:37.685Z"
     },
     {
       "id": "products_bala-krishna-frame-photo-823_jpg",
@@ -773,8 +782,8 @@
       "path": "/assets/products/bala-krishna-frame-photo-823.jpg",
       "category": "products",
       "label": "bala krishna frame photo",
-      "sizeBytes": 206834,
-      "updatedAt": "2026-10-19T05:31:12.069Z"
+      "sizeBytes": 164616,
+      "updatedAt": "2026-11-03T05:33:07.457Z"
     },
     {
       "id": "products_bala-krishna-frame-photo-823_webp",
@@ -782,8 +791,8 @@
       "path": "/assets/products/bala-krishna-frame-photo-823.webp",
       "category": "products",
       "label": "bala krishna frame photo",
-      "sizeBytes": 162388,
-      "updatedAt": "2026-10-19T05:31:12.070Z"
+      "sizeBytes": 137880,
+      "updatedAt": "2026-11-03T05:33:07.611Z"
     },
     {
       "id": "products_demo-accent-brass-kumkum-chimizh-800_jpg",
@@ -791,8 +800,8 @@
       "path": "/assets/products/demo-accent-brass-kumkum-chimizh-800.jpg",
       "category": "products",
       "label": "demo accent brass kumkum chimizh",
-      "sizeBytes": 158784,
-      "updatedAt": "2026-10-19T06:02:24.373Z"
+      "sizeBytes": 102269,
+      "updatedAt": "2026-11-03T05:33:07.653Z"
     },
     {
       "id": "products_demo-accent-brass-kumkum-chimizh-800_webp",
@@ -800,8 +809,8 @@
       "path": "/assets/products/demo-accent-brass-kumkum-chimizh-800.webp",
       "category": "products",
       "label": "demo accent brass kumkum chimizh",
-      "sizeBytes": 125872,
-      "updatedAt": "2026-10-19T06:02:24.420Z"
+      "sizeBytes": 70328,
+      "updatedAt": "2026-11-03T05:33:07.758Z"
     },
     {
       "id": "products_demo-accent-brass-nandi-bell-800_jpg",
@@ -809,8 +818,8 @@
       "path": "/assets/products/demo-accent-brass-nandi-bell-800.jpg",
       "category": "products",
       "label": "demo accent brass nandi bell",
-      "sizeBytes": 147598,
-      "updatedAt": "2026-10-19T06:02:29.201Z"
+      "sizeBytes": 88977,
+      "updatedAt": "2026-11-03T05:33:07.799Z"
     },
     {
       "id": "products_demo-accent-brass-nandi-bell-800_webp",
@@ -818,8 +827,8 @@
       "path": "/assets/products/demo-accent-brass-nandi-bell-800.webp",
       "category": "products",
       "label": "demo accent brass nandi bell",
-      "sizeBytes": 128352,
-      "updatedAt": "2026-10-19T06:02:29.248Z"
+      "sizeBytes": 75634,
+      "updatedAt": "2026-11-03T05:33:07.904Z"
     },
     {
       "id": "products_demo-accent-ceremonial-bell-800_jpg",
@@ -827,8 +836,8 @@
       "path": "/assets/products/demo-accent-ceremonial-bell-800.jpg",
       "category": "products",
       "label": "demo accent ceremonial bell",
-      "sizeBytes": 215374,
-      "updatedAt": "2026-10-19T05:31:12.070Z"
+      "sizeBytes": 134149,
+      "updatedAt": "2026-11-03T05:33:07.962Z"
     },
     {
       "id": "products_demo-accent-ceremonial-bell-800_webp",
@@ -836,8 +845,8 @@
       "path": "/assets/products/demo-accent-ceremonial-bell-800.webp",
       "category": "products",
       "label": "demo accent ceremonial bell",
-      "sizeBytes": 196018,
-      "updatedAt": "2026-10-19T05:31:12.071Z"
+      "sizeBytes": 117146,
+      "updatedAt": "2026-11-03T05:33:08.099Z"
     },
     {
       "id": "products_demo-accent-ganesh-idol-800_jpg",
@@ -845,8 +854,8 @@
       "path": "/assets/products/demo-accent-ganesh-idol-800.jpg",
       "category": "products",
       "label": "demo accent ganesh idol",
-      "sizeBytes": 137723,
-      "updatedAt": "2026-10-19T05:31:12.072Z"
+      "sizeBytes": 88021,
+      "updatedAt": "2026-11-03T05:33:08.149Z"
     },
     {
       "id": "products_demo-accent-ganesh-idol-800_webp",
@@ -854,8 +863,8 @@
       "path": "/assets/products/demo-accent-ganesh-idol-800.webp",
       "category": "products",
       "label": "demo accent ganesh idol",
-      "sizeBytes": 110326,
-      "updatedAt": "2026-10-19T05:31:12.072Z"
+      "sizeBytes": 64226,
+      "updatedAt": "2026-11-03T05:33:08.274Z"
     },
     {
       "id": "products_demo-accent-ganesha-statue-800_jpg",
@@ -863,8 +872,8 @@
       "path": "/assets/products/demo-accent-ganesha-statue-800.jpg",
       "category": "products",
       "label": "demo accent ganesha statue",
-      "sizeBytes": 196626,
-      "updatedAt": "2026-10-19T05:31:12.073Z"
+      "sizeBytes": 118858,
+      "updatedAt": "2026-11-03T05:33:08.339Z"
     },
     {
       "id": "products_demo-accent-ganesha-statue-800_webp",
@@ -872,8 +881,8 @@
       "path": "/assets/products/demo-accent-ganesha-statue-800.webp",
       "category": "products",
       "label": "demo accent ganesha statue",
-      "sizeBytes": 175838,
-      "updatedAt": "2026-10-19T05:31:12.074Z"
+      "sizeBytes": 105994,
+      "updatedAt": "2026-11-03T05:33:08.483Z"
     },
     {
       "id": "products_demo-accent-krishna-flute-800_jpg",
@@ -881,8 +890,8 @@
       "path": "/assets/products/demo-accent-krishna-flute-800.jpg",
       "category": "products",
       "label": "demo accent krishna flute",
-      "sizeBytes": 75084,
-      "updatedAt": "2026-10-19T05:31:12.075Z"
+      "sizeBytes": 58611,
+      "updatedAt": "2026-11-03T05:33:08.515Z"
     },
     {
       "id": "products_demo-accent-krishna-flute-800_webp",
@@ -890,8 +899,8 @@
       "path": "/assets/products/demo-accent-krishna-flute-800.webp",
       "category": "products",
       "label": "demo accent krishna flute",
-      "sizeBytes": 61828,
-      "updatedAt": "2026-10-19T05:31:12.075Z"
+      "sizeBytes": 33786,
+      "updatedAt": "2026-11-03T05:33:08.597Z"
     },
     {
       "id": "products_demo-accent-lakshmi-ganesh-brass-800_jpg",
@@ -899,8 +908,8 @@
       "path": "/assets/products/demo-accent-lakshmi-ganesh-brass-800.jpg",
       "category": "products",
       "label": "demo accent lakshmi ganesh brass",
-      "sizeBytes": 124982,
-      "updatedAt": "2026-10-19T06:02:32.331Z"
+      "sizeBytes": 75421,
+      "updatedAt": "2026-11-03T05:33:08.639Z"
     },
     {
       "id": "products_demo-accent-lakshmi-ganesh-brass-800_webp",
@@ -908,8 +917,8 @@
       "path": "/assets/products/demo-accent-lakshmi-ganesh-brass-800.webp",
       "category": "products",
       "label": "demo accent lakshmi ganesh brass",
-      "sizeBytes": 98886,
-      "updatedAt": "2026-10-19T06:02:32.375Z"
+      "sizeBytes": 57792,
+      "updatedAt": "2026-11-03T05:33:08.730Z"
     },
     {
       "id": "products_demo-bespoke-silver-plaque-800_jpg",
@@ -917,8 +926,8 @@
       "path": "/assets/products/demo-bespoke-silver-plaque-800.jpg",
       "category": "products",
       "label": "demo bespoke silver plaque",
-      "sizeBytes": 104687,
-      "updatedAt": "2026-10-19T06:02:33.433Z"
+      "sizeBytes": 64881,
+      "updatedAt": "2026-11-03T05:33:08.762Z"
     },
     {
       "id": "products_demo-bespoke-silver-plaque-800_webp",
@@ -926,8 +935,8 @@
       "path": "/assets/products/demo-bespoke-silver-plaque-800.webp",
       "category": "products",
       "label": "demo bespoke silver plaque",
-      "sizeBytes": 69642,
-      "updatedAt": "2026-10-19T06:02:33.468Z"
+      "sizeBytes": 37222,
+      "updatedAt": "2026-11-03T05:33:08.843Z"
     },
     {
       "id": "products_demo-decor-brass-stand-800_jpg",
@@ -935,8 +944,8 @@
       "path": "/assets/products/demo-decor-brass-stand-800.jpg",
       "category": "products",
       "label": "demo decor brass stand",
-      "sizeBytes": 65624,
-      "updatedAt": "2026-10-19T05:31:12.075Z"
+      "sizeBytes": 51486,
+      "updatedAt": "2026-11-03T05:33:08.871Z"
     },
     {
       "id": "products_demo-decor-brass-stand-800_webp",
@@ -945,7 +954,7 @@
       "category": "products",
       "label": "demo decor brass stand",
       "sizeBytes": 46024,
-      "updatedAt": "2026-10-19T05:31:12.076Z"
+      "updatedAt": "2026-11-03T03:11:37.694Z"
     },
     {
       "id": "products_demo-decor-brass-uruli-floating-800_jpg",
@@ -953,8 +962,8 @@
       "path": "/assets/products/demo-decor-brass-uruli-floating-800.jpg",
       "category": "products",
       "label": "demo decor brass uruli floating",
-      "sizeBytes": 102900,
-      "updatedAt": "2026-10-19T06:02:31.489Z"
+      "sizeBytes": 80360,
+      "updatedAt": "2026-11-03T05:33:08.903Z"
     },
     {
       "id": "products_demo-decor-brass-uruli-floating-800_webp",
@@ -962,8 +971,8 @@
       "path": "/assets/products/demo-decor-brass-uruli-floating-800.webp",
       "category": "products",
       "label": "demo decor brass uruli floating",
-      "sizeBytes": 82184,
-      "updatedAt": "2026-10-19T06:02:31.530Z"
+      "sizeBytes": 45016,
+      "updatedAt": "2026-11-03T05:33:08.986Z"
     },
     {
       "id": "products_demo-decor-floral-uruli-800_jpg",
@@ -971,8 +980,8 @@
       "path": "/assets/products/demo-decor-floral-uruli-800.jpg",
       "category": "products",
       "label": "demo decor floral uruli",
-      "sizeBytes": 102900,
-      "updatedAt": "2026-10-19T05:31:12.076Z"
+      "sizeBytes": 80360,
+      "updatedAt": "2026-11-03T05:33:09.020Z"
     },
     {
       "id": "products_demo-decor-floral-uruli-800_webp",
@@ -980,8 +989,8 @@
       "path": "/assets/products/demo-decor-floral-uruli-800.webp",
       "category": "products",
       "label": "demo decor floral uruli",
-      "sizeBytes": 82184,
-      "updatedAt": "2026-10-19T05:31:12.077Z"
+      "sizeBytes": 45016,
+      "updatedAt": "2026-11-03T05:33:09.111Z"
     },
     {
       "id": "products_demo-decor-marigold-diya-800_jpg",
@@ -990,7 +999,7 @@
       "category": "products",
       "label": "demo decor marigold diya",
       "sizeBytes": 59464,
-      "updatedAt": "2026-10-19T05:31:12.077Z"
+      "updatedAt": "2026-11-03T03:11:37.697Z"
     },
     {
       "id": "products_demo-decor-marigold-diya-800_webp",
@@ -999,7 +1008,7 @@
       "category": "products",
       "label": "demo decor marigold diya",
       "sizeBytes": 37584,
-      "updatedAt": "2026-10-19T05:31:12.077Z"
+      "updatedAt": "2026-11-03T03:11:37.697Z"
     },
     {
       "id": "products_demo-decor-pooja-arrangement-800_jpg",
@@ -1007,8 +1016,8 @@
       "path": "/assets/products/demo-decor-pooja-arrangement-800.jpg",
       "category": "products",
       "label": "demo decor pooja arrangement",
-      "sizeBytes": 135855,
-      "updatedAt": "2026-10-19T05:31:12.078Z"
+      "sizeBytes": 105837,
+      "updatedAt": "2026-11-03T05:33:09.154Z"
     },
     {
       "id": "products_demo-decor-pooja-arrangement-800_webp",
@@ -1016,8 +1025,8 @@
       "path": "/assets/products/demo-decor-pooja-arrangement-800.webp",
       "category": "products",
       "label": "demo decor pooja arrangement",
-      "sizeBytes": 120500,
-      "updatedAt": "2026-10-19T05:31:12.078Z"
+      "sizeBytes": 68760,
+      "updatedAt": "2026-11-03T05:33:09.256Z"
     },
     {
       "id": "products_demo-decor-shola-pith-tassel-800_jpg",
@@ -1025,8 +1034,8 @@
       "path": "/assets/products/demo-decor-shola-pith-tassel-800.jpg",
       "category": "products",
       "label": "demo decor shola pith tassel",
-      "sizeBytes": 80832,
-      "updatedAt": "2026-10-19T06:02:25.102Z"
+      "sizeBytes": 50122,
+      "updatedAt": "2026-11-03T05:33:09.282Z"
     },
     {
       "id": "products_demo-decor-shola-pith-tassel-800_webp",
@@ -1035,7 +1044,7 @@
       "category": "products",
       "label": "demo decor shola pith tassel",
       "sizeBytes": 46664,
-      "updatedAt": "2026-10-19T06:02:25.142Z"
+      "updatedAt": "2026-11-03T03:11:37.698Z"
     },
     {
       "id": "products_demo-decor-terracotta-dhoop-800_jpg",
@@ -1043,8 +1052,8 @@
       "path": "/assets/products/demo-decor-terracotta-dhoop-800.jpg",
       "category": "products",
       "label": "demo decor terracotta dhoop",
-      "sizeBytes": 165166,
-      "updatedAt": "2026-10-19T06:02:26.221Z"
+      "sizeBytes": 98934,
+      "updatedAt": "2026-11-03T05:33:09.324Z"
     },
     {
       "id": "products_demo-decor-terracotta-dhoop-800_webp",
@@ -1052,8 +1061,8 @@
       "path": "/assets/products/demo-decor-terracotta-dhoop-800.webp",
       "category": "products",
       "label": "demo decor terracotta dhoop",
-      "sizeBytes": 137304,
-      "updatedAt": "2026-10-19T06:02:26.271Z"
+      "sizeBytes": 65208,
+      "updatedAt": "2026-11-03T05:33:09.434Z"
     },
     {
       "id": "products_demo-decor-wood-elephant-tealight-800_jpg",
@@ -1062,7 +1071,7 @@
       "category": "products",
       "label": "demo decor wood elephant tealight",
       "sizeBytes": 46891,
-      "updatedAt": "2026-10-19T06:02:28.490Z"
+      "updatedAt": "2026-11-03T03:11:37.700Z"
     },
     {
       "id": "products_demo-decor-wood-elephant-tealight-800_webp",
@@ -1071,7 +1080,7 @@
       "category": "products",
       "label": "demo decor wood elephant tealight",
       "sizeBytes": 26318,
-      "updatedAt": "2026-10-19T06:02:28.515Z"
+      "updatedAt": "2026-11-03T03:11:37.700Z"
     },
     {
       "id": "products_demo-decor-wooden-heritage-coasters-800_jpg",
@@ -1079,8 +1088,8 @@
       "path": "/assets/products/demo-decor-wooden-heritage-coasters-800.jpg",
       "category": "products",
       "label": "demo decor wooden heritage coasters",
-      "sizeBytes": 75084,
-      "updatedAt": "2026-10-19T06:02:30.955Z"
+      "sizeBytes": 58611,
+      "updatedAt": "2026-11-03T05:33:09.462Z"
     },
     {
       "id": "products_demo-decor-wooden-heritage-coasters-800_webp",
@@ -1088,8 +1097,8 @@
       "path": "/assets/products/demo-decor-wooden-heritage-coasters-800.webp",
       "category": "products",
       "label": "demo decor wooden heritage coasters",
-      "sizeBytes": 61828,
-      "updatedAt": "2026-10-19T06:02:30.992Z"
+      "sizeBytes": 33786,
+      "updatedAt": "2026-11-03T05:33:09.534Z"
     },
     {
       "id": "products_demo-frame-baroque-floral-800_jpg",
@@ -1097,8 +1106,8 @@
       "path": "/assets/products/demo-frame-baroque-floral-800.jpg",
       "category": "products",
       "label": "demo frame baroque floral",
-      "sizeBytes": 157778,
-      "updatedAt": "2026-10-20T23:48:10.198Z"
+      "sizeBytes": 113560,
+      "updatedAt": "2026-11-03T05:33:09.587Z"
     },
     {
       "id": "products_demo-frame-baroque-floral-800_webp",
@@ -1106,8 +1115,8 @@
       "path": "/assets/products/demo-frame-baroque-floral-800.webp",
       "category": "products",
       "label": "demo frame baroque floral",
-      "sizeBytes": 130424,
-      "updatedAt": "2026-10-20T23:48:10.189Z"
+      "sizeBytes": 96032,
+      "updatedAt": "2026-11-03T05:33:09.701Z"
     },
     {
       "id": "products_demo-frame-sanctum-gold-800_jpg",
@@ -1115,8 +1124,8 @@
       "path": "/assets/products/demo-frame-sanctum-gold-800.jpg",
       "category": "products",
       "label": "demo frame sanctum gold",
-      "sizeBytes": 179860,
-      "updatedAt": "2026-10-20T23:48:10.053Z"
+      "sizeBytes": 130533,
+      "updatedAt": "2026-11-03T05:33:09.758Z"
     },
     {
       "id": "products_demo-frame-sanctum-gold-800_webp",
@@ -1124,8 +1133,8 @@
       "path": "/assets/products/demo-frame-sanctum-gold-800.webp",
       "category": "products",
       "label": "demo frame sanctum gold",
-      "sizeBytes": 152156,
-      "updatedAt": "2026-10-20T23:48:10.044Z"
+      "sizeBytes": 112572,
+      "updatedAt": "2026-11-03T05:33:09.880Z"
     },
     {
       "id": "products_demo-frame-temple-collection-800_jpg",
@@ -1133,8 +1142,8 @@
       "path": "/assets/products/demo-frame-temple-collection-800.jpg",
       "category": "products",
       "label": "demo frame temple collection",
-      "sizeBytes": 173742,
-      "updatedAt": "2026-10-20T23:48:09.898Z"
+      "sizeBytes": 123734,
+      "updatedAt": "2026-11-03T05:33:09.936Z"
     },
     {
       "id": "products_demo-frame-temple-collection-800_webp",
@@ -1142,8 +1151,8 @@
       "path": "/assets/products/demo-frame-temple-collection-800.webp",
       "category": "products",
       "label": "demo frame temple collection",
-      "sizeBytes": 147360,
-      "updatedAt": "2026-10-20T23:48:09.890Z"
+      "sizeBytes": 109810,
+      "updatedAt": "2026-11-03T05:33:10.066Z"
     },
     {
       "id": "products_demo-frame-vintage-altar-800_jpg",
@@ -1151,8 +1160,8 @@
       "path": "/assets/products/demo-frame-vintage-altar-800.jpg",
       "category": "products",
       "label": "demo frame vintage altar",
-      "sizeBytes": 136670,
-      "updatedAt": "2026-10-20T23:48:10.325Z"
+      "sizeBytes": 98187,
+      "updatedAt": "2026-11-03T05:33:10.110Z"
     },
     {
       "id": "products_demo-frame-vintage-altar-800_webp",
@@ -1160,8 +1169,8 @@
       "path": "/assets/products/demo-frame-vintage-altar-800.webp",
       "category": "products",
       "label": "demo frame vintage altar",
-      "sizeBytes": 114020,
-      "updatedAt": "2026-10-20T23:48:10.317Z"
+      "sizeBytes": 84274,
+      "updatedAt": "2026-11-03T05:33:10.203Z"
     },
     {
       "id": "products_demo-gift-brocade-potli-800_jpg",
@@ -1169,8 +1178,8 @@
       "path": "/assets/products/demo-gift-brocade-potli-800.jpg",
       "category": "products",
       "label": "demo gift brocade potli",
-      "sizeBytes": 141207,
-      "updatedAt": "2026-10-19T06:02:23.342Z"
+      "sizeBytes": 84354,
+      "updatedAt": "2026-11-03T05:33:10.243Z"
     },
     {
       "id": "products_demo-gift-brocade-potli-800_webp",
@@ -1178,8 +1187,8 @@
       "path": "/assets/products/demo-gift-brocade-potli-800.webp",
       "category": "products",
       "label": "demo gift brocade potli",
-      "sizeBytes": 120898,
-      "updatedAt": "2026-10-19T06:02:23.441Z"
+      "sizeBytes": 64374,
+      "updatedAt": "2026-11-03T05:33:10.346Z"
     },
     {
       "id": "products_demo-gift-festive-brass-hamper-800_jpg",
@@ -1187,8 +1196,8 @@
       "path": "/assets/products/demo-gift-festive-brass-hamper-800.jpg",
       "category": "products",
       "label": "demo gift festive brass hamper",
-      "sizeBytes": 93907,
-      "updatedAt": "2026-10-19T06:02:32.525Z"
+      "sizeBytes": 71710,
+      "updatedAt": "2026-11-03T05:33:10.379Z"
     },
     {
       "id": "products_demo-gift-festive-brass-hamper-800_webp",
@@ -1196,8 +1205,8 @@
       "path": "/assets/products/demo-gift-festive-brass-hamper-800.webp",
       "category": "products",
       "label": "demo gift festive brass hamper",
-      "sizeBytes": 73262,
-      "updatedAt": "2026-10-19T06:02:32.568Z"
+      "sizeBytes": 35884,
+      "updatedAt": "2026-11-03T05:33:10.457Z"
     },
     {
       "id": "products_demo-gift-festive-twin-diya-800_jpg",
@@ -1205,8 +1214,8 @@
       "path": "/assets/products/demo-gift-festive-twin-diya-800.jpg",
       "category": "products",
       "label": "demo gift festive twin diya",
-      "sizeBytes": 177114,
-      "updatedAt": "2026-10-19T05:31:12.082Z"
+      "sizeBytes": 116610,
+      "updatedAt": "2026-11-03T05:33:10.505Z"
     },
     {
       "id": "products_demo-gift-festive-twin-diya-800_webp",
@@ -1214,8 +1223,8 @@
       "path": "/assets/products/demo-gift-festive-twin-diya-800.webp",
       "category": "products",
       "label": "demo gift festive twin diya",
-      "sizeBytes": 153144,
-      "updatedAt": "2026-10-19T05:31:12.083Z"
+      "sizeBytes": 83028,
+      "updatedAt": "2026-11-03T05:33:10.617Z"
     },
     {
       "id": "products_demo-gift-luxury-botanical-800_jpg",
@@ -1223,8 +1232,8 @@
       "path": "/assets/products/demo-gift-luxury-botanical-800.jpg",
       "category": "products",
       "label": "demo gift luxury botanical",
-      "sizeBytes": 141207,
-      "updatedAt": "2026-10-19T05:31:12.083Z"
+      "sizeBytes": 84354,
+      "updatedAt": "2026-11-03T05:33:10.655Z"
     },
     {
       "id": "products_demo-gift-luxury-botanical-800_webp",
@@ -1232,8 +1241,8 @@
       "path": "/assets/products/demo-gift-luxury-botanical-800.webp",
       "category": "products",
       "label": "demo gift luxury botanical",
-      "sizeBytes": 120898,
-      "updatedAt": "2026-10-19T05:31:12.084Z"
+      "sizeBytes": 64374,
+      "updatedAt": "2026-11-03T05:33:10.759Z"
     },
     {
       "id": "products_demo-gift-meenakari-peacock-box-800_jpg",
@@ -1241,8 +1250,8 @@
       "path": "/assets/products/demo-gift-meenakari-peacock-box-800.jpg",
       "category": "products",
       "label": "demo gift meenakari peacock box",
-      "sizeBytes": 88910,
-      "updatedAt": "2026-10-19T06:02:27.564Z"
+      "sizeBytes": 67414,
+      "updatedAt": "2026-11-03T05:33:10.789Z"
     },
     {
       "id": "products_demo-gift-meenakari-peacock-box-800_webp",
@@ -1250,8 +1259,8 @@
       "path": "/assets/products/demo-gift-meenakari-peacock-box-800.webp",
       "category": "products",
       "label": "demo gift meenakari peacock box",
-      "sizeBytes": 66682,
-      "updatedAt": "2026-10-19T06:02:27.613Z"
+      "sizeBytes": 35738,
+      "updatedAt": "2026-11-03T05:33:10.869Z"
     },
     {
       "id": "products_demo-gift-mini-brass-pooja-thali-800_jpg",
@@ -1259,8 +1268,8 @@
       "path": "/assets/products/demo-gift-mini-brass-pooja-thali-800.jpg",
       "category": "products",
       "label": "demo gift mini brass pooja thali",
-      "sizeBytes": 211105,
-      "updatedAt": "2026-10-19T06:02:31.292Z"
+      "sizeBytes": 137138,
+      "updatedAt": "2026-11-03T05:33:10.921Z"
     },
     {
       "id": "products_demo-gift-mini-brass-pooja-thali-800_webp",
@@ -1268,8 +1277,8 @@
       "path": "/assets/products/demo-gift-mini-brass-pooja-thali-800.webp",
       "category": "products",
       "label": "demo gift mini brass pooja thali",
-      "sizeBytes": 187234,
-      "updatedAt": "2026-10-19T06:02:31.349Z"
+      "sizeBytes": 110176,
+      "updatedAt": "2026-11-03T05:33:11.054Z"
     },
     {
       "id": "products_demo-gift-silver-dryfruit-bowl-800_jpg",
@@ -1277,8 +1286,8 @@
       "path": "/assets/products/demo-gift-silver-dryfruit-bowl-800.jpg",
       "category": "products",
       "label": "demo gift silver dryfruit bowl",
-      "sizeBytes": 148445,
-      "updatedAt": "2026-10-19T06:02:30.788Z"
+      "sizeBytes": 93495,
+      "updatedAt": "2026-11-03T05:33:11.095Z"
     },
     {
       "id": "products_demo-gift-silver-dryfruit-bowl-800_webp",
@@ -1286,8 +1295,8 @@
       "path": "/assets/products/demo-gift-silver-dryfruit-bowl-800.webp",
       "category": "products",
       "label": "demo gift silver dryfruit bowl",
-      "sizeBytes": 122852,
-      "updatedAt": "2026-10-19T06:02:30.833Z"
+      "sizeBytes": 76698,
+      "updatedAt": "2026-11-03T05:33:11.194Z"
     },
     {
       "id": "products_demo-gift-silver-dual-bowl-set-800_jpg",
@@ -1295,8 +1304,8 @@
       "path": "/assets/products/demo-gift-silver-dual-bowl-set-800.jpg",
       "category": "products",
       "label": "demo gift silver dual bowl set",
-      "sizeBytes": 200380,
-      "updatedAt": "2026-10-19T06:02:33.249Z"
+      "sizeBytes": 129566,
+      "updatedAt": "2026-11-03T05:33:11.251Z"
     },
     {
       "id": "products_demo-gift-silver-dual-bowl-set-800_webp",
@@ -1304,8 +1313,8 @@
       "path": "/assets/products/demo-gift-silver-dual-bowl-set-800.webp",
       "category": "products",
       "label": "demo gift silver dual bowl set",
-      "sizeBytes": 182526,
-      "updatedAt": "2026-10-19T06:02:33.292Z"
+      "sizeBytes": 114098,
+      "updatedAt": "2026-11-03T05:33:11.376Z"
     },
     {
       "id": "products_demo-gift-sweets-presentation-800_jpg",
@@ -1313,8 +1322,8 @@
       "path": "/assets/products/demo-gift-sweets-presentation-800.jpg",
       "category": "products",
       "label": "demo gift sweets presentation",
-      "sizeBytes": 99093,
-      "updatedAt": "2026-10-19T05:31:12.084Z"
+      "sizeBytes": 55087,
+      "updatedAt": "2026-11-03T05:33:11.405Z"
     },
     {
       "id": "products_demo-gift-sweets-presentation-800_webp",
@@ -1323,7 +1332,7 @@
       "category": "products",
       "label": "demo gift sweets presentation",
       "sizeBytes": 58426,
-      "updatedAt": "2026-10-19T05:31:12.084Z"
+      "updatedAt": "2026-11-03T03:11:37.714Z"
     },
     {
       "id": "products_demo-gift-traditional-hamper-800_jpg",
@@ -1331,8 +1340,8 @@
       "path": "/assets/products/demo-gift-traditional-hamper-800.jpg",
       "category": "products",
       "label": "demo gift traditional hamper",
-      "sizeBytes": 93907,
-      "updatedAt": "2026-10-19T05:31:12.085Z"
+      "sizeBytes": 71710,
+      "updatedAt": "2026-11-03T05:33:11.436Z"
     },
     {
       "id": "products_demo-gift-traditional-hamper-800_webp",
@@ -1340,8 +1349,8 @@
       "path": "/assets/products/demo-gift-traditional-hamper-800.webp",
       "category": "products",
       "label": "demo gift traditional hamper",
-      "sizeBytes": 73262,
-      "updatedAt": "2026-10-19T05:31:12.085Z"
+      "sizeBytes": 35884,
+      "updatedAt": "2026-11-03T05:33:11.514Z"
     },
     {
       "id": "products_demo-lamp-brass-akhand-diya-800_jpg",
@@ -1350,7 +1359,7 @@
       "category": "products",
       "label": "demo lamp brass akhand diya",
       "sizeBytes": 38227,
-      "updatedAt": "2026-10-19T06:02:26.722Z"
+      "updatedAt": "2026-11-03T03:11:37.714Z"
     },
     {
       "id": "products_demo-lamp-brass-akhand-diya-800_webp",
@@ -1359,7 +1368,7 @@
       "category": "products",
       "label": "demo lamp brass akhand diya",
       "sizeBytes": 25554,
-      "updatedAt": "2026-10-19T06:02:26.766Z"
+      "updatedAt": "2026-11-03T03:11:37.715Z"
     },
     {
       "id": "products_demo-lamp-ceremonial-diya-800_jpg",
@@ -1367,8 +1376,8 @@
       "path": "/assets/products/demo-lamp-ceremonial-diya-800.jpg",
       "category": "products",
       "label": "demo lamp ceremonial diya",
-      "sizeBytes": 130913,
-      "updatedAt": "2026-10-19T05:31:12.086Z"
+      "sizeBytes": 79547,
+      "updatedAt": "2026-11-03T05:33:11.550Z"
     },
     {
       "id": "products_demo-lamp-ceremonial-diya-800_webp",
@@ -1376,8 +1385,8 @@
       "path": "/assets/products/demo-lamp-ceremonial-diya-800.webp",
       "category": "products",
       "label": "demo lamp ceremonial diya",
-      "sizeBytes": 94516,
-      "updatedAt": "2026-10-19T05:31:12.086Z"
+      "sizeBytes": 48332,
+      "updatedAt": "2026-11-03T05:33:11.645Z"
     },
     {
       "id": "products_demo-lamp-peacock-mayur-pair-800_jpg",
@@ -1385,8 +1394,8 @@
       "path": "/assets/products/demo-lamp-peacock-mayur-pair-800.jpg",
       "category": "products",
       "label": "demo lamp peacock mayur pair",
-      "sizeBytes": 313151,
-      "updatedAt": "2026-10-19T06:02:30.060Z"
+      "sizeBytes": 197916,
+      "updatedAt": "2026-11-03T05:33:11.728Z"
     },
     {
       "id": "products_demo-lamp-peacock-mayur-pair-800_webp",
@@ -1394,8 +1403,8 @@
       "path": "/assets/products/demo-lamp-peacock-mayur-pair-800.webp",
       "category": "products",
       "label": "demo lamp peacock mayur pair",
-      "sizeBytes": 303356,
-      "updatedAt": "2026-10-19T06:02:30.114Z"
+      "sizeBytes": 206030,
+      "updatedAt": "2026-11-03T05:33:11.944Z"
     },
     {
       "id": "products_demo-lamp-sacred-flame-800_jpg",
@@ -1403,8 +1412,8 @@
       "path": "/assets/products/demo-lamp-sacred-flame-800.jpg",
       "category": "products",
       "label": "demo lamp sacred flame",
-      "sizeBytes": 106119,
-      "updatedAt": "2026-10-19T05:31:12.086Z"
+      "sizeBytes": 67945,
+      "updatedAt": "2026-11-03T05:33:11.976Z"
     },
     {
       "id": "products_demo-lamp-sacred-flame-800_webp",
@@ -1412,8 +1421,8 @@
       "path": "/assets/products/demo-lamp-sacred-flame-800.webp",
       "category": "products",
       "label": "demo lamp sacred flame",
-      "sizeBytes": 73532,
-      "updatedAt": "2026-10-19T05:31:12.086Z"
+      "sizeBytes": 40124,
+      "updatedAt": "2026-11-03T05:33:12.060Z"
     },
     {
       "id": "products_demo-lamp-serene-glow-800_jpg",
@@ -1421,8 +1430,8 @@
       "path": "/assets/products/demo-lamp-serene-glow-800.jpg",
       "category": "products",
       "label": "demo lamp serene glow",
-      "sizeBytes": 193846,
-      "updatedAt": "2026-10-19T05:31:12.088Z"
+      "sizeBytes": 122308,
+      "updatedAt": "2026-11-03T05:33:12.110Z"
     },
     {
       "id": "products_demo-lamp-serene-glow-800_webp",
@@ -1430,8 +1439,8 @@
       "path": "/assets/products/demo-lamp-serene-glow-800.webp",
       "category": "products",
       "label": "demo lamp serene glow",
-      "sizeBytes": 178842,
-      "updatedAt": "2026-10-19T05:31:12.088Z"
+      "sizeBytes": 109874,
+      "updatedAt": "2026-11-03T05:33:12.245Z"
     },
     {
       "id": "products_demo-lamp-traditional-pillar-800_jpg",
@@ -1439,8 +1448,8 @@
       "path": "/assets/products/demo-lamp-traditional-pillar-800.jpg",
       "category": "products",
       "label": "demo lamp traditional pillar",
-      "sizeBytes": 211105,
-      "updatedAt": "2026-10-19T05:31:12.089Z"
+      "sizeBytes": 137138,
+      "updatedAt": "2026-11-03T05:33:12.297Z"
     },
     {
       "id": "products_demo-lamp-traditional-pillar-800_webp",
@@ -1448,8 +1457,8 @@
       "path": "/assets/products/demo-lamp-traditional-pillar-800.webp",
       "category": "products",
       "label": "demo lamp traditional pillar",
-      "sizeBytes": 187234,
-      "updatedAt": "2026-10-19T05:31:12.090Z"
+      "sizeBytes": 110176,
+      "updatedAt": "2026-11-03T05:33:12.428Z"
     },
     {
       "id": "products_ganesha-frame-600_jpg",
@@ -1457,8 +1466,8 @@
       "path": "/assets/products/ganesha-frame-600.jpg",
       "category": "products",
       "label": "ganesha frame",
-      "sizeBytes": 102224,
-      "updatedAt": "2026-10-20T23:48:09.844Z"
+      "sizeBytes": 73203,
+      "updatedAt": "2026-11-03T05:33:12.485Z"
     },
     {
       "id": "products_ganesha-frame-600_webp",
@@ -1466,8 +1475,8 @@
       "path": "/assets/products/ganesha-frame-600.webp",
       "category": "products",
       "label": "ganesha frame",
-      "sizeBytes": 88228,
-      "updatedAt": "2026-10-20T23:48:09.837Z"
+      "sizeBytes": 63596,
+      "updatedAt": "2026-11-03T05:33:12.577Z"
     },
     {
       "id": "products_ganesha-frame-800_jpg",
@@ -1475,8 +1484,8 @@
       "path": "/assets/products/ganesha-frame-800.jpg",
       "category": "products",
       "label": "ganesha frame",
-      "sizeBytes": 173742,
-      "updatedAt": "2026-10-20T23:48:09.808Z"
+      "sizeBytes": 123734,
+      "updatedAt": "2026-11-03T05:33:12.632Z"
     },
     {
       "id": "products_ganesha-frame-800_webp",
@@ -1484,8 +1493,8 @@
       "path": "/assets/products/ganesha-frame-800.webp",
       "category": "products",
       "label": "ganesha frame",
-      "sizeBytes": 147360,
-      "updatedAt": "2026-10-20T23:48:09.799Z"
+      "sizeBytes": 109810,
+      "updatedAt": "2026-11-03T05:33:12.757Z"
     },
     {
       "id": "products_hanuman-frame-600_jpg",
@@ -1493,8 +1502,8 @@
       "path": "/assets/products/hanuman-frame-600.jpg",
       "category": "products",
       "label": "hanuman frame",
-      "sizeBytes": 81530,
-      "updatedAt": "2026-10-19T05:31:12.090Z"
+      "sizeBytes": 62275,
+      "updatedAt": "2026-11-03T05:33:12.791Z"
     },
     {
       "id": "products_hanuman-frame-600_webp",
@@ -1503,7 +1512,7 @@
       "category": "products",
       "label": "hanuman frame",
       "sizeBytes": 55858,
-      "updatedAt": "2026-10-19T05:31:12.090Z"
+      "updatedAt": "2026-11-03T03:11:37.722Z"
     },
     {
       "id": "products_hanuman-frame-960_jpg",
@@ -1511,8 +1520,8 @@
       "path": "/assets/products/hanuman-frame-960.jpg",
       "category": "products",
       "label": "hanuman frame",
-      "sizeBytes": 187734,
-      "updatedAt": "2026-10-19T05:31:12.091Z"
+      "sizeBytes": 139212,
+      "updatedAt": "2026-11-03T05:33:12.864Z"
     },
     {
       "id": "products_hanuman-frame-960_webp",
@@ -1520,8 +1529,8 @@
       "path": "/assets/products/hanuman-frame-960.webp",
       "category": "products",
       "label": "hanuman frame",
-      "sizeBytes": 116890,
-      "updatedAt": "2026-10-19T05:31:12.092Z"
+      "sizeBytes": 97668,
+      "updatedAt": "2026-11-03T05:33:13.015Z"
     },
     {
       "id": "products_hanuman-frame-photo-600_jpg",
@@ -1529,8 +1538,8 @@
       "path": "/assets/products/hanuman-frame-photo-600.jpg",
       "category": "products",
       "label": "hanuman frame photo",
-      "sizeBytes": 128237,
-      "updatedAt": "2026-10-19T05:31:12.093Z"
+      "sizeBytes": 102199,
+      "updatedAt": "2026-11-03T05:33:13.060Z"
     },
     {
       "id": "products_hanuman-frame-photo-600_webp",
@@ -1539,7 +1548,7 @@
       "category": "products",
       "label": "hanuman frame photo",
       "sizeBytes": 108868,
-      "updatedAt": "2026-10-19T05:31:12.093Z"
+      "updatedAt": "2026-11-03T03:11:37.725Z"
     },
     {
       "id": "products_hanuman-frame-photo-741_jpg",
@@ -1547,8 +1556,8 @@
       "path": "/assets/products/hanuman-frame-photo-741.jpg",
       "category": "products",
       "label": "hanuman frame photo",
-      "sizeBytes": 185802,
-      "updatedAt": "2026-10-19T05:31:12.093Z"
+      "sizeBytes": 146560,
+      "updatedAt": "2026-11-03T05:33:13.212Z"
     },
     {
       "id": "products_hanuman-frame-photo-741_webp",
@@ -1557,7 +1566,7 @@
       "category": "products",
       "label": "hanuman frame photo",
       "sizeBytes": 149168,
-      "updatedAt": "2026-10-19T05:31:12.094Z"
+      "updatedAt": "2026-11-03T03:11:37.726Z"
     },
     {
       "id": "products_lakshmi-frame-600_jpg",
@@ -1565,8 +1574,8 @@
       "path": "/assets/products/lakshmi-frame-600.jpg",
       "category": "products",
       "label": "lakshmi frame",
-      "sizeBytes": 109355,
-      "updatedAt": "2026-10-20T23:48:09.996Z"
+      "sizeBytes": 78929,
+      "updatedAt": "2026-11-03T05:33:13.376Z"
     },
     {
       "id": "products_lakshmi-frame-600_webp",
@@ -1574,8 +1583,8 @@
       "path": "/assets/products/lakshmi-frame-600.webp",
       "category": "products",
       "label": "lakshmi frame",
-      "sizeBytes": 95982,
-      "updatedAt": "2026-10-20T23:48:09.990Z"
+      "sizeBytes": 71390,
+      "updatedAt": "2026-11-03T05:33:13.451Z"
     },
     {
       "id": "products_lakshmi-frame-800_jpg",
@@ -1583,8 +1592,8 @@
       "path": "/assets/products/lakshmi-frame-800.jpg",
       "category": "products",
       "label": "lakshmi frame",
-      "sizeBytes": 179860,
-      "updatedAt": "2026-10-20T23:48:09.959Z"
+      "sizeBytes": 130533,
+      "updatedAt": "2026-11-03T05:33:13.510Z"
     },
     {
       "id": "products_lakshmi-frame-800_webp",
@@ -1592,8 +1601,8 @@
       "path": "/assets/products/lakshmi-frame-800.webp",
       "category": "products",
       "label": "lakshmi frame",
-      "sizeBytes": 152156,
-      "updatedAt": "2026-10-20T23:48:09.951Z"
+      "sizeBytes": 112572,
+      "updatedAt": "2026-11-03T05:33:13.667Z"
     },
     {
       "id": "products_murugan-frame-600_jpg",
@@ -1601,8 +1610,8 @@
       "path": "/assets/products/murugan-frame-600.jpg",
       "category": "products",
       "label": "murugan frame",
-      "sizeBytes": 106356,
-      "updatedAt": "2026-10-20T23:48:10.424Z"
+      "sizeBytes": 75835,
+      "updatedAt": "2026-11-03T05:33:13.731Z"
     },
     {
       "id": "products_murugan-frame-600_webp",
@@ -1610,8 +1619,8 @@
       "path": "/assets/products/murugan-frame-600.webp",
       "category": "products",
       "label": "murugan frame",
-      "sizeBytes": 90930,
-      "updatedAt": "2026-10-20T23:48:10.418Z"
+      "sizeBytes": 68608,
+      "updatedAt": "2026-11-03T05:33:13.863Z"
     },
     {
       "id": "products_murugan-frame-800_jpg",
@@ -1619,8 +1628,8 @@
       "path": "/assets/products/murugan-frame-800.jpg",
       "category": "products",
       "label": "murugan frame",
-      "sizeBytes": 179010,
-      "updatedAt": "2026-10-20T23:48:10.387Z"
+      "sizeBytes": 127956,
+      "updatedAt": "2026-11-03T05:33:13.953Z"
     },
     {
       "id": "products_murugan-frame-800_webp",
@@ -1628,8 +1637,8 @@
       "path": "/assets/products/murugan-frame-800.webp",
       "category": "products",
       "label": "murugan frame",
-      "sizeBytes": 152030,
-      "updatedAt": "2026-10-20T23:48:10.379Z"
+      "sizeBytes": 111210,
+      "updatedAt": "2026-11-03T05:33:14.148Z"
     },
     {
       "id": "products_placeholder-devotional-frame-600_jpg",
@@ -1637,8 +1646,8 @@
       "path": "/assets/products/placeholder-devotional-frame-600.jpg",
       "category": "products",
       "label": "placeholder devotional frame",
-      "sizeBytes": 65394,
-      "updatedAt": "2026-10-20T23:48:10.617Z"
+      "sizeBytes": 46356,
+      "updatedAt": "2026-11-03T05:33:14.179Z"
     },
     {
       "id": "products_placeholder-devotional-frame-600_webp",
@@ -1647,7 +1656,7 @@
       "category": "products",
       "label": "placeholder devotional frame",
       "sizeBytes": 48716,
-      "updatedAt": "2026-10-20T23:48:10.610Z"
+      "updatedAt": "2026-11-03T03:11:37.730Z"
     },
     {
       "id": "products_placeholder-devotional-frame-800_jpg",
@@ -1655,8 +1664,8 @@
       "path": "/assets/products/placeholder-devotional-frame-800.jpg",
       "category": "products",
       "label": "placeholder devotional frame",
-      "sizeBytes": 110013,
-      "updatedAt": "2026-10-21T00:32:32.847Z"
+      "sizeBytes": 77119,
+      "updatedAt": "2026-11-03T05:33:14.233Z"
     },
     {
       "id": "products_placeholder-devotional-frame-800_webp",
@@ -1664,8 +1673,8 @@
       "path": "/assets/products/placeholder-devotional-frame-800.webp",
       "category": "products",
       "label": "placeholder devotional frame",
-      "sizeBytes": 76376,
-      "updatedAt": "2026-10-21T00:32:32.844Z"
+      "sizeBytes": 50910,
+      "updatedAt": "2026-11-03T05:33:14.417Z"
     },
     {
       "id": "products_placeholder-devotional-frame_jpg",
@@ -1673,8 +1682,8 @@
       "path": "/assets/products/placeholder-devotional-frame.jpg",
       "category": "products",
       "label": "placeholder devotional frame",
-      "sizeBytes": 110013,
-      "updatedAt": "2026-10-20T23:48:10.583Z"
+      "sizeBytes": 77119,
+      "updatedAt": "2026-11-03T05:33:14.487Z"
     },
     {
       "id": "products_placeholder-devotional-frame_webp",
@@ -1682,8 +1691,8 @@
       "path": "/assets/products/placeholder-devotional-frame.webp",
       "category": "products",
       "label": "placeholder devotional frame",
-      "sizeBytes": 76376,
-      "updatedAt": "2026-10-20T23:48:10.575Z"
+      "sizeBytes": 50910,
+      "updatedAt": "2026-11-03T05:33:14.721Z"
     },
     {
       "id": "products_radha-krishna-frame-600_jpg",
@@ -1691,8 +1700,8 @@
       "path": "/assets/products/radha-krishna-frame-600.jpg",
       "category": "products",
       "label": "radha krishna frame",
-      "sizeBytes": 78291,
-      "updatedAt": "2026-10-19T05:31:12.095Z"
+      "sizeBytes": 60018,
+      "updatedAt": "2026-11-03T05:33:14.794Z"
     },
     {
       "id": "products_radha-krishna-frame-600_webp",
@@ -1701,7 +1710,7 @@
       "category": "products",
       "label": "radha krishna frame",
       "sizeBytes": 53514,
-      "updatedAt": "2026-10-19T05:31:12.095Z"
+      "updatedAt": "2026-11-03T03:11:37.732Z"
     },
     {
       "id": "products_radha-krishna-frame-960_jpg",
@@ -1709,8 +1718,8 @@
       "path": "/assets/products/radha-krishna-frame-960.jpg",
       "category": "products",
       "label": "radha krishna frame",
-      "sizeBytes": 180592,
-      "updatedAt": "2026-10-19T05:31:12.095Z"
+      "sizeBytes": 134054,
+      "updatedAt": "2026-11-03T05:33:14.955Z"
     },
     {
       "id": "products_radha-krishna-frame-960_webp",
@@ -1718,8 +1727,8 @@
       "path": "/assets/products/radha-krishna-frame-960.webp",
       "category": "products",
       "label": "radha krishna frame",
-      "sizeBytes": 108124,
-      "updatedAt": "2026-10-19T05:31:12.096Z"
+      "sizeBytes": 88554,
+      "updatedAt": "2026-11-03T05:33:15.408Z"
     },
     {
       "id": "products_radha-krishna-frame-photo-600_jpg",
@@ -1727,8 +1736,8 @@
       "path": "/assets/products/radha-krishna-frame-photo-600.jpg",
       "category": "products",
       "label": "radha krishna frame photo",
-      "sizeBytes": 122251,
-      "updatedAt": "2026-10-19T05:31:12.097Z"
+      "sizeBytes": 98348,
+      "updatedAt": "2026-11-03T05:33:15.522Z"
     },
     {
       "id": "products_radha-krishna-frame-photo-600_webp",
@@ -1737,7 +1746,7 @@
       "category": "products",
       "label": "radha krishna frame photo",
       "sizeBytes": 100346,
-      "updatedAt": "2026-10-19T05:31:12.097Z"
+      "updatedAt": "2026-11-03T03:11:37.734Z"
     },
     {
       "id": "products_radha-krishna-frame-photo-744_jpg",
@@ -1745,8 +1754,8 @@
       "path": "/assets/products/radha-krishna-frame-photo-744.jpg",
       "category": "products",
       "label": "radha krishna frame photo",
-      "sizeBytes": 172832,
-      "updatedAt": "2026-10-19T05:31:12.098Z"
+      "sizeBytes": 139747,
+      "updatedAt": "2026-11-03T05:33:15.986Z"
     },
     {
       "id": "products_radha-krishna-frame-photo-744_webp",
@@ -1755,7 +1764,7 @@
       "category": "products",
       "label": "radha krishna frame photo",
       "sizeBytes": 142596,
-      "updatedAt": "2026-10-19T05:31:12.099Z"
+      "updatedAt": "2026-11-03T03:11:37.735Z"
     },
     {
       "id": "products_sai-baba-frame-600_jpg",
@@ -1763,8 +1772,8 @@
       "path": "/assets/products/sai-baba-frame-600.jpg",
       "category": "products",
       "label": "sai baba frame",
-      "sizeBytes": 104507,
-      "updatedAt": "2026-10-20T23:48:10.528Z"
+      "sizeBytes": 75529,
+      "updatedAt": "2026-11-03T05:33:16.383Z"
     },
     {
       "id": "products_sai-baba-frame-600_webp",
@@ -1772,8 +1781,8 @@
       "path": "/assets/products/sai-baba-frame-600.webp",
       "category": "products",
       "label": "sai baba frame",
-      "sizeBytes": 92586,
-      "updatedAt": "2026-10-20T23:48:10.521Z"
+      "sizeBytes": 68546,
+      "updatedAt": "2026-11-03T05:33:16.581Z"
     },
     {
       "id": "products_sai-baba-frame-800_jpg",
@@ -1781,8 +1790,8 @@
       "path": "/assets/products/sai-baba-frame-800.jpg",
       "category": "products",
       "label": "sai baba frame",
-      "sizeBytes": 174082,
-      "updatedAt": "2026-10-20T23:48:10.486Z"
+      "sizeBytes": 125612,
+      "updatedAt": "2026-11-03T05:33:16.721Z"
     },
     {
       "id": "products_sai-baba-frame-800_webp",
@@ -1790,8 +1799,8 @@
       "path": "/assets/products/sai-baba-frame-800.webp",
       "category": "products",
       "label": "sai baba frame",
-      "sizeBytes": 149178,
-      "updatedAt": "2026-10-20T23:48:10.478Z"
+      "sizeBytes": 111446,
+      "updatedAt": "2026-11-03T05:33:16.956Z"
     },
     {
       "id": "products_saraswati-frame-600_jpg",
@@ -1799,8 +1808,8 @@
       "path": "/assets/products/saraswati-frame-600.jpg",
       "category": "products",
       "label": "saraswati frame",
-      "sizeBytes": 94533,
-      "updatedAt": "2026-10-20T23:48:10.145Z"
+      "sizeBytes": 67827,
+      "updatedAt": "2026-11-03T05:33:17.018Z"
     },
     {
       "id": "products_saraswati-frame-600_webp",
@@ -1808,8 +1817,8 @@
       "path": "/assets/products/saraswati-frame-600.webp",
       "category": "products",
       "label": "saraswati frame",
-      "sizeBytes": 78358,
-      "updatedAt": "2026-10-20T23:48:10.138Z"
+      "sizeBytes": 57064,
+      "updatedAt": "2026-11-03T05:33:17.167Z"
     },
     {
       "id": "products_saraswati-frame-800_jpg",
@@ -1817,8 +1826,8 @@
       "path": "/assets/products/saraswati-frame-800.jpg",
       "category": "products",
       "label": "saraswati frame",
-      "sizeBytes": 157778,
-      "updatedAt": "2026-10-20T23:48:10.110Z"
+      "sizeBytes": 113560,
+      "updatedAt": "2026-11-03T05:33:17.288Z"
     },
     {
       "id": "products_saraswati-frame-800_webp",
@@ -1826,8 +1835,8 @@
       "path": "/assets/products/saraswati-frame-800.webp",
       "category": "products",
       "label": "saraswati frame",
-      "sizeBytes": 130424,
-      "updatedAt": "2026-10-20T23:48:10.102Z"
+      "sizeBytes": 96032,
+      "updatedAt": "2026-11-03T05:33:17.546Z"
     },
     {
       "id": "products_shiva-parvati-frame-600_jpg",
@@ -1835,8 +1844,8 @@
       "path": "/assets/products/shiva-parvati-frame-600.jpg",
       "category": "products",
       "label": "shiva parvati frame",
-      "sizeBytes": 80997,
-      "updatedAt": "2026-10-20T23:48:10.280Z"
+      "sizeBytes": 58000,
+      "updatedAt": "2026-11-03T05:33:17.616Z"
     },
     {
       "id": "products_shiva-parvati-frame-600_webp",
@@ -1844,8 +1853,8 @@
       "path": "/assets/products/shiva-parvati-frame-600.webp",
       "category": "products",
       "label": "shiva parvati frame",
-      "sizeBytes": 68148,
-      "updatedAt": "2026-10-20T23:48:10.274Z"
+      "sizeBytes": 50296,
+      "updatedAt": "2026-11-03T05:33:17.833Z"
     },
     {
       "id": "products_shiva-parvati-frame-800_jpg",
@@ -1853,8 +1862,8 @@
       "path": "/assets/products/shiva-parvati-frame-800.jpg",
       "category": "products",
       "label": "shiva parvati frame",
-      "sizeBytes": 136670,
-      "updatedAt": "2026-10-20T23:48:10.249Z"
+      "sizeBytes": 98187,
+      "updatedAt": "2026-11-03T05:33:17.933Z"
     },
     {
       "id": "products_shiva-parvati-frame-800_webp",
@@ -1862,8 +1871,8 @@
       "path": "/assets/products/shiva-parvati-frame-800.webp",
       "category": "products",
       "label": "shiva parvati frame",
-      "sizeBytes": 114020,
-      "updatedAt": "2026-10-20T23:48:10.241Z"
+      "sizeBytes": 84274,
+      "updatedAt": "2026-11-03T05:33:18.162Z"
     },
     {
       "id": "products_venkateswara-frame-600_jpg",
@@ -1871,8 +1880,8 @@
       "path": "/assets/products/venkateswara-frame-600.jpg",
       "category": "products",
       "label": "venkateswara frame",
-      "sizeBytes": 81513,
-      "updatedAt": "2026-10-19T05:31:12.099Z"
+      "sizeBytes": 62632,
+      "updatedAt": "2026-11-03T05:33:18.233Z"
     },
     {
       "id": "products_venkateswara-frame-600_webp",
@@ -1881,7 +1890,7 @@
       "category": "products",
       "label": "venkateswara frame",
       "sizeBytes": 56008,
-      "updatedAt": "2026-10-19T05:31:12.099Z"
+      "updatedAt": "2026-11-03T03:11:37.739Z"
     },
     {
       "id": "products_venkateswara-frame-960_jpg",
@@ -1889,8 +1898,8 @@
       "path": "/assets/products/venkateswara-frame-960.jpg",
       "category": "products",
       "label": "venkateswara frame",
-      "sizeBytes": 186132,
-      "updatedAt": "2026-10-19T05:31:12.100Z"
+      "sizeBytes": 138480,
+      "updatedAt": "2026-11-03T05:33:18.444Z"
     },
     {
       "id": "products_venkateswara-frame-960_webp",
@@ -1898,8 +1907,8 @@
       "path": "/assets/products/venkateswara-frame-960.webp",
       "category": "products",
       "label": "venkateswara frame",
-      "sizeBytes": 116158,
-      "updatedAt": "2026-10-19T05:31:12.100Z"
+      "sizeBytes": 96034,
+      "updatedAt": "2026-11-03T05:33:18.826Z"
     },
     {
       "id": "products_venkateswara-frame-photo-600_jpg",
@@ -1907,8 +1916,8 @@
       "path": "/assets/products/venkateswara-frame-photo-600.jpg",
       "category": "products",
       "label": "venkateswara frame photo",
-      "sizeBytes": 128456,
-      "updatedAt": "2026-10-19T05:31:12.101Z"
+      "sizeBytes": 103461,
+      "updatedAt": "2026-11-03T05:33:18.902Z"
     },
     {
       "id": "products_venkateswara-frame-photo-600_webp",
@@ -1917,7 +1926,7 @@
       "category": "products",
       "label": "venkateswara frame photo",
       "sizeBytes": 107574,
-      "updatedAt": "2026-10-19T05:31:12.102Z"
+      "updatedAt": "2026-11-03T03:11:37.740Z"
     },
     {
       "id": "products_venkateswara-frame-photo-781_jpg",
@@ -1925,8 +1934,8 @@
       "path": "/assets/products/venkateswara-frame-photo-781.jpg",
       "category": "products",
       "label": "venkateswara frame photo",
-      "sizeBytes": 194566,
-      "updatedAt": "2026-10-19T05:31:12.102Z"
+      "sizeBytes": 157253,
+      "updatedAt": "2026-11-03T05:33:19.211Z"
     },
     {
       "id": "products_venkateswara-frame-photo-781_webp",
@@ -1934,8 +1943,8 @@
       "path": "/assets/products/venkateswara-frame-photo-781.webp",
       "category": "products",
       "label": "venkateswara frame photo",
-      "sizeBytes": 159618,
-      "updatedAt": "2026-10-19T05:31:12.103Z"
+      "sizeBytes": 134778,
+      "updatedAt": "2026-11-03T05:33:19.651Z"
     }
   ]
 }

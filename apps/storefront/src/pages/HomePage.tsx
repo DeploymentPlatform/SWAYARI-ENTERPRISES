@@ -11,6 +11,7 @@ import { Link } from '../lib/router';
 import { usePageMeta } from '../lib/meta';
 import { useProducts } from '../lib/products';
 import { Product, BRAND_TAGLINES } from '@swayari/shared';
+import { productCardImage, uniqueProductImages } from '../lib/media';
 
 const DEITIES = [
   { key: 'ganesha', label: 'Ganesha', href: '/shop?deity=ganesha' },
@@ -71,7 +72,7 @@ export const HomePage: React.FC = () => {
         const match = products.find(
           p => (p.deity || '').toLowerCase().includes(d.key) || p.name.toLowerCase().includes(d.key)
         );
-        return { ...d, image: match?.images?.[0] };
+        return { ...d, image: uniqueProductImages(match?.images)[0] };
       }).filter(d => d.image),
     [products]
   );
@@ -104,9 +105,11 @@ export const HomePage: React.FC = () => {
                     <span className="relative block aspect-square w-full rounded-full p-[3px] transition-all duration-700 ease-luxury [background:conic-gradient(from_180deg,#E3CC9A,#8C6B2E,#E3CC9A,#B8924A,#E3CC9A)] group-hover:rotate-[10deg] group-hover:shadow-gold">
                       <span className="block h-full w-full overflow-hidden rounded-full bg-gradient-to-b from-ivory-light to-stone p-3">
                         <img
-                          src={d.image}
+                          {...productCardImage(d.image!)}
+                          sizes="(min-width: 1024px) 120px, (min-width: 640px) 160px, 104px"
                           alt=""
                           loading="lazy"
+                          decoding="async"
                           className="h-full w-full object-contain transition-transform duration-700 ease-luxury group-hover:-rotate-[10deg] group-hover:scale-110"
                         />
                       </span>
@@ -172,8 +175,11 @@ export const HomePage: React.FC = () => {
               <div className="relative overflow-hidden rounded-t-full shadow-dialog">
                 <img
                   src="/assets/editorial/hero-devotional-collection-desktop.webp"
+                  srcSet="/assets/editorial/hero-devotional-collection-mobile.webp 900w, /assets/editorial/hero-devotional-collection-desktop.webp 1440w"
+                  sizes="(min-width: 1024px) 460px, 420px"
                   alt="Gold-relief devotional frames arranged for a celebration"
                   loading="lazy"
+                  decoding="async"
                   className="aspect-[4/5] w-full object-cover transition-transform duration-[2000ms] ease-luxury hover:scale-105"
                 />
               </div>

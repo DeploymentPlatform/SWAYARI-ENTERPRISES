@@ -1,8 +1,14 @@
+@import '../../../packages/ui/src/fonts.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* Cormorant's old-style figures sit unevenly in prices and counters; use lining figures. */
+  .font-display, .font-serif {
+    font-variant-numeric: lining-nums;
+  }
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;

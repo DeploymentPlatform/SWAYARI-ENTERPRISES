@@ -1,22 +1,15 @@
-# SWAYARI ENTERPRISES robots.txt
+# SWAYARI — Décor & Gifting
 User-agent: *
 Allow: /
-Allow: /shop/
-Allow: /product/
-Allow: /about/
-Allow: /contact/
-Allow: /ordering-policy/
-Allow: /privacy/
 
-# Disallow authenticated, transaction, and management interfaces
-Disallow: /admin/
-Disallow: /account/
-Disallow: /cart/
-Disallow: /checkout/
-Disallow: /order-confirmation/
+# Private, transactional and staff areas
+Disallow: /admin
+Disallow: /account
 Disallow: /orders
-Disallow: /search
+Disallow: /cart
+Disallow: /checkout
+Disallow: /order-confirmation/
 Disallow: /dev-login
 Disallow: /api/
 
-Sitemap: https://swayari-enterprises.pages.dev/sitemap.xml
+Sitemap: https://swayari-store.pages.dev/sitemap.xml

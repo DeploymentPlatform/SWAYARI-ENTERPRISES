@@ -10,8 +10,8 @@
   ],
   "scripts": {
     "assets:sync": "node scripts/sync-assets.js all",
-    "build:storefront": "node scripts/sync-assets.js storefront && vite build --config apps/storefront/vite.config.ts apps/storefront",
-    "build:admin": "node scripts/sync-assets.js admin && vite build --config apps/admin/vite.config.ts apps/admin",
+    "build:storefront": "node scripts/generate-thumbnails.js && node scripts/sync-assets.js storefront && vite build --config apps/storefront/vite.config.ts apps/storefront",
+    "build:admin": "node scripts/generate-thumbnails.js && node scripts/sync-assets.js admin && vite build --config apps/admin/vite.config.ts apps/admin",
     "build": "node scripts/generate-manifest.js && npm run build:storefront && npm run build:admin",
     "test": "node scripts/run-tests.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",

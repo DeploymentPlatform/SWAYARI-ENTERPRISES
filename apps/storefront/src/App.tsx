@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import { MotionConfig } from 'framer-motion';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -11,27 +11,53 @@ import { SignInDialog } from './components/SignInDialog';
 import { PageTransition } from './components/motion';
 
 import { HomePage } from './pages/HomePage';
-import { ShopPage } from './pages/ShopPage';
-import { ProductDetailPage } from './pages/ProductDetailPage';
-import { CartPage } from './pages/CartPage';
-import { CheckoutPage } from './pages/CheckoutPage';
-import { OrderConfirmationPage } from './pages/OrderConfirmationPage';
-import { AccountOrdersPage } from './pages/AccountOrdersPage';
-import { AboutPage } from './pages/AboutPage';
-import { ContactPage } from './pages/ContactPage';
-import { OrderingPolicyPage } from './pages/OrderingPolicyPage';
-import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
-import { NotFoundPage } from './pages/NotFoundPage';
-import { DevLoginPage } from './pages/DevLoginPage';
+
+// Every page except the home page is split into its own chunk and loaded on demand.
+const named = <T extends Record<string, React.ComponentType<any>>>(load: () => Promise<T>, key: keyof T) =>
+  lazy(() => load().then(m => ({ default: m[key] })));
+
+const loadShop = () => import('./pages/ShopPage');
+const loadProduct = () => import('./pages/ProductDetailPage');
+
+const ShopPage = named(loadShop, 'ShopPage');
+const ProductDetailPage = named(loadProduct, 'ProductDetailPage');
+const CartPage = named(() => import('./pages/CartPage'), 'CartPage');
+const CheckoutPage = named(() => import('./pages/CheckoutPage'), 'CheckoutPage');
+const OrderConfirmationPage = named(() => import('./pages/OrderConfirmationPage'), 'OrderConfirmationPage');
+const AccountOrdersPage = named(() => import('./pages/AccountOrdersPage'), 'AccountOrdersPage');
+const AboutPage = named(() => import('./pages/AboutPage'), 'AboutPage');
+const ContactPage = named(() => import('./pages/ContactPage'), 'ContactPage');
+const OrderingPolicyPage = named(() => import('./pages/OrderingPolicyPage'), 'OrderingPolicyPage');
+const PrivacyPolicyPage = named(() => import('./pages/PrivacyPolicyPage'), 'PrivacyPolicyPage');
+const NotFoundPage = named(() => import('./pages/NotFoundPage'), 'NotFoundPage');
+const DevLoginPage = named(() => import('./pages/DevLoginPage'), 'DevLoginPage');
+
+// Warm the two most visited pages once the browser is idle, so the first tap feels instant.
+if (typeof window !== 'undefined') {
+  const warm = () => {
+    loadShop();
+    loadProduct();
+  };
+  const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+  window.addEventListener('load', () => (idle ? idle(warm) : setTimeout(warm, 1500)), { once: true });
+}
+
+const PageFallback: React.FC = () => (
+  <div className="grid min-h-[60vh] place-items-center" role="status" aria-label="Loading page">
+    <span className="h-8 w-8 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+  </div>
+);
 
 initPreviewMode();
 
 function Routes() {
   const { path } = useRouter();
   return (
-    <PageTransition routeKey={path}>
-      <RouteSwitch />
-    </PageTransition>
+    <Suspense fallback={<PageFallback />}>
+      <PageTransition routeKey={path}>
+        <RouteSwitch />
+      </PageTransition>
+    </Suspense>
   );
 }
 

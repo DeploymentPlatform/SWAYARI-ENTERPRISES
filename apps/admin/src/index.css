@@ -1,9 +1,15 @@
+@import '../../../packages/ui/src/fonts.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* SWAYARI staff portal — the storefront's "temple-luxe" language, tuned denser and calmer for a back office. */
 @layer base {
+  /* Cormorant's old-style figures sit unevenly in prices and counters; use lining figures. */
+  .font-display, .font-serif {
+    font-variant-numeric: lining-nums;
+  }
   html {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;

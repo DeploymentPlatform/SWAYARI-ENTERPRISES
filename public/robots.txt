@@ -16,4 +16,4 @@ Disallow: /checkout/
 Disallow: /order-confirmation/
 Disallow: /api/
 
-Sitemap: https://swayari-enterprises.pages.dev/sitemap.xml
+Sitemap: https://swayari.com/sitemap.xml

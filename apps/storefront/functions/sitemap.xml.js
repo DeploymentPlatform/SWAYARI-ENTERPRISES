@@ -11,8 +11,10 @@ const STATIC_PAGES = [
 const escapeXml = value =>
   String(value).replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[c]);
 
-export async function onRequestGet({ request, env }) {
-  const origin = new URL(request.url).origin;
+// Always list the public domain, even when the sitemap is fetched from the pages.dev copy.
+const origin = 'https://swayari.com';
+
+export async function onRequestGet({ env }) {
   let products = [];
   try {
     const { results } = await env.DB.prepare(

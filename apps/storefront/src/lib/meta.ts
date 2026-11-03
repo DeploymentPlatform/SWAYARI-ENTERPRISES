@@ -24,8 +24,9 @@ export function usePageMeta(title: string | null, description?: string, options?
     setMeta('meta[property="og:title"]', 'property', 'og:title', fullTitle);
     setMeta('meta[property="og:description"]', 'property', 'og:description', desc);
     setMeta('meta[name="robots"]', 'name', 'robots', options?.noindex ? 'noindex, nofollow' : 'index, follow');
-    // Canonical URL follows the current page (query strings are filters, not separate pages).
-    const canonicalUrl = `${window.location.origin}${window.location.pathname}`;
+    // Canonical URL is always on the public domain (query strings are filters, not separate pages),
+    // so the pages.dev copy and www never compete with swayari.com in search results.
+    const canonicalUrl = `https://swayari.com${window.location.pathname}`;
     setMeta('meta[property="og:url"]', 'property', 'og:url', canonicalUrl);
     let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!canonical) {

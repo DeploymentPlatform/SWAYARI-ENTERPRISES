@@ -1,5 +1,5 @@
 import React from 'react';
-import { BUDGET_BANDS, BudgetBandDefinition } from '@swayari/shared';
+import { BRAND_TAGLINES, FRAME_PRICE_BANDS, FramePriceBandDefinition } from '@swayari/shared';
 import { Link } from '../lib/router';
 import { Sparkles, ArrowRight, Tag } from 'lucide-react';
 
@@ -29,18 +29,19 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
                 <span>Shop by Budget</span>
               </div>
               <h2 id="budget-navigation-title" className="font-display text-[1.5rem] sm:text-[1.875rem] font-bold text-[#292421] leading-tight">
-                Everything under ₹999
+                Gifting under ₹2,999
               </h2>
-              <p className="text-[13px] sm:text-[14px] text-[#7A6E66] mt-1">
-                Explore auspicious god frames and gifts, all under ₹999, with transparent unit pricing.
+              <p className="text-[13px] sm:text-[14px] text-ink-soft mt-1 max-w-2xl">
+                Return gifts from ₹39, god frames for every home and grand pieces for the pooja room. For a statement gift,
+                our long 5, 10 and 12 god wall frames start at ₹3,299. {BRAND_TAGLINES.priceNote}
               </p>
             </div>
             
             <Link
-              to="/shop"
+              to="/shop?budget=under-2999"
               className="text-[13px] font-semibold text-[#571C2A] hover:text-[#441420] flex items-center gap-1.5 group transition-colors self-start sm:self-end"
             >
-              <span>View everything under ₹999</span>
+              <span>Shop gifts under ₹2,999</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
@@ -48,9 +49,11 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
 
         {/* 4 Prominent Budget Cards (4 across on desktop, 2 across on mobile) */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          {BUDGET_BANDS.map((band: BudgetBandDefinition, idx: number) => {
+          {FRAME_PRICE_BANDS.map((band: FramePriceBandDefinition, idx: number) => {
             const isSelected = selectedBudget === band.id;
-            const isEntryLevel = band.id === 'under-99';
+            const isEntryLevel = band.id === 'under-299';
+            const isPremium = band.id === '3000-plus';
+            const tag = isEntryLevel ? 'Return gifts' : isPremium ? 'Premium pick' : null;
 
             return (
               <div
@@ -63,11 +66,11 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
                     : 'bg-white border-[#E7DFD5] hover:border-[#B49155] hover:shadow-hover text-[#292421]'
                 }`}
               >
-                {/* Entry-level / Best Proposition Tag */}
-                {isEntryLevel && !isSelected && (
-                  <span className="absolute -top-2.5 left-4 px-2 py-0.5 rounded-full bg-[#571C2A] text-white text-[9.5px] font-bold tracking-wider uppercase shadow-xs flex items-center gap-1">
+                {/* Return-gift and premium tags */}
+                {tag && !isSelected && (
+                  <span className="absolute -top-2.5 left-4 px-2 py-0.5 rounded-full bg-[#571C2A] text-white text-[10.5px] font-bold tracking-wider uppercase shadow-xs flex items-center gap-1">
                     <Sparkles className="w-2.5 h-2.5 text-[#E8D29E]" />
-                    <span>Starter Favors</span>
+                    <span>{tag}</span>
                   </span>
                 )}
 
@@ -81,11 +84,11 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
                       {band.shortLabel}
                     </span>
                     <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                        isSelected ? 'bg-white/10 text-white/90' : 'bg-[#FAF7F2] text-[#7A6E66]'
+                      className={`text-[11px] px-1.5 py-0.5 rounded font-medium ${
+                        isSelected ? 'bg-white/10 text-white/90' : 'bg-[#FAF7F2] text-ink-soft'
                       }`}
                     >
-                      Tier {idx + 1}
+                      {isPremium ? 'Above ₹2,999' : `Band ${idx + 1}`}
                     </span>
                   </div>
 
@@ -99,7 +102,7 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
 
                   <p
                     className={`mt-2 text-[11.5px] sm:text-[12px] line-clamp-2 leading-relaxed ${
-                      isSelected ? 'text-white/80' : 'text-[#7A6E66]'
+                      isSelected ? 'text-white/90' : 'text-ink-soft'
                     }`}
                   >
                     {band.description}
@@ -117,7 +120,7 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
                           : 'bg-[#FAF7F2] text-[#292421] group-hover:bg-[#571C2A] group-hover:text-white'
                       }`}
                     >
-                      <span>{isSelected ? 'Filtered' : 'Browse Band'}</span>
+                      <span>{isSelected ? 'Showing' : 'Browse'}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   ) : (
@@ -129,7 +132,7 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
                           : 'bg-[#FAF7F2] text-[#292421] group-hover:bg-[#571C2A] group-hover:text-white'
                       }`}
                     >
-                      <span>Explore Collection</span>
+                      <span>{isPremium ? 'See wall frames' : 'Explore'}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   )}

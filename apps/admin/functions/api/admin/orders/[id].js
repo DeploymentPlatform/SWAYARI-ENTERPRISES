@@ -179,7 +179,7 @@ export async function onRequestPatch(context) {
       for (const it of items) {
         const pCheck = validateFramePrice(it.agreedUnitPrice, `Quoted unit price for "${it.productName || it.productId || 'Item'}"`);
         if (!pCheck.isValid || pCheck.paise === null) {
-          return errorResponse(pCheck.error || 'Quoted unit price is required and must be a valid positive amount of ₹999 or less', 400);
+          return errorResponse(pCheck.error || 'Quoted unit price is required and must be a valid positive amount', 400);
         }
         const qCheck = validateQuantity(it.quantity, `Quantity for "${it.productName || it.productId || 'Item'}"`);
         if (!qCheck.isValid) {

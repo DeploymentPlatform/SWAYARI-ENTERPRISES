@@ -1,13 +1,14 @@
 import React from 'react';
+import { BRAND_TAGLINES } from '@swayari/shared';
 import { BadgeIndianRupee, Users, Truck, ShieldCheck, Sparkles, HandHeart } from 'lucide-react';
 
 const ASSURANCES = [
-  { icon: BadgeIndianRupee, label: 'Everything under ₹999' },
-  { icon: Users, label: 'Minimum 25 frames — mix any designs' },
-  { icon: Truck, label: 'Shipping charged extra' },
+  { icon: BadgeIndianRupee, label: BRAND_TAGLINES.proposition },
+  { icon: Users, label: BRAND_TAGLINES.minimumOrder },
+  { icon: Truck, label: 'Delivery extra, at actual cost' },
   { icon: ShieldCheck, label: 'No online payment — order by request' },
   { icon: HandHeart, label: 'Personally confirmed by our team' },
-  { icon: Sparkles, label: 'Silver foil relief, table stand & wall hook' }
+  { icon: Sparkles, label: 'Silver foil god frames, stotram cards & god stands' }
 ];
 
 /** Slow, endless ribbon of ordering assurances (pauses on hover; static for reduced motion). */

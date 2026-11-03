@@ -7,10 +7,10 @@ import { LotusMark, useDialogBehaviour } from './ui';
 import { EASE_LUXURY } from './motion';
 
 const COPY = {
-  add: { title: 'Sign in to add to your bag', body: 'We save your bag and requests to your account so our team can follow up with you. Your item will be added as soon as you are signed in.' },
-  checkout: { title: 'Sign in to send your request', body: 'We use your verified Google email to keep track of your request and its updates.' },
+  add: { title: 'Sign in to SWAYARI', body: 'Sign in to keep your cart and requests together.' },
+  checkout: { title: 'Sign in to send your request', body: 'Your cart is kept. We use your verified Google email to save the request and send you updates — no payment is taken online.' },
   orders: { title: 'Sign in to see your requests', body: 'View the requests you have sent and any updates from our team.' },
-  account: { title: 'Sign in to SWAYARI', body: 'Keep your bag and order requests together in one place.' }
+  account: { title: 'Sign in to SWAYARI', body: 'Keep your cart and order requests together in one place.' }
 };
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';

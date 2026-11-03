@@ -3,6 +3,10 @@ import { ArrowRight, Phone, Sparkles, Flower2, PackageCheck, HandHeart } from 'l
 import { Hero } from '../components/Hero';
 import { InfoStrip } from '../components/InfoStrip';
 import { BulkReturnGiftsSection } from '../components/BulkReturnGiftsSection';
+import { CategoryShortcuts } from '../components/CategoryShortcuts';
+import { ShopByOccasion } from '../components/ShopByOccasion';
+import { ShopByBudget } from '../components/ShopByBudget';
+import { productPricing } from '../components/Price';
 import { OrderProcessExplanation } from '../components/OrderProcessExplanation';
 import { ProductCard } from '../components/ProductCard';
 import { SectionHeading } from '../components/ui';
@@ -10,19 +14,8 @@ import { Reveal, StaggerGroup, StaggerItem } from '../components/motion';
 import { Link } from '../lib/router';
 import { usePageMeta } from '../lib/meta';
 import { useProducts } from '../lib/products';
-import { Product, BRAND_TAGLINES, MAX_FRAME_PRICE } from '@swayari/shared';
+import { Product, BRAND_TAGLINES, DEITIES, GIFTING_PRICE_CAP } from '@swayari/shared';
 import { productCardImage, uniqueProductImages } from '../lib/media';
-
-// Short names for the "Shop by deity" row; one tile per frame in the catalogue.
-const DEITY_LABELS: Record<string, string> = {
-  balaji: 'Balaji',
-  'balaji padmavathi': 'Padmavathi Srinivasa',
-  'sai baba': 'Sai Baba',
-  'radha krishna': 'Radha Krishna',
-  'bal krishna': 'Bal Krishna',
-  'ram darbar': 'Ram Darbar',
-  hanuman: 'Hanuman'
-};
 
 // Featured cards wrap in a centred row, so an odd last row sits in the middle instead of leaving a gap.
 const FEATURED_CELL = 'w-[calc(50%-0.4375rem)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1.125rem)]';
@@ -39,10 +32,29 @@ const SkeletonCard: React.FC = () => (
   </div>
 );
 
+// Featured picks: two designs from each gift collection, in catalogue order.
+const FEATURED_FROM = ['god-frames', 'stotram-frames', 'god-stands', 'stotram-cards'];
+
+const ProductRow: React.FC<{ products: Product[]; loading: boolean; count?: number }> = ({ products, loading, count = 8 }) => (
+  <StaggerGroup className="mt-10 flex flex-wrap justify-center gap-3.5 sm:gap-6">
+    {loading
+      ? Array.from({ length: Math.min(count, 4) }).map((_, i) => (
+          <StaggerItem key={i} className={FEATURED_CELL}>
+            <SkeletonCard />
+          </StaggerItem>
+        ))
+      : products.slice(0, count).map((prod, idx) => (
+          <StaggerItem key={prod.id} className={FEATURED_CELL}>
+            <ProductCard product={prod} priority={idx < 2} />
+          </StaggerItem>
+        ))}
+  </StaggerGroup>
+);
+
 export const HomePage: React.FC = () => {
   usePageMeta(
     BRAND_TAGLINES.headline,
-    `${BRAND_TAGLINES.supporting} Everything under ₹999, including No. 1 silver foil god frames at ₹149 each for wedding return gifts, griha pravesh and poojas. Minimum order 25 frames; shipping extra.`
+    'Silver foil god frames, Telugu stotram frames, god stands and stotram cards. Return gifts from ₹39, order from 1 piece, bulk prices as you add more — for weddings, griha pravesh, vratams and festivals.'
   );
 
   const { products, status } = useProducts();
@@ -56,7 +68,7 @@ export const HomePage: React.FC = () => {
         const ids: string[] = JSON.parse(stored);
         const matches = ids
           .map(id => products.find(p => p.id === id))
-          .filter((p): p is Product => Boolean(p) && (p.indicativePrice === null || p.indicativePrice <= MAX_FRAME_PRICE))
+          .filter((p): p is Product => Boolean(p))
           .slice(0, 4);
         setRecentlyViewed(matches);
       }
@@ -65,21 +77,30 @@ export const HomePage: React.FC = () => {
     }
   }, [products]);
 
-  const eligibleFrames = products.filter(p => p.indicativePrice !== null && p.indicativePrice <= MAX_FRAME_PRICE);
-  const featuredFrames = (eligibleFrames.length > 0 ? eligibleFrames : products).slice(0, 8);
+  const featured = useMemo(
+    () => FEATURED_FROM.flatMap(slug => products.filter(p => p.categorySlug === slug).slice(0, 2)),
+    [products]
+  );
+  // Return gifts: everything whose bulk price drops to ₹99 or less
+  const returnGifts = useMemo(
+    () => products.filter(p => (productPricing(p).best ?? Infinity) <= 99).sort((a, b) => (productPricing(a).best ?? 0) - (productPricing(b).best ?? 0)),
+    [products]
+  );
+  const wallFrames = useMemo(() => products.filter(p => p.categorySlug === 'wall-frames'), [products]);
+  const giftable = useMemo(() => products.filter(p => p.indicativePrice !== null && p.indicativePrice <= GIFTING_PRICE_CAP), [products]);
 
-  // One tile per frame, linking straight to that design.
+  // One tile per god, using a god frame photo where there is one.
   const deityTiles = useMemo(
     () =>
-      products
-        .map(p => ({
-          key: p.id,
-          label: DEITY_LABELS[(p.deity || '').toLowerCase()] || p.deity || p.name,
-          href: `/product/${p.slug}`,
-          image: uniqueProductImages(p.images)[0]
-        }))
-        .filter(d => d.image)
-        .slice(0, 8),
+      DEITIES.filter(d => !['all', 'multi', 'interfaith'].includes(d.id))
+        .map(d => {
+          const matches = products.filter(p => (p.deity || '').toLowerCase().includes(d.id));
+          const pick = matches.find(p => p.categorySlug === 'god-frames') || matches[0];
+          return pick
+            ? { key: d.id, label: d.name, href: `/shop?deity=${d.id}`, image: uniqueProductImages(pick.images)[0], count: matches.length }
+            : null;
+        })
+        .flatMap(d => (d && d.image ? [{ ...d, image: d.image as string }] : [])),
     [products]
   );
 
@@ -87,6 +108,8 @@ export const HomePage: React.FC = () => {
     <div className="min-h-screen">
       <Hero />
       <InfoStrip />
+
+      <CategoryShortcuts />
 
       {/* Shop by deity */}
       {deityTiles.length > 0 && (
@@ -96,7 +119,7 @@ export const HomePage: React.FC = () => {
               <SectionHeading
                 align="center"
                 id="deity-title"
-                eyebrow="Shop by deity"
+                eyebrow="Shop by god"
                 title={
                   <>
                     Choose your <em>blessing</em>
@@ -104,7 +127,7 @@ export const HomePage: React.FC = () => {
                 }
               />
             </Reveal>
-            <StaggerGroup className="scrollbar-none -mx-4 mt-10 flex snap-x gap-5 overflow-x-auto px-4 pb-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-8 sm:overflow-visible sm:px-0 lg:grid-cols-7">
+            <StaggerGroup className="scrollbar-none -mx-4 mt-10 flex snap-x gap-5 overflow-x-auto px-4 pb-4 sm:mx-0 sm:grid sm:grid-cols-5 sm:gap-8 sm:overflow-visible sm:px-0 lg:grid-cols-10">
               {deityTiles.map(d => (
                 <StaggerItem key={d.key} className="w-[104px] flex-shrink-0 snap-start sm:w-auto">
                   <Link to={d.href} className="group flex flex-col items-center text-center">
@@ -116,11 +139,12 @@ export const HomePage: React.FC = () => {
                           alt=""
                           loading="lazy"
                           decoding="async"
-                          className="h-full w-full scale-[1.35] object-cover transition-transform duration-700 ease-luxury group-hover:-rotate-[10deg] group-hover:scale-[1.5]"
+                          className="h-full w-full scale-[1.15] object-cover transition-transform duration-700 ease-luxury group-hover:-rotate-[10deg] group-hover:scale-[1.5]"
                         />
                       </span>
                     </span>
                     <span className="mt-3 font-display text-[1.05rem] text-ink transition-colors group-hover:text-burgundy sm:text-[1.15rem]">{d.label}</span>
+                    <span className="text-[0.75rem] text-ink-soft">{d.count} designs</span>
                   </Link>
                 </StaggerItem>
               ))}
@@ -130,47 +154,61 @@ export const HomePage: React.FC = () => {
       )}
 
       {/* Featured collection */}
-      <section aria-labelledby="frames-collection-title" className="section pt-10 sm:pt-14">
+      <section aria-labelledby="featured-title" className="section pt-10 sm:pt-14">
         <div className="container-content">
           <Reveal>
             <SectionHeading
-              id="frames-collection-title"
-              eyebrow="The devotional collection"
+              id="featured-title"
+              eyebrow="Most-loved gifts"
               title={
                 <>
-                  Silver foil god frames <em>₹149 each</em>
+                  Devotional gifting <em>under ₹2,999</em>
                 </>
               }
-              intro="Silver foil relief with hand-applied colour, in a maroon and gold frame that stands on a table or hangs on a wall. Mix any designs — minimum 25 frames per order."
+              intro="Silver foil god frames, Telugu stotram frames, god stands and stotram cards. Order from 1 piece — the price per piece drops as you add more of a product, and you can mix designs."
               action={
-                <Link to="/shop" className="btn-secondary hidden md:inline-flex">
-                  Explore all frames <ArrowRight className="h-4 w-4" />
+                <Link to="/shop?budget=under-2999" className="btn-secondary hidden md:inline-flex">
+                  Shop all {giftable.length || ''} gifts <ArrowRight className="h-4 w-4" />
                 </Link>
               }
             />
           </Reveal>
-
-          <StaggerGroup className="mt-10 flex flex-wrap justify-center gap-3.5 sm:gap-6">
-            {loading && products.length === 0
-              ? Array.from({ length: 8 }).map((_, i) => (
-                  <StaggerItem key={i} className={FEATURED_CELL}>
-                    <SkeletonCard />
-                  </StaggerItem>
-                ))
-              : featuredFrames.map((prod, idx) => (
-                  <StaggerItem key={prod.id} className={FEATURED_CELL}>
-                    <ProductCard product={prod} priority={idx < 2} />
-                  </StaggerItem>
-                ))}
-          </StaggerGroup>
-
-          <div className="mt-10 text-center md:hidden">
-            <Link to="/shop" className="btn-primary">
-              View all frames <ArrowRight className="h-4 w-4" />
+          <ProductRow products={featured} loading={loading} />
+          <div className="mt-10 flex justify-center md:hidden">
+            <Link to="/shop?budget=under-2999" className="btn-primary">
+              Shop all gifts <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
       </section>
+
+      <ShopByOccasion />
+
+      {/* Return gifts */}
+      {(loading || returnGifts.length > 0) && (
+        <section aria-labelledby="return-gifts-title" className="section bg-white/60">
+          <div className="container-content">
+            <Reveal>
+              <SectionHeading
+                id="return-gifts-title"
+                eyebrow="Wedding & function return gifts"
+                title={
+                  <>
+                    Return gifts <em>from ₹39</em>
+                  </>
+                }
+                intro="Stotram cards and god stands that guests keep in their pooja room. Bulk price per piece shown — mix designs to reach it."
+                action={
+                  <Link to="/shop?occasion=wedding-return-gifts" className="btn-secondary hidden md:inline-flex">
+                    All return gifts <ArrowRight className="h-4 w-4" />
+                  </Link>
+                }
+              />
+            </Reveal>
+            <ProductRow products={returnGifts} loading={loading} count={4} />
+          </div>
+        </section>
+      )}
 
       {/* Brand story */}
       <section aria-labelledby="story-title" className="section bg-white/60">
@@ -183,15 +221,15 @@ export const HomePage: React.FC = () => {
                   src="/assets/editorial/hero-god-frames-desktop.webp"
                   srcSet="/assets/editorial/hero-god-frames-mobile.webp 900w, /assets/editorial/hero-god-frames-desktop.webp 1376w"
                   sizes="(min-width: 1024px) 460px, 420px"
-                  alt="Devotional frames arranged for a celebration"
+                  alt="Silver foil god frames arranged for a celebration"
                   loading="lazy"
                   decoding="async"
                   className="aspect-[4/5] w-full object-cover object-[80%_50%] transition-transform duration-[2000ms] ease-luxury hover:scale-105"
                 />
               </div>
               <div className="absolute -bottom-6 -right-2 hidden rounded-2xl border border-gold/30 bg-ivory-light/95 px-6 py-5 shadow-card backdrop-blur sm:block lg:-right-8">
-                <p className="font-display text-4xl text-burgundy">₹999</p>
-                <p className="mt-1 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-gold-dark">Everything is under</p>
+                <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-gold-dark">Gifting under</p>
+                <p className="mt-1 font-display text-4xl text-burgundy">₹2,999</p>
               </div>
             </div>
           </Reveal>
@@ -202,12 +240,12 @@ export const HomePage: React.FC = () => {
               Devotion, <em>thoughtfully</em> given
             </h2>
             <p className="lede mt-6">
-              SWAYARI brings you devotional god frames that families are proud to hand to every guest. Each one has silver foil relief with colour work, a cream mount and a carved-look maroon and gold border — at a price that lets you be generous with every invitation.
+              SWAYARI brings together devotional gifts that families are proud to give — silver foil god frames, Telugu stotram frames and cards, and god stands — at prices that let you be generous with every guest.
             </p>
             <ul className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-5">
               {[
-                { icon: Flower2, title: 'Seven designs', body: 'Balaji to Sai Baba' },
-                { icon: PackageCheck, title: 'From 25 frames', body: 'Mix designs freely' },
+                { icon: Flower2, title: `${products.length || 90}+ designs`, body: 'Balaji to Sai Baba' },
+                { icon: PackageCheck, title: 'From 1 piece', body: 'Bulk prices as you add' },
                 { icon: HandHeart, title: 'Personal service', body: 'We confirm every detail' }
               ].map(item => (
                 <li key={item.title} className="flex items-center gap-4 rounded-2xl border border-stone-deep/70 bg-ivory-light/70 p-4 sm:block">
@@ -228,7 +266,29 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      <BulkReturnGiftsSection products={eligibleFrames} />
+      {wallFrames.length > 0 && (
+        <section aria-labelledby="wall-title" className="section">
+          <div className="container-content">
+            <Reveal>
+              <SectionHeading
+                id="wall-title"
+                eyebrow="For the pooja room"
+                title={
+                  <>
+                    Grand <em>wall frames</em>
+                  </>
+                }
+                intro="Five, ten and twelve gods in one long silver foil frame — a centrepiece for the pooja room entrance or the hall, and a gift to remember for a griha pravesh."
+              />
+            </Reveal>
+            <ProductRow products={wallFrames} loading={false} count={4} />
+          </div>
+        </section>
+      )}
+
+      <ShopByBudget />
+
+      <BulkReturnGiftsSection products={returnGifts} />
 
       <OrderProcessExplanation />
 
@@ -247,14 +307,14 @@ export const HomePage: React.FC = () => {
                   Planning for hundreds of guests? <em>Let’s talk.</em>
                 </h2>
                 <p className="lede mx-auto mt-5 max-w-xl">
-                  Our team will guide you on deity selections, mixed design arrangements, safe packaging and courier timings for your event date.
+                  Fill your cart with any mix of designs and send it as a request. Our team guides you on designs, packing and delivery for your event date — and quotes specially for very large orders.
                 </p>
                 <div className="mt-8 flex flex-wrap justify-center gap-3">
                   <Link to="/contact" className="btn-primary">
                     <Phone className="h-4 w-4" /> Contact our team
                   </Link>
-                  <Link to="/shop?bulk=1" className="btn-secondary">
-                    Request a bulk quote
+                  <Link to="/shop?occasion=corporate-gifting" className="btn-secondary">
+                    Corporate & bulk gifting
                   </Link>
                 </div>
               </div>

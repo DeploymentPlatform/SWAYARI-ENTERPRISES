@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Check, X, AlertCircle, Upload, Image as ImageIcon, Star, ArrowUp, ArrowDown, Trash2, Plus } from 'lucide-react';
-import { Category, DEITIES, FRAME_SIZES, MAX_FRAME_PRICE, MIN_ORDER_FRAMES, ORIENTATIONS, Product } from '@swayari/shared';
+import { Category, DEITIES, FRAME_SIZES, MAX_FRAME_PRICE, ORIENTATIONS, Product } from '@swayari/shared';
 import { Drawer, ErrorBanner } from './ui';
 
 interface ProductEditorModalProps {
@@ -59,7 +59,7 @@ function parseBulkTiers(text: string) {
     .filter(Boolean);
 }
 
-/** Structured product editor; every item on SWAYARI must be priced at ₹999 or less. */
+/** Structured product editor. Prices follow the kit: a 1-piece price plus quantity slabs. */
 export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productId, onClose, onSaved }) => {
   const editing = Boolean(productId);
   const [state, setState] = useState<'loading' | 'ready' | 'error'>(editing ? 'loading' : 'ready');
@@ -247,9 +247,9 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
       return;
     }
 
-    // ₹999 rule: no item may cost more than ₹999
+    // Sanity cap: catches typing mistakes such as an extra zero
     if (f.indicativePrice !== '' && Number(f.indicativePrice) > MAX_FRAME_PRICE) {
-      setError(`Everything on SWAYARI is under ₹${MAX_FRAME_PRICE}. Enter a price of ₹${MAX_FRAME_PRICE} or less.`);
+      setError(`That price looks too high. Enter ₹${MAX_FRAME_PRICE.toLocaleString("en-IN")} or less.`);
       return;
     }
 
@@ -312,7 +312,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
       onClose={onClose}
       width="max-w-[760px]"
       title={editing ? `Edit ${f.name || 'product'}` : 'New Devotional Frame'}
-      subtitle={editing ? f.sku : 'Everything is ₹999 or less (god frames are ₹149). Minimum order 25 frames in total; shipping extra.'}
+      subtitle={editing ? f.sku : 'Price per piece in INR with quantity slabs. Designs of one product share slabs. Delivery extra.'}
       footer={
         <div className="flex items-center justify-between gap-2 sm:justify-end">
           <button type="button" className="adm-btn-quiet" onClick={onClose}>
@@ -606,12 +606,12 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
             </label>
           </Section>
 
-          {/* Pricing section: ₹999 limit */}
+          {/* Pricing section */}
           <Section step={4} title="Price & Quantity">
             <div className="flex items-start gap-3 rounded-xl border border-gold/40 bg-gold-pale/50 px-4 py-3 text-[0.8125rem] leading-relaxed text-gold-dark">
               <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-gold" />
               <span>
-                <strong>Business rule:</strong> every item must be priced at <strong>₹{MAX_FRAME_PRICE} or less</strong> (god frames are ₹149). Customers must order at least <strong>{MIN_ORDER_FRAMES} frames in total</strong>, mixing any designs; shipping is charged extra.
+                <strong>How pricing works:</strong> the price below is the 1-piece price. Slabs lower the price per piece as the total quantity of this product (all designs, same size) grows. Products with sizes keep their own per-size slabs. Delivery is charged extra.
               </span>
             </div>
 
@@ -655,7 +655,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
 
             <div>
               <span className="adm-label">Volume discounts (optional — leave empty for one flat price)</span>
-              <p className="adm-hint">One per line as MinQty: UnitPrice, e.g. 100: 95. Every price must be ₹999 or less.</p>
+              <p className="adm-hint">One per line as MinQty: UnitPrice, e.g. 10: 469 then 50: 429 then 100: 399.</p>
               <textarea
                 className="adm-textarea font-mono text-xs"
                 rows={3}

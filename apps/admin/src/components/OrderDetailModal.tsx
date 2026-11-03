@@ -41,7 +41,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ orderId, onC
       setLines(
         latest
           ? latest.items.map((q: QuoteLine) => ({ ...q }))
-          : (o.items || []).map((it: any) => ({ productId: it.productId, productName: it.name, quantity: it.quantity, agreedUnitPrice: it.indicativePrice || 0 }))
+          : (o.items || []).map((it: any) => ({ productId: it.productId, productName: it.variant ? `${it.name} (${it.variant})` : it.name, quantity: it.quantity, agreedUnitPrice: it.indicativePrice || 0 }))
       );
       setState('ready');
     } catch {
@@ -245,7 +245,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ orderId, onC
                     e.preventDefault();
                     const invalidLine = lines.find(l => (Number(l.agreedUnitPrice) || 0) > MAX_FRAME_PRICE);
                     if (invalidLine) {
-                      setActionError(`Agreed unit price for "${invalidLine.productName}" cannot exceed ₹${MAX_FRAME_PRICE} per frame.`);
+                      setActionError(`Agreed unit price for "${invalidLine.productName}" cannot exceed ₹${MAX_FRAME_PRICE.toLocaleString('en-IN')} per piece.`);
                       return;
                     }
                     patch(
@@ -267,7 +267,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ orderId, onC
                 >
                   <div className="space-y-4 px-5 py-5 sm:px-6">
                     <p className="text-sm leading-relaxed text-ink-soft">
-                      Publishing adds a new revision. Earlier revisions and the original request stay unchanged. Price ceiling is ₹{MAX_FRAME_PRICE} per frame.
+                      Publishing adds a new revision. Earlier revisions and the original request stay unchanged. Prices are per piece (sanity limit ₹{MAX_FRAME_PRICE.toLocaleString("en-IN")}).
                     </p>
                     <div className="divide-y divide-stone-deep/60 rounded-xl border border-stone-deep/80 bg-white">
                       {lines.map((l, i) => (

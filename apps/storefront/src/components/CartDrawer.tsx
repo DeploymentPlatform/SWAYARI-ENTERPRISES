@@ -1,13 +1,13 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ShoppingBag, Trash2, X } from 'lucide-react';
-import { MIN_ORDER_FRAMES, formatPrice } from '@swayari/shared';
+import { BRAND_TAGLINES, formatPrice } from '@swayari/shared';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Link, useRouter } from '../lib/router';
 import { productImageSources } from '../lib/media';
 import { EASE_LUXURY } from './motion';
-import { LotusMark, MinimumOrderMeter, Picture, PriceText, QuantityStepper, useDialogBehaviour } from './ui';
+import { LotusMark, Picture, PriceText, QuantityStepper, useDialogBehaviour } from './ui';
 
 export const CartDrawer: React.FC = () => {
   const { items, isDrawerOpen, closeDrawer, removeItem, updateQuantity, subtotal, hasUnpricedItems, itemCount } = useCart();
@@ -49,9 +49,9 @@ export const CartDrawer: React.FC = () => {
             {/* Header */}
             <div className="relative flex items-center justify-between border-b border-stone-deep/80 px-5 pb-4 pt-5 sm:px-7">
               <div>
-                <p className="eyebrow text-[0.625rem]">Your request</p>
+                <p className="eyebrow text-[0.625rem]">Your cart</p>
                 <h2 id="bag-title" className="mt-1 flex items-baseline gap-2 font-display text-[2rem] leading-none">
-                  Your bag
+                  Your cart
                   <span className="inline-flex h-6 min-w-[1.5rem] translate-y-[-3px] items-center justify-center rounded-full bg-burgundy px-2 font-sans text-[0.75rem] font-semibold text-ivory-light">
                     <span className="sr-only">(</span>
                     {itemCount}
@@ -63,7 +63,7 @@ export const CartDrawer: React.FC = () => {
                 type="button"
                 onClick={closeDrawer}
                 className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-full text-ink transition-colors duration-300 hover:bg-stone hover:text-burgundy"
-                aria-label="Close bag"
+                aria-label="Close cart"
               >
                 <X className="h-5 w-5" strokeWidth={1.5} aria-hidden />
               </button>
@@ -74,11 +74,11 @@ export const CartDrawer: React.FC = () => {
                 <div className="flex h-20 w-20 items-center justify-center rounded-full border border-gold/30 bg-gradient-to-b from-gold-pale/80 to-ivory-light shadow-gold">
                   <ShoppingBag className="h-7 w-7 text-gold-dark" strokeWidth={1.5} aria-hidden />
                 </div>
-                <p className="mt-7 font-display text-[2rem] leading-tight">Your bag is empty</p>
+                <p className="mt-7 font-display text-[2rem] leading-tight">Your cart is empty</p>
                 <div className="ornament mt-4" aria-hidden>
                   <span className="block h-1.5 w-1.5 rotate-45 bg-gold" />
                 </div>
-                <p className="mt-4 max-w-xs text-ink-soft">Add the pieces you like and send them to us as one request.</p>
+                <p className="mt-4 max-w-xs text-ink-soft">Add the pieces you like, then send the cart to us as one request. No payment now.</p>
                 <Link to="/shop" onClick={closeDrawer} className="btn-primary mt-8">
                   Explore the Collection
                 </Link>
@@ -119,7 +119,7 @@ export const CartDrawer: React.FC = () => {
                                 type="button"
                                 onClick={() => removeItem(item.productId, item.selectedVariant)}
                                 className="-mr-2 -mt-2 inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-ink-faint transition-colors duration-300 hover:bg-burgundy-soft hover:text-burgundy"
-                                aria-label={`Remove ${item.name} from your bag`}
+                                aria-label={`Remove ${item.name} from your cart`}
                               >
                                 <Trash2 className="h-4 w-4" aria-hidden />
                               </button>
@@ -139,7 +139,14 @@ export const CartDrawer: React.FC = () => {
                                   value={item.indicativePrice === null ? null : item.indicativePrice * item.quantity}
                                   className="font-display text-[1.2rem] font-semibold leading-none text-burgundy lining-nums"
                                 />
-                                {item.indicativePrice !== null && <span className="mt-1 block text-[0.6875rem] text-ink-faint">₹{item.indicativePrice}/frame</span>}
+                                {item.indicativePrice !== null && (
+                                  <span className="mt-1 block text-[0.75rem] text-ink-soft">
+                                    {formatPrice(item.indicativePrice)}/pc
+                                    {item.basePrice != null && item.indicativePrice < item.basePrice && (
+                                      <s className="ml-1 text-ink-faint">{formatPrice(item.basePrice)}</s>
+                                    )}
+                                  </span>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -159,20 +166,16 @@ export const CartDrawer: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex items-baseline justify-between text-xs text-ink-soft">
-                    <span>Shipping</span>
-                    <span className="font-medium italic text-gold-dark">Extra · at actual cost</span>
+                    <span>Delivery</span>
+                    <span className="font-medium text-ink">Extra, at actual cost</span>
                   </div>
-                  <MinimumOrderMeter count={itemCount} />
+                  <p className="text-[0.75rem] leading-snug text-ink-soft">{BRAND_TAGLINES.priceNote}</p>
                   <div className="grid gap-2.5 pb-2 pt-1">
-                    <button type="button" onClick={proceed} className="btn-primary w-full" disabled={itemCount < MIN_ORDER_FRAMES}>
-                      {itemCount < MIN_ORDER_FRAMES
-                        ? `Add ${MIN_ORDER_FRAMES - itemCount} more frames`
-                        : user
-                          ? 'Continue to request details'
-                          : 'Sign in to send request'}
+                    <button type="button" onClick={proceed} className="btn-primary w-full">
+                      {user ? 'Continue to send request' : 'Sign in & send request'}
                     </button>
                     <Link to="/cart" onClick={closeDrawer} className="btn-secondary btn-sm w-full">
-                      View full bag
+                      View full cart
                     </Link>
                   </div>
                   <p className="flex items-center justify-center gap-2 pb-1 text-[0.6875rem] uppercase tracking-[0.14em] text-ink-faint">

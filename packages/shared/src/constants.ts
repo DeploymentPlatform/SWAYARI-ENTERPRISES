@@ -21,12 +21,15 @@ export const BRAND = {
   }
 } as const;
 
-/** Highest price allowed for any item on SWAYARI (everything is under ₹999). */
-export const MAX_FRAME_PRICE = 999;
-export const MAX_FRAME_PRICE_PAISE = 99900;
+/** Sanity cap for any single price on SWAYARI (the largest wall frame is well below it). */
+export const MAX_FRAME_PRICE = 20000;
+export const MAX_FRAME_PRICE_PAISE = 2000000;
 
-/** Smallest order we accept, counted across every design in one request. */
-export const MIN_ORDER_FRAMES = 25;
+/** No order-wide minimum: buyers start at 1 piece and slabs reward larger quantities. */
+export const MIN_ORDER_FRAMES = 1;
+
+/** The gifting promise shown across the site. */
+export const GIFTING_PRICE_CAP = 2999;
 
 export const ORDER_DISCLAIMER_TEXT =
   'Our team will contact you to confirm availability, final pricing, shipping charges and delivery details. Submitting this request does not confirm a purchase or reserve stock.';
@@ -47,11 +50,12 @@ export const SESSION_COOKIE_NAMES = {
 } as const;
 
 export const BRAND_TAGLINES = {
-  headline: 'Devotional gifts under ₹999',
-  supporting: 'Thoughtful return gifts for your special celebrations.',
-  proposition: 'Everything under ₹999 — silver foil god frames from ₹149',
-  minimumOrder: 'Minimum order 25 frames — mix any designs',
-  shippingNote: 'Shipping is extra, charged at the actual courier cost.'
+  headline: 'Devotional gifting under ₹2,999',
+  supporting: 'Silver foil stotram frames, god frames and return gifts for every celebration.',
+  proposition: 'Gifting under ₹2,999 — return gifts from ₹39',
+  minimumOrder: 'Order from 1 piece — mix designs to unlock bulk prices',
+  shippingNote: 'Delivery is extra, charged at actual cost for your location.',
+  priceNote: 'Prices per piece in INR. Delivery charges extra. Mix designs to reach a slab.'
 } as const;
 
 export interface FramePriceBandDefinition {
@@ -63,30 +67,39 @@ export interface FramePriceBandDefinition {
   description?: string;
 }
 
+/** Shop-by-budget bands, matched against the 1-piece price. */
 export const FRAME_PRICE_BANDS: FramePriceBandDefinition[] = [
   {
-    id: 'under-199',
-    label: 'Under ₹199',
-    shortLabel: '< ₹199',
+    id: 'under-299',
+    label: 'Under ₹299',
+    shortLabel: '< ₹299',
     minPrice: 0,
-    maxPrice: 199,
-    description: 'Return gifts for every guest, including our ₹149 god frames'
+    maxPrice: 299,
+    description: 'Stotram cards, god stands and colour frames for every guest'
   },
   {
-    id: '200-499',
-    label: '₹200 – ₹499',
-    shortLabel: '₹200–499',
-    minPrice: 200,
-    maxPrice: 499,
-    description: 'Special gifts for close family and friends'
-  },
-  {
-    id: '500-999',
-    label: '₹500 – ₹999',
-    shortLabel: '₹500–999',
-    minPrice: 500,
+    id: '300-999',
+    label: '₹300 – ₹999',
+    shortLabel: '₹300–999',
+    minPrice: 300,
     maxPrice: 999,
-    description: 'Premium keepsakes, still under ₹999'
+    description: 'Stotram flip frames, god frames and gifts for close family'
+  },
+  {
+    id: '1000-2999',
+    label: '₹1,000 – ₹2,999',
+    shortLabel: '₹1k–2,999',
+    minPrice: 1000,
+    maxPrice: 2999,
+    description: 'Grand god frames for the pooja room and special occasions'
+  },
+  {
+    id: '3000-plus',
+    label: 'Wall frames ₹3,000+',
+    shortLabel: '₹3,000+',
+    minPrice: 3000,
+    maxPrice: 20000,
+    description: '5, 10 and 12 god wall frames for the pooja room entrance'
   }
 ];
 
@@ -94,19 +107,24 @@ export const FRAME_PRICE_BANDS: FramePriceBandDefinition[] = [
 export const BUDGET_BANDS = FRAME_PRICE_BANDS;
 export type BudgetBandDefinition = FramePriceBandDefinition;
 
+/** Deity filters; the id is matched as a keyword inside each product's deity tags. */
 export const DEITIES = [
-  { id: 'all', name: 'All Deities' },
-  { id: 'balaji', name: 'Balaji & Padmavathi' },
-  { id: 'sai', name: 'Sai Baba' },
+  { id: 'all', name: 'All Gods' },
+  { id: 'balaji', name: 'Balaji' },
+  { id: 'lakshmi', name: 'Lakshmi' },
+  { id: 'ganesh', name: 'Ganesh' },
+  { id: 'devi', name: 'Devi' },
   { id: 'krishna', name: 'Krishna' },
-  { id: 'ram', name: 'Ram Darbar' },
-  { id: 'hanuman', name: 'Hanuman' }
+  { id: 'shiva', name: 'Shiva' },
+  { id: 'hanuman', name: 'Hanuman' },
+  { id: 'sai', name: 'Sai Baba' },
+  { id: 'rama', name: 'Sri Rama' },
+  { id: 'vishnu', name: 'Vishnu' },
+  { id: 'multi', name: 'Many Gods' },
+  { id: 'interfaith', name: 'Other Faiths' }
 ] as const;
 
-export const FRAME_SIZES = [
-  { id: 'all', name: 'All Sizes' },
-  { id: 'no. 1', name: 'No. 1' }
-] as const;
+export const FRAME_SIZES = [{ id: 'all', name: 'All Sizes' }] as const;
 
 export const ORIENTATIONS = [
   { id: 'all', name: 'All Orientations' },
@@ -115,29 +133,36 @@ export const ORIENTATIONS = [
   { id: 'square', name: 'Square' }
 ] as const;
 
+/** Occasions; the id is stored on each product (occasions_json) and used in /shop?occasion=. */
 export const OCCASIONS = [
   {
-    id: 'wedding-return',
+    id: 'wedding-return-gifts',
     name: 'Wedding Return Gifts',
-    badge: 'Bulk Favors',
-    description: 'Auspicious devotional god frames for your wedding guests and family ceremonies'
+    badge: 'Most gifted',
+    description: 'Stotram cards, god stands and colour frames your guests will keep for years'
   },
   {
-    id: 'housewarming',
-    name: 'Griha Pravesh & Housewarming',
-    badge: 'New Beginnings',
-    description: 'Balaji, Padmavathi Srinivasa and Ram Darbar frames for new home blessings'
+    id: 'griha-pravesh',
+    name: 'Griha Pravesh',
+    badge: 'New beginnings',
+    description: 'Balaji, Lakshmi and Ganesh frames to bless a new home'
   },
   {
-    id: 'navratri-haldi',
-    name: 'Navratri & Haldi Kumkum',
-    badge: 'Sacred Blessings',
-    description: 'Radha Krishna and Bal Krishna frames for haldi kumkum and festive gatherings'
+    id: 'festivals-vratams',
+    name: 'Festivals & Vratams',
+    badge: 'Sacred days',
+    description: 'Varalakshmi Vratam, Vinayaka Chavithi, Diwali and Navratri gifts'
   },
   {
-    id: 'family-celebrations',
-    name: 'Family Celebrations & Poojas',
-    badge: 'Spiritual Keepsakes',
-    description: 'Revered devotional frames for sashtiapthapoorthi, satyanarayan pooja and milestones'
+    id: 'pooja-room',
+    name: 'Pooja Room',
+    badge: 'For the home',
+    description: 'Grand silver foil god frames and wall frames for your pooja room'
+  },
+  {
+    id: 'corporate-gifting',
+    name: 'Corporate Gifting',
+    badge: 'Bulk pricing',
+    description: 'Gift-boxed frames and stands for clients, teams and festive hampers'
   }
 ] as const;

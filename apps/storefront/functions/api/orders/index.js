@@ -145,24 +145,33 @@ export async function onRequestPost(context) {
     }
 
     const aggregatedItems = Array.from(aggregatedMap.values());
-
-    // Order-wide minimum: frames of every design count together (25, as in @swayari/shared).
-    // MIN_ORDER_FRAMES in env exists only so the legacy behaviour tests can use small quantities.
-    const MIN_ORDER_FRAMES = Number(env.MIN_ORDER_FRAMES) > 0 ? Number(env.MIN_ORDER_FRAMES) : 25;
-    const totalFrames = aggregatedItems.reduce((sum, it) => sum + it.quantity, 0);
-    if (totalFrames < MIN_ORDER_FRAMES) {
-      return errorResponse(`Minimum order is ${MIN_ORDER_FRAMES} frames (mix any designs). This request has ${totalFrames}.`, 400);
+    if (aggregatedItems.length > 200) {
+      return errorResponse('Too many different items in one request. Please split it or contact our team.', 400);
     }
-    const verifiedItems = [];
+
+    // There is no order-wide minimum any more (slabs start at 1 piece). MIN_ORDER_FRAMES in env
+    // remains only as an optional switch for tests or a future campaign.
+    const MIN_ORDER_FRAMES = Number(env.MIN_ORDER_FRAMES) > 0 ? Number(env.MIN_ORDER_FRAMES) : 1;
+    const totalPieces = aggregatedItems.reduce((sum, it) => sum + it.quantity, 0);
+    if (totalPieces < MIN_ORDER_FRAMES) {
+      return errorResponse(`Minimum order is ${MIN_ORDER_FRAMES} pieces. This request has ${totalPieces}.`, 400);
+    }
+    if (totalPieces > 100000) {
+      return errorResponse('For orders this large please contact our team for a special quote.', 400);
+    }
+    const MAX_UNIT_PRICE = 20000; // sanity cap; the largest wall frame is well below it
     let calculatedSubtotalPaise = 0;
     let hasUnpricedItem = false;
 
     // Check environment: preview samples permitted ONLY if explicitly approved development/preview
     const isApprovedDevOrPreview = env.ENVIRONMENT === 'development' || env.ENVIRONMENT === 'preview';
 
+    // Pass 1: load and validate every line, and resolve the price list for its size.
+    const lines = [];
     for (const item of aggregatedItems) {
       const prod = await env.DB.prepare(`
-        SELECT id, sku, name, indicative_price, images, status, min_quantity, order_increment, is_demo, bulk_tiers_json
+        SELECT id, sku, name, indicative_price, images, status, min_quantity, order_increment, is_demo,
+               bulk_tiers_json, variants_json, has_variants, price_group
         FROM products
         WHERE id = ?
       `).bind(item.productId).first();
@@ -176,20 +185,10 @@ export async function onRequestPost(context) {
         return errorResponse(`${prod.name} is a preview sample and cannot be requested`, 400);
       }
 
-      // Validate base price: must be positive and <= 99,900 paise (₹999)
-      if (prod.indicative_price === null || prod.indicative_price === undefined) {
-        hasUnpricedItem = true;
-      } else {
-        const basePrice = Number(prod.indicative_price);
-        if (!Number.isFinite(basePrice) || basePrice <= 0 || basePrice > 999) {
-          return errorResponse(`Product ${prod.name} is above the ₹999 price limit`, 400);
-        }
-      }
-
       // Enforce MOQ (Minimum Order Quantity)
       const minQty = Math.max(1, parseInt(prod.min_quantity, 10) || 1);
       if (item.quantity < minQty) {
-        return errorResponse(`Product "${prod.name}" requires a minimum order quantity of ${minQty} frames`, 400);
+        return errorResponse(`Product "${prod.name}" requires a minimum order quantity of ${minQty} pieces`, 400);
       }
 
       // Enforce Order Increment
@@ -198,13 +197,50 @@ export async function onRequestPost(context) {
         return errorResponse(`Product "${prod.name}" quantity must be in multiples of ${increment} above the minimum quantity of ${minQty}`, 400);
       }
 
-      // Calculate effective tier price in integer paise
-      let unitPrice = prod.indicative_price !== null && prod.indicative_price !== undefined ? Number(prod.indicative_price) : null;
-      const bulkTiers = JSON.parse(prod.bulk_tiers_json || '[]');
-      if (Array.isArray(bulkTiers) && bulkTiers.length > 0 && unitPrice !== null) {
-        const sortedTiers = [...bulkTiers].sort((a, b) => b.min_qty - a.min_qty);
+      // Size: products with sizes must name one of their own; others carry no size.
+      let variants = [];
+      try {
+        variants = JSON.parse(prod.variants_json || '[]');
+      } catch {
+        variants = [];
+      }
+      let basePrice = prod.indicative_price !== null && prod.indicative_price !== undefined ? Number(prod.indicative_price) : null;
+      let tiers = JSON.parse(prod.bulk_tiers_json || '[]');
+      let variantName = null;
+      if (Array.isArray(variants) && variants.length > 0) {
+        const chosen = variants.find(v => v && v.name === item.selectedVariant) || (variants.length === 1 ? variants[0] : null);
+        if (!chosen) {
+          return errorResponse(`Please choose a size for "${prod.name}"`, 400);
+        }
+        variantName = chosen.name;
+        if (chosen.indicativePrice !== null && chosen.indicativePrice !== undefined) {
+          basePrice = Number(chosen.indicativePrice);
+          tiers = Array.isArray(chosen.tiers) ? chosen.tiers : [];
+        }
+      }
+
+      if (basePrice !== null && (!Number.isFinite(basePrice) || basePrice <= 0 || basePrice > MAX_UNIT_PRICE)) {
+        return errorResponse(`Product ${prod.name} has an invalid price. Please contact our team.`, 400);
+      }
+
+      lines.push({ item, prod, basePrice, tiers, variantName, slabKey: `${prod.price_group || prod.id}::${variantName || ''}` });
+    }
+
+    // Designs of one product and size count together towards a quantity slab.
+    const slabTotals = new Map();
+    for (const line of lines) {
+      slabTotals.set(line.slabKey, (slabTotals.get(line.slabKey) || 0) + line.item.quantity);
+    }
+
+    // Pass 2: price each line with its group slab (server-side; client prices are never trusted).
+    const verifiedItems = [];
+    for (const { item, prod, basePrice, tiers, variantName, slabKey } of lines) {
+      let unitPrice = basePrice;
+      const groupQty = slabTotals.get(slabKey) || item.quantity;
+      if (Array.isArray(tiers) && tiers.length > 0 && unitPrice !== null) {
+        const sortedTiers = [...tiers].sort((a, b) => b.min_qty - a.min_qty);
         for (const tier of sortedTiers) {
-          if (item.quantity >= tier.min_qty && tier.unit_price) {
+          if (groupQty >= tier.min_qty && tier.unit_price) {
             const tierPrice = Number(tier.unit_price);
             if (Number.isFinite(tierPrice) && tierPrice > 0 && tierPrice <= unitPrice) {
               unitPrice = tierPrice;
@@ -214,13 +250,8 @@ export async function onRequestPost(context) {
         }
       }
 
-      if (unitPrice !== null && unitPrice > 999) {
-        return errorResponse(`Product ${prod.name} unit price ₹${unitPrice} is above the ₹999 price limit`, 400);
-      }
-
       if (unitPrice !== null) {
-        const unitPricePaise = Math.round(unitPrice * 100);
-        calculatedSubtotalPaise += unitPricePaise * item.quantity;
+        calculatedSubtotalPaise += Math.round(unitPrice * 100) * item.quantity;
       } else {
         hasUnpricedItem = true;
       }
@@ -233,7 +264,7 @@ export async function onRequestPost(context) {
         productId: prod.id,
         productSku: prod.sku,
         productName: prod.name,
-        selectedVariant: item.selectedVariant || null,
+        selectedVariant: variantName,
         quantity: item.quantity,
         snapshotIndicativePrice: unitPrice,
         snapshotImageUrl: firstImage,

@@ -20,12 +20,12 @@ export async function onRequestGet(context) {
              p.customisation_info, p.status, p.is_demo, p.price_type, p.set_contents,
              p.order_increment, p.is_quote_only, p.bulk_tiers_json, p.packaging_options_json,
              p.shipping_info, p.occasions_json, p.supports_individual, p.supports_bulk,
-             p.deity, p.frame_size, p.orientation, p.border_finish,
+             p.deity, p.frame_size, p.orientation, p.border_finish, p.mrp, p.price_group,
              p.created_at, p.updated_at,
              c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.slug = ? AND p.status = 'published' AND (p.indicative_price IS NULL OR p.indicative_price <= 999) ${demoFilter}
+      WHERE p.slug = ? AND p.status = 'published' ${demoFilter}
     `).bind(slug).first();
 
     if (!row) {
@@ -66,6 +66,8 @@ export async function onRequestGet(context) {
       frameSize: row.frame_size || null,
       orientation: row.orientation || 'portrait',
       borderFinish: row.border_finish || null,
+      mrp: row.mrp !== null && row.mrp !== undefined ? Number(row.mrp) : null,
+      priceGroup: row.price_group || null,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };

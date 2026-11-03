@@ -29,6 +29,9 @@ const AboutPage = named(() => import('./pages/AboutPage'), 'AboutPage');
 const ContactPage = named(() => import('./pages/ContactPage'), 'ContactPage');
 const OrderingPolicyPage = named(() => import('./pages/OrderingPolicyPage'), 'OrderingPolicyPage');
 const PrivacyPolicyPage = named(() => import('./pages/PrivacyPolicyPage'), 'PrivacyPolicyPage');
+const TermsPage = lazy(() => import('./pages/TermsPage').then(m => ({ default: m.TermsPage })));
+const ShippingPolicyPage = named(() => import('./pages/ShippingPolicyPage'), 'ShippingPolicyPage');
+const RefundPolicyPage = named(() => import('./pages/RefundPolicyPage'), 'RefundPolicyPage');
 const NotFoundPage = named(() => import('./pages/NotFoundPage'), 'NotFoundPage');
 const DevLoginPage = named(() => import('./pages/DevLoginPage'), 'DevLoginPage');
 
@@ -76,6 +79,9 @@ function RouteSwitch() {
   if (path === '/contact') return <ContactPage />;
   if (path === '/ordering-policy') return <OrderingPolicyPage />;
   if (path === '/privacy-policy' || path === '/privacy') return <PrivacyPolicyPage />;
+  if (path === '/terms' || path === '/terms-and-conditions') return <TermsPage />;
+  if (path === '/shipping-policy' || path === '/delivery-policy') return <ShippingPolicyPage />;
+  if (path === '/refund-policy' || path === '/cancellation-policy' || path === '/returns') return <RefundPolicyPage />;
   if (path === '/dev-login') return <DevLoginPage />;
   return <NotFoundPage />;
 }

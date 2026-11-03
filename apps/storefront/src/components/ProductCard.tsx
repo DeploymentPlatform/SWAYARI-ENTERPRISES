@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Eye, ShoppingBag, Check, ArrowUpRight } from 'lucide-react';
-import { MIN_ORDER_FRAMES, Product, formatPrice } from '@swayari/shared';
+import { Product } from '@swayari/shared';
 import { Link } from '../lib/router';
-import { toCartItem } from '../lib/products';
+import { useAddToBag } from '../lib/products';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
 import { QuickViewModal } from './QuickViewModal';
+import { CardPrice } from './Price';
 import { PRODUCT_CARD_SIZES, productCardImage, uniqueProductImages } from '../lib/media';
 
 interface ProductCardProps {
@@ -40,8 +40,8 @@ export const ProductImage: React.FC<{ product: Product; sizes?: string; priority
 };
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, sizes }) => {
-  const { addItem, openDrawer, itemCount } = useCart();
-  const { user, initiateGoogleSignIn } = useAuth();
+  const { openDrawer } = useCart();
+  const { add, canRequest } = useAddToBag();
 
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [added, setAdded] = useState(false);
@@ -58,14 +58,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, siz
     e.preventDefault();
     e.stopPropagation();
 
-    // Fill what the order-wide minimum still needs; once met, add a modest default.
-    const item = toCartItem(product, itemCount < MIN_ORDER_FRAMES ? MIN_ORDER_FRAMES - itemCount : 10);
-    if (!user) {
-      initiateGoogleSignIn(item, 'add');
+    // Products sold in several sizes: let the visitor pick the size first.
+    if ((product.variants?.length || 0) > 1 || !canRequest(product)) {
+      setQuickViewOpen(true);
       return;
     }
-
-    addItem(item);
+    add(product, 1);
     setAdded(true);
     setTimeout(() => {
       setAdded(false);
@@ -149,8 +147,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, siz
         {/* Details */}
         <div className="flex flex-1 flex-col px-3.5 pb-3.5 pt-4 sm:px-5 sm:pb-5">
           <p className="truncate text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-gold-dark sm:text-[0.6875rem]">
-            {product.dimensions || product.frameSize || 'Devotional frame'}
-            {product.orientation ? <span className="text-ink-faint"> · {product.orientation}</span> : null}
+            {(product.variants?.length || 0) > 1 ? `${product.variants!.length} sizes` : product.dimensions || product.frameSize || 'Devotional gift'}
           </p>
           <h3 className="mt-1.5 line-clamp-2 min-h-[2.5em] font-display text-[1.05rem] font-medium leading-[1.15] text-ink transition-colors duration-300 group-hover:text-burgundy sm:text-[1.3rem]">
             <Link to={href} className="after:absolute after:inset-0 after:content-[''] focus:outline-none">
@@ -159,21 +156,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, siz
           </h3>
 
           <div className="mt-auto flex items-end justify-between gap-2 pt-3">
-            <div>
-              <p className="flex items-baseline gap-1">
-                {product.indicativePrice === null ? (
-                  <span className="font-sans text-[0.9375rem] font-bold text-burgundy sm:text-[1.0625rem]">Price on request</span>
-                ) : (
-                  <>
-                    <span className="font-sans text-[1.0625rem] font-bold text-burgundy sm:text-[1.2rem]">{formatPrice(product.indicativePrice)}</span>
-                    <span className="text-[0.6875rem] text-ink-faint">/ frame</span>
-                  </>
-                )}
-              </p>
-              <p className="mt-0.5 text-[0.6875rem] text-ink-faint">
-                {product.minQuantity > 1 ? `Min. ${product.minQuantity} pcs` : 'Bulk available'}
-              </p>
-            </div>
+            <CardPrice product={product} />
             <ArrowUpRight className="hidden h-5 w-5 flex-shrink-0 text-gold opacity-0 transition-all duration-500 ease-luxury group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100 sm:block" />
           </div>
 
@@ -194,7 +177,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, priority, siz
                 </motion.span>
               ) : (
                 <motion.span key="add" className="flex items-center gap-2" initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -12, opacity: 0 }}>
-                  <ShoppingBag className="h-3.5 w-3.5" /> Add to request
+                  <ShoppingBag className="h-3.5 w-3.5" /> {(product.variants?.length || 0) > 1 ? 'Choose size' : 'Add to cart'}
                 </motion.span>
               )}
             </AnimatePresence>

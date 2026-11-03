@@ -2,43 +2,44 @@ import React from 'react';
 import { Link } from '../lib/router';
 import { ArrowRight } from 'lucide-react';
 
+/** The five catalogue categories, each with a real product photo (480px thumbnails for the small tiles). */
 const SHORTCUTS = [
   {
-    slug: 'devotional-frames',
-    name: 'Devotional Frames',
-    count: '4 Pieces',
-    image: '/assets/categories/cat-devotional-frames.webp',
-    href: '/shop?category=devotional-frames'
+    slug: 'god-frames',
+    name: 'God Frames',
+    line: 'From ₹329 · bulk from ₹249',
+    image: '/assets/products/thumbs/kit-08-02.webp',
+    alt: 'Silver foil god frame in a carved gold-trimmed frame'
   },
   {
-    slug: 'decorative-lamps',
-    name: 'Decorative Lamps',
-    count: '4 Pieces',
-    image: '/assets/categories/cat-decorative-lamps.webp',
-    href: '/shop?category=decorative-lamps'
+    slug: 'stotram-frames',
+    name: 'Stotram Frames',
+    line: 'From ₹499 · bulk from ₹359',
+    image: '/assets/products/thumbs/kit-02-01.webp',
+    alt: 'Silver foil stotram frame'
   },
   {
-    slug: 'home-accents',
-    name: 'Home Accents',
-    count: '4 Pieces',
-    image: '/assets/categories/cat-home-accents.webp',
-    href: '/shop?category=home-accents'
+    slug: 'god-stands',
+    name: 'God Stands',
+    line: '₹89 for 1 · bulk from ₹49',
+    image: '/assets/products/thumbs/kit-04-02.webp',
+    alt: 'Colour silver foil god image in a clear acrylic stand'
   },
   {
-    slug: 'festive-decor',
-    name: 'Festive Décor',
-    count: '4 Pieces',
-    image: '/assets/categories/cat-festive-decor.webp',
-    href: '/shop?category=festive-decor'
+    slug: 'stotram-cards',
+    name: 'Stotram Cards',
+    line: 'Return gifts from ₹39',
+    image: '/assets/products/thumbs/kit-03-01.webp',
+    alt: 'Silver foil stotram card in a red gift cover'
   },
   {
-    slug: 'gift-sets',
-    name: 'Gift Sets',
-    count: '4 Pieces',
-    image: '/assets/categories/cat-gift-sets.webp',
-    href: '/shop?category=gift-sets'
+    slug: 'wall-frames',
+    name: 'Wall Frames',
+    line: '5, 10 & 12 gods · from ₹3,299',
+    image: '/assets/products/thumbs/kit-07-01.webp',
+    alt: 'Long silver foil wall frame with many gods'
   }
-];
+].map(item => ({ ...item, href: `/shop?category=${item.slug}` }));
 
 export const CategoryShortcuts: React.FC = () => {
   return (
@@ -55,7 +56,7 @@ export const CategoryShortcuts: React.FC = () => {
             to="/shop"
             className="text-[12px] sm:text-[13px] font-semibold text-[#571C2A] hover:text-[#441420] hover:underline flex items-center gap-1 transition-colors"
           >
-            <span>All 20 Pieces</span>
+            <span>Shop all gifts</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -72,18 +73,21 @@ export const CategoryShortcuts: React.FC = () => {
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-white p-1 border border-[#E7DFD5] shadow-sm group-hover:scale-105 transition-transform duration-300">
                 <img
                   src={item.image}
-                  alt={item.name}
+                  alt={item.alt}
+                  width={480}
+                  height={480}
                   loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover rounded-full"
                 />
               </div>
 
-              {/* Title & Count */}
+              {/* Title & starting price */}
               <h3 className="mt-2 text-[12.5px] sm:text-[13.5px] font-semibold text-[#292421] group-hover:text-[#571C2A] transition-colors leading-snug">
                 {item.name}
               </h3>
-              <span className="text-[11px] text-[#7A6E66] mt-0.5">
-                {item.count}
+              <span className="text-[12px] text-ink-soft mt-0.5 leading-snug">
+                {item.line}
               </span>
             </Link>
           ))}

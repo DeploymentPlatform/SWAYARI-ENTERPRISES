@@ -18,8 +18,8 @@ export const ShopByOccasion: React.FC = () => {
             <h2 id="occasions-title" className="font-display text-[1.5rem] sm:text-[1.875rem] font-bold text-[#292421] leading-tight">
               Shop by Occasion
             </h2>
-            <p className="text-[13px] sm:text-[14px] text-[#7A6E66] mt-1">
-              Curated gift combinations and return favors tailored for every tradition and sacred celebration.
+            <p className="text-[13px] sm:text-[14px] text-ink-soft mt-1">
+              Return gifts for weddings, blessings for a new home, and pieces for the pooja room — chosen for each celebration.
             </p>
           </div>
 
@@ -27,7 +27,7 @@ export const ShopByOccasion: React.FC = () => {
             to="/shop"
             className="text-[13px] font-semibold text-[#571C2A] hover:text-[#441420] flex items-center gap-1.5 group transition-colors self-start sm:self-end"
           >
-            <span>Explore All Occasions</span>
+            <span>Shop all gifts</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
@@ -37,12 +37,12 @@ export const ShopByOccasion: React.FC = () => {
           {OCCASIONS.map((occ) => (
             <Link
               key={occ.id}
-              to={`/shop?occasion=${encodeURIComponent(occ.name)}`}
+              to={`/shop?occasion=${occ.id}`}
               className="flex-shrink-0 w-[240px] sm:w-auto group rounded-xl p-4 sm:p-5 bg-[#FAF7F2] border border-[#E7DFD5] hover:border-[#571C2A] hover:bg-white hover:shadow-hover transition-all duration-300 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="px-2 py-0.5 rounded-full bg-[#B49155]/20 text-[#6B5018] text-[10px] font-bold uppercase tracking-wide">
+                  <span className="px-2 py-0.5 rounded-full bg-[#B49155]/20 text-[#6B5018] text-[11px] font-bold uppercase tracking-wide">
                     {occ.badge}
                   </span>
                   <Sparkles className="w-3 h-3 text-[#B49155] opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all" />
@@ -52,13 +52,13 @@ export const ShopByOccasion: React.FC = () => {
                   {occ.name}
                 </h3>
 
-                <p className="mt-2 text-[11.5px] text-[#7A6E66] line-clamp-2 leading-relaxed">
+                <p className="mt-2 text-[12.5px] text-ink-soft line-clamp-2 leading-relaxed">
                   {occ.description}
                 </p>
               </div>
 
-              <div className="mt-4 pt-2.5 border-t border-[#E7DFD5]/60 flex items-center justify-between text-[11.5px] font-semibold text-[#571C2A]">
-                <span>Discover Gifts</span>
+              <div className="mt-4 pt-2.5 border-t border-[#E7DFD5]/60 flex items-center justify-between text-[12px] font-semibold text-[#571C2A]">
+                <span>See the gifts</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </div>
             </Link>

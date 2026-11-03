@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Lock, Mail } from 'lucide-react';
-import { formatPrice, MIN_ORDER_FRAMES, OCCASIONS, validateOrderSubmission } from '@swayari/shared';
+import { formatPrice, OCCASIONS, validateOrderSubmission } from '@swayari/shared';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Link, useRouter } from '../lib/router';
@@ -13,7 +13,7 @@ import { OrderDisclaimer, Picture, PriceText, Spinner } from '../components/ui';
 
 const KEY_STORAGE = 'swayari_request_key';
 
-/** One idempotency key per bag: retries after a network error reuse it, so nothing is duplicated. */
+/** One idempotency key per cart: retries after a network error reuse it, so nothing is duplicated. */
 function requestKey(): string {
   try {
     const existing = sessionStorage.getItem(KEY_STORAGE);
@@ -101,24 +101,7 @@ export const CheckoutPage: React.FC = () => {
   if (items.length === 0) {
     return (
       <div className="container-content">
-        <EmptyState title="Your bag is empty" body={<p>Add pieces to your bag before sending a request.</p>} action={{ to: '/shop', label: 'Explore the Collection' }} />
-      </div>
-    );
-  }
-
-  const frameCount = items.reduce((sum, it) => sum + it.quantity, 0);
-  if (frameCount < MIN_ORDER_FRAMES) {
-    return (
-      <div className="container-content">
-        <EmptyState
-          title={`Minimum order is ${MIN_ORDER_FRAMES} frames`}
-          body={
-            <p>
-              Your bag has {frameCount} {frameCount === 1 ? 'frame' : 'frames'}. Add {MIN_ORDER_FRAMES - frameCount} more — you can mix any designs — and then send your request.
-            </p>
-          }
-          action={{ to: '/shop', label: 'Add more frames' }}
-        />
+        <EmptyState title="Your cart is empty" body={<p>Add pieces to your cart before sending a request.</p>} action={{ to: '/shop', label: 'Explore the Collection' }} />
       </div>
     );
   }
@@ -171,9 +154,9 @@ export const CheckoutPage: React.FC = () => {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success || !data.orderId) {
-        throw new Error(data.error || 'We could not save your request. Your bag has been kept — please try again.');
+        throw new Error(data.error || 'We could not save your request. Your cart has been kept — please try again.');
       }
-      // Only after the server has saved the request do we clear the bag and show success.
+      // Only after the server has saved the request do we clear the cart and show success.
       try {
         sessionStorage.removeItem(KEY_STORAGE);
       } catch {
@@ -182,7 +165,7 @@ export const CheckoutPage: React.FC = () => {
       clearCart();
       navigate(`/order-confirmation/${encodeURIComponent(data.orderId)}`);
     } catch (err: any) {
-      setServerError(err.message || 'We could not save your request. Your bag has been kept — please try again.');
+      setServerError(err.message || 'We could not save your request. Your cart has been kept — please try again.');
       window.setTimeout(() => errorSummaryRef.current?.focus(), 0);
     } finally {
       setSubmitting(false);
@@ -408,7 +391,7 @@ export const CheckoutPage: React.FC = () => {
             <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-gold-light via-gold to-gold-light" />
             <div className="flex items-baseline justify-between gap-3">
               <h2 id="checkout-summary" className="font-display text-[1.75rem] leading-tight">
-                Your bag
+                Your cart
               </h2>
               <Link to="/cart" className="link-underline text-sm font-semibold text-burgundy">
                 Edit
@@ -457,8 +440,8 @@ export const CheckoutPage: React.FC = () => {
                 </dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-ink-soft">Shipping</dt>
-                <dd className="text-right font-medium italic text-gold-dark">Extra · at actual cost</dd>
+                <dt className="text-ink-soft">Delivery</dt>
+                <dd className="text-right font-medium text-ink">Extra, at actual cost</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-ink-soft">Payment</dt>

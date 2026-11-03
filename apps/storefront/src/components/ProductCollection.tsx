@@ -60,9 +60,15 @@ export const FeaturedProduct: React.FC<{ product: Product }> = ({ product }) => 
         <p className="mt-5 max-w-prose text-base leading-relaxed text-ink-soft">{product.description}</p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           {canRequest(product) && (
-            <button type="button" className="btn-primary" onClick={() => add(product)}>
-              Add to bag
-            </button>
+            (product.variants?.length || 0) > 1 ? (
+              <Link to={href} className="btn-primary">
+                Choose size
+              </Link>
+            ) : (
+              <button type="button" className="btn-primary" onClick={() => add(product)}>
+                Add to cart
+              </button>
+            )
           )}
           <Link to={href} className="btn-secondary">
             View details

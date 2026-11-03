@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, ChevronLeft, ChevronRight, MessageCircle, PackageCheck, ShoppingBag, Sparkles, Truck } from 'lucide-react';
-import { MIN_ORDER_FRAMES, Product, formatPrice, calculateEffectiveUnitPrice } from '@swayari/shared';
-import { useCart } from '../context/CartContext';
+import { ChevronDown, ChevronLeft, ChevronRight, MessageCircle, ShoppingBag, Sparkles, Truck } from 'lucide-react';
+import { Product, formatPrice } from '@swayari/shared';
 import { Link } from '../lib/router';
 import { usePageMeta, useStructuredData } from '../lib/meta';
 import { useAddToBag, useProducts } from '../lib/products';
@@ -10,7 +9,9 @@ import { withPreview } from '../lib/preview';
 import { EmptyState, LoadError, Ornament } from '../components/States';
 import { ProductCard } from '../components/ProductCard';
 import { EASE_LUXURY, Reveal, StaggerGroup, StaggerItem } from '../components/motion';
-import { OrderDisclaimer, QuantityStepper, SampleTag } from '../components/ui';
+import { OrderDisclaimer, SampleTag } from '../components/ui';
+import { BuyBox } from '../components/BuyBox';
+import { productPricing } from '../components/Price';
 
 type Status = 'loading' | 'ready' | 'notfound' | 'error';
 
@@ -33,14 +34,8 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
   const [status, setStatus] = useState<Status>('loading');
   const [attempt, setAttempt] = useState(0);
   const [activeImage, setActiveImage] = useState(0);
-  const [variant, setVariant] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState(1);
   const [note, setNote] = useState('');
-  const { add, canRequest } = useAddToBag();
-  const { itemCount } = useCart();
-  // Suggest whatever still completes the order-wide minimum; once it is met, a sensible default.
-  const suggestedQty = useRef(0);
-  suggestedQty.current = itemCount < MIN_ORDER_FRAMES ? MIN_ORDER_FRAMES - itemCount : 10;
+  const { canRequest } = useAddToBag();
   const formActionsRef = useRef<HTMLDivElement>(null);
   const [showStickyBar, setShowStickyBar] = useState(false);
 
@@ -62,8 +57,6 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
         const p: Product = data.product;
         setProduct(p);
         setActiveImage(0);
-        setQuantity(Math.max(p.minQuantity || 1, suggestedQty.current));
-        setVariant(p.hasVariants && p.variants?.length ? p.variants[0].name : null);
         setStatus('ready');
       })
       .catch(() => !cancelled && setStatus('error'));
@@ -87,9 +80,13 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
     };
   }, [status, product?.id]);
 
-  usePageMeta(product?.name || (status === 'notfound' ? 'Frame not found' : null), product?.description?.slice(0, 155), {
-    noindex: status === 'notfound' || Boolean(product?.isDemo)
-  });
+  usePageMeta(
+    product ? `${product.name}${product.indicativePrice != null ? ` — ₹${product.indicativePrice.toLocaleString('en-IN')}` : ''}` : status === 'notfound' ? 'Design not found' : null,
+    product?.description?.slice(0, 155),
+    {
+      noindex: status === 'notfound' || Boolean(product?.isDemo)
+    }
+  );
   useStructuredData(
     'product-jsonld',
     product && !product.isDemo
@@ -102,8 +99,43 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
           image: product.images?.map(src => new URL(src, window.location.origin).href),
           brand: { '@type': 'Brand', name: 'SWAYARI' },
           ...(product.indicativePrice !== null
-            ? { offers: { '@type': 'Offer', priceCurrency: 'INR', price: product.indicativePrice, availability: 'https://schema.org/InStock' } }
+            ? {
+                // All sizes and quantity slabs: the 1-piece price is the highest, the best slab the lowest
+                offers: (() => {
+                  const prices = [product.indicativePrice!, ...(product.bulkTiers || []).map(t => t.unit_price)];
+                  for (const v of product.variants || []) {
+                    if (v.indicativePrice != null) prices.push(v.indicativePrice);
+                    for (const t of v.tiers || []) prices.push(t.unit_price);
+                  }
+                  return {
+                    '@type': 'AggregateOffer',
+                    priceCurrency: 'INR',
+                    lowPrice: Math.min(...prices),
+                    highPrice: Math.max(...prices),
+                    offerCount: Math.max(1, product.variants?.length || 1),
+                    availability: 'https://schema.org/InStock',
+                    url: `https://swayari.com/product/${product.slug}`,
+                    seller: { '@type': 'Organization', name: 'SWAYARI Enterprises' }
+                  };
+                })()
+              }
             : {})
+        }
+      : null
+  );
+  useStructuredData(
+    'breadcrumb-jsonld',
+    product
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Shop', item: 'https://swayari.com/shop' },
+            ...(product.categorySlug
+              ? [{ '@type': 'ListItem', position: 2, name: product.categoryName, item: `https://swayari.com/shop?category=${product.categorySlug}` }]
+              : []),
+            { '@type': 'ListItem', position: product.categorySlug ? 3 : 2, name: product.name, item: `https://swayari.com/product/${product.slug}` }
+          ]
         }
       : null
   );
@@ -152,23 +184,7 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
 
   const images = uniqueImages(product.images);
   const requestable = canRequest(product);
-  const minQty = product.minQuantity || 1;
-  const inc = product.orderIncrement || 1;
-
-  // Bulk tier pricing calculation (everything is ₹999 or less)
-  const currentUnitPrice = calculateEffectiveUnitPrice(product.indicativePrice, product.bulkTiers, quantity);
-  const calculatedSubtotal = currentUnitPrice !== null ? currentUnitPrice * quantity : null;
-  const bulkApplied = currentUnitPrice !== null && product.indicativePrice !== null && currentUnitPrice < product.indicativePrice;
-
-  const setCleanQuantity = (q: number) => {
-    const raw = Math.max(minQty, q);
-    const rem = (raw - minQty) % inc;
-    const clean = rem === 0 ? raw : raw + (inc - rem);
-    setQuantity(clean);
-  };
-
-  const tiers = [...(product.bulkTiers || [])].sort((a, b) => a.min_qty - b.min_qty);
-  const activeTierQty = tiers.filter(t => quantity >= t.min_qty).pop()?.min_qty ?? null;
+  const pricing = productPricing(product);
 
   const details: { id: string; title: string; rows: [string, string][]; text?: string }[] = [
     {
@@ -196,17 +212,17 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
       title: 'Packaging & mixing designs',
       rows: [
         ...(product.packagingOptions || []).map(
-          o => [o.name, o.included ? 'Included' : o.price ? `${formatPrice(o.price)} per frame` : 'On request'] as [string, string]
+          o => [o.name, o.included ? 'Included' : o.price ? `${formatPrice(o.price)} per piece` : 'On request'] as [string, string]
         ),
-        ['Mixed Designs', 'Allowed across complete request'] as [string, string]
+        ['Mixed designs', 'Designs of the same product and size count together for the slab'] as [string, string]
       ]
     },
     {
       id: 'shipping',
       title: 'Shipping & ordering',
       rows: [
-        ['Shipping', 'Extra — quoted for your quantity and delivery PIN code'] as [string, string],
-        ['Minimum order', `${MIN_ORDER_FRAMES} frames in total, any mix of designs`] as [string, string]
+        ['Delivery', 'Extra, charged at actual cost for your PIN code'] as [string, string],
+        ['Minimum order', 'From 1 piece — mix designs of a product to reach a bulk slab'] as [string, string]
       ],
       text: product.shippingInfo || undefined
     }
@@ -219,17 +235,17 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
           <ol className="flex min-w-0 items-center gap-1.5">
             <li className="flex-shrink-0">
               <Link to="/shop" className="link-underline transition-colors">
-                All Frames
+                Shop
               </Link>
             </li>
             <li aria-hidden className="flex-shrink-0">
               <ChevronRight className="h-3.5 w-3.5 text-gold" />
             </li>
-            {product.deity && (
+            {product.categorySlug && (
               <>
                 <li className="flex-shrink-0">
-                  <Link to={`/shop?deity=${encodeURIComponent(product.deity.toLowerCase())}`} className="link-underline transition-colors">
-                    {product.deity}
+                  <Link to={`/shop?category=${product.categorySlug}`} className="link-underline transition-colors">
+                    {product.categoryName}
                   </Link>
                 </li>
                 <li aria-hidden className="flex-shrink-0">
@@ -247,9 +263,9 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
           {/* Gallery */}
           <motion.div
             className="lg:col-span-7"
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: EASE_LUXURY }}
+            transition={{ duration: 0.4, ease: EASE_LUXURY }}
           >
             <div className="lg:sticky lg:top-28">
               <Gallery images={images} name={product.name} active={activeImage} onChange={setActiveImage} isDemo={product.isDemo} />
@@ -259,9 +275,9 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
           {/* Details */}
           <motion.div
             className="lg:col-span-5"
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: EASE_LUXURY, delay: 0.08 }}
+            transition={{ duration: 0.4, ease: EASE_LUXURY }}
           >
             {product.isDemo && (
               <p className="mb-6 flex items-start gap-3 rounded-2xl border border-gold/40 bg-gold-pale/40 p-3.5 text-[0.8125rem] leading-relaxed text-gold-dark">
@@ -270,132 +286,38 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
               </p>
             )}
 
-            <p className="eyebrow">
-              {product.dimensions || product.frameSize || 'Devotional Frame'}
-              {product.orientation && <span className="capitalize"> · {product.orientation}</span>}
-            </p>
+            <p className="eyebrow">{product.categoryName || 'Devotional gift'}</p>
 
             <h1 className="mt-4 font-display text-[2.25rem] font-medium leading-[1.04] text-ink sm:text-[2.75rem] xl:text-[3.25rem]">{product.name}</h1>
 
-            {/* Price */}
-            <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <motion.span
-                key={currentUnitPrice ?? 'na'}
-                initial={{ opacity: 0.4, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: EASE_LUXURY }}
-                className="font-display text-[2.6rem] font-semibold leading-none text-burgundy lining-nums"
-              >
-                {formatPrice(currentUnitPrice)}
-              </motion.span>
-              <span className="text-sm text-ink-soft">per frame</span>
-              {bulkApplied && (
-                <>
-                  <span className="text-sm text-ink-faint line-through">{formatPrice(product.indicativePrice)}</span>
-                  <span className="badge-gold">Bulk price</span>
-                </>
-              )}
-            </div>
-
             <p className="lede mt-5 whitespace-pre-line">{product.description}</p>
 
-            {/* Order-wide minimum */}
-            <p className="mt-5 inline-flex flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-gold/40 bg-gold-pale/50 px-3.5 py-1.5 text-[0.8125rem] font-semibold text-gold-dark">
-              <PackageCheck className="h-4 w-4" aria-hidden />
-              Minimum order {MIN_ORDER_FRAMES} frames · mix any designs
-              {product.minQuantity > 1 ? ` · at least ${product.minQuantity} of this design` : ''}
-            </p>
-
-            {/* Bulk volume tiers */}
-            {tiers.length > 0 && (
-              <section className="mt-7" aria-labelledby="tiers-title">
-                <div className="flex items-baseline justify-between gap-3">
-                  <h2 id="tiers-title" className="font-sans text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-gold-dark">
-                    Volume pricing tiers
-                  </h2>
-                  <span className="text-xs text-ink-faint">Tap a tier to apply</span>
-                </div>
-                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {product.indicativePrice !== null && (
-                    <TierCard
-                      label={`${minQty}+ frames`}
-                      price={formatPrice(product.indicativePrice)}
-                      active={activeTierQty === null}
-                      onClick={() => setCleanQuantity(minQty)}
-                    />
-                  )}
-                  {tiers.map(t => (
-                    <TierCard
-                      key={t.min_qty}
-                      label={`${t.min_qty}+ frames`}
-                      price={formatPrice(t.unit_price)}
-                      active={activeTierQty === t.min_qty}
-                      reached={quantity >= t.min_qty}
-                      onClick={() => setCleanQuantity(t.min_qty)}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Subtotal */}
-            {calculatedSubtotal !== null && (
-              <dl className="mt-6 space-y-2 rounded-2xl border border-stone-deep bg-white/70 p-4 text-sm">
-                <div className="flex justify-between gap-4 text-ink-soft">
-                  <dt>Unit price × quantity:</dt>
-                  <dd className="font-medium tabular-nums text-ink">
-                    {formatPrice(currentUnitPrice)} × {quantity}
-                  </dd>
-                </div>
-                <div className="flex items-baseline justify-between gap-4 border-t border-stone-deep/70 pt-2">
-                  <dt className="font-semibold text-ink">Items subtotal:</dt>
-                  <dd className="font-display text-[1.5rem] font-semibold leading-none tabular-nums text-burgundy lining-nums">{formatPrice(calculatedSubtotal)}</dd>
-                </div>
-                <div className="flex justify-between gap-4 text-xs text-ink-soft">
-                  <dt>Shipping:</dt>
-                  <dd className="font-medium italic text-gold-dark">extra · at actual cost</dd>
-                </div>
-              </dl>
-            )}
-            <p className="mt-2.5 text-xs leading-relaxed text-ink-faint">
-              Items subtotal is indicative. Submitting this request does not confirm a purchase or charge payment online.
-            </p>
-
             {requestable ? (
-              <form
-                id="pdp-request-form"
-                className="mt-7 space-y-5"
-                onSubmit={e => {
-                  e.preventDefault();
-                  add(product, quantity, { selectedVariant: variant, customisationNote: note.trim() || undefined });
-                }}
-              >
-                <div>
-                  <label htmlFor="item-note" className="field-label">
-                    Event note or custom tags <span className="font-normal text-ink-faint">(optional)</span>
-                  </label>
-                  <input
-                    id="item-note"
-                    type="text"
-                    maxLength={300}
-                    value={note}
-                    onChange={e => setNote(e.target.value)}
-                    placeholder="For example, wedding date, couple names for sticker, or preferred packaging"
-                    className="field-input text-[0.9375rem]"
-                  />
-                </div>
-
-                <div ref={formActionsRef} className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <QuantityStepper value={quantity} min={minQty} step={inc} onChange={setCleanQuantity} label="Frame quantity" />
-                  <button type="submit" className="btn-primary flex-1">
-                    <ShoppingBag className="h-4 w-4" aria-hidden />
-                    Add to Request
-                  </button>
-                </div>
-              </form>
+              <div ref={formActionsRef} className="mt-7 scroll-mt-28" id="buy">
+                <BuyBox
+                  product={product}
+                  customisationNote={note.trim()}
+                  beforeAdd={
+                    <div>
+                      <label htmlFor="item-note" className="field-label">
+                        Event note or custom tags <span className="font-normal text-ink-soft">(optional)</span>
+                      </label>
+                      <input
+                        id="item-note"
+                        type="text"
+                        maxLength={300}
+                        value={note}
+                        onChange={e => setNote(e.target.value)}
+                        placeholder="Wedding date, names for a sticker, or packing preference"
+                        className="field-input text-[0.9375rem]"
+                      />
+                    </div>
+                  }
+                />
+              </div>
             ) : (
               <div className="mt-7 rounded-2xl border border-stone-deep bg-white/80 p-4 text-sm leading-relaxed text-ink-soft">
-                This preview sample cannot be requested online yet. To ask about a similar frame,{' '}
+                This preview sample cannot be requested online yet. To ask about a similar piece,{' '}
                 <Link to={`/contact?product=${encodeURIComponent(product.name)}`} className="font-semibold text-burgundy underline underline-offset-4">
                   contact our team
                 </Link>
@@ -410,7 +332,7 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
               </li>
               <li className="flex flex-col items-center gap-2 rounded-2xl border border-stone-deep/70 bg-white/60 px-2 py-3.5">
                 <Truck className="h-4 w-4 text-gold" aria-hidden />
-                Shipping charges extra
+                Delivery at actual cost
               </li>
               <li className="flex flex-col items-center gap-2 rounded-2xl border border-stone-deep/70 bg-white/60 px-2 py-3.5">
                 <MessageCircle className="h-4 w-4 text-gold" aria-hidden />
@@ -454,7 +376,7 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
 
       <RelatedProducts product={product} />
 
-      {/* Mobile sticky add-to-request bar */}
+      {/* Mobile sticky add-to-cart bar */}
       {requestable && (
         <AnimatePresence>
           {showStickyBar && (
@@ -468,15 +390,22 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
               <div className="mx-auto flex max-w-xl items-center gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-xs text-ink-soft">
-                    {quantity} × {formatPrice(currentUnitPrice)}
+                    {pricing.best != null && pricing.basePrice != null && pricing.best < pricing.basePrice
+                      ? `Bulk price from ${formatPrice(pricing.best)}`
+                      : 'Price per piece'}
                   </p>
                   <p className="font-display text-[1.4rem] font-semibold leading-tight text-burgundy lining-nums">
-                    {calculatedSubtotal !== null ? formatPrice(calculatedSubtotal) : formatPrice(currentUnitPrice)}
+                    {(product.variants?.length || 0) > 1 ? 'from ' : ''}
+                    {formatPrice(pricing.basePrice)}
                   </p>
                 </div>
-                <button type="submit" form="pdp-request-form" className="btn-primary px-6">
+                <button
+                  type="button"
+                  className="btn-primary px-6"
+                  onClick={() => document.getElementById('buy')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                >
                   <ShoppingBag className="h-4 w-4" aria-hidden />
-                  Add to Request
+                  Add to cart
                 </button>
               </div>
             </motion.div>

@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, ShoppingBag, ShieldCheck, Truck, ChevronRight } from 'lucide-react';
-import { MIN_ORDER_FRAMES, Product, formatPrice, calculateEffectiveUnitPrice } from '@swayari/shared';
+import { X, ChevronRight } from 'lucide-react';
+import { Product } from '@swayari/shared';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
-import { toCartItem } from '../lib/products';
 import { Link } from '../lib/router';
 import { EASE_LUXURY } from './motion';
-import { QuantityStepper, SampleTag, useDialogBehaviour } from './ui';
+import { SampleTag, useDialogBehaviour } from './ui';
+import { BuyBox } from './BuyBox';
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -15,15 +14,8 @@ interface QuickViewModalProps {
 }
 
 export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose }) => {
-  const { addItem, openDrawer, itemCount } = useCart();
-  const { user, initiateGoogleSignIn } = useAuth();
-
-  const minQty = product?.minQuantity || 1;
-  const incQty = product?.orderIncrement || 1;
+  const { openDrawer } = useCart();
   const [selectedImgIdx, setSelectedImgIdx] = useState(0);
-  const [quantity, setQuantity] = useState(() => Math.max(minQty, itemCount < MIN_ORDER_FRAMES ? MIN_ORDER_FRAMES - itemCount : 10));
-  const [added, setAdded] = useState(false);
-  const [customNote, setCustomNote] = useState('');
   // Plays the exit animation first; the parent unmounts us via onClose once it has finished.
   const [visible, setVisible] = useState(true);
   const afterExit = React.useRef<() => void>(() => {});
@@ -36,33 +28,6 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
   if (!product) return null;
 
   const images = product.images && product.images.length > 0 ? product.images : ['/assets/products/gf-venkateswara-studio.webp'];
-
-  // Calculate current applicable unit price based on quantity and bulk tiers
-  const currentUnitPrice = calculateEffectiveUnitPrice(product.indicativePrice, product.bulkTiers, quantity);
-  const itemsSubtotal = currentUnitPrice !== null ? currentUnitPrice * quantity : null;
-
-  function handleQuantityChange(rawVal: number) {
-    const raw = isNaN(rawVal) ? minQty : Math.max(minQty, rawVal);
-    const rem = (raw - minQty) % incQty;
-    const validVal = rem === 0 ? raw : raw + (incQty - rem);
-    setQuantity(validVal);
-  }
-
-  function handleAdd() {
-    const item = toCartItem(product, quantity, { customisationNote: customNote || undefined });
-    if (!user) {
-      // Close first so the sign-in dialog is the only modal on screen; the add resumes after sign-in.
-      requestClose(() => initiateGoogleSignIn(item, 'add'));
-      return;
-    }
-
-    addItem(item);
-    setAdded(true);
-    setTimeout(() => {
-      setAdded(false);
-      requestClose(openDrawer);
-    }, 600);
-  }
 
   return (
     <AnimatePresence
@@ -129,11 +94,6 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                   )}
                   {product.isDemo && <SampleTag />}
                 </div>
-                {product.minQuantity > 1 && (
-                  <span className="absolute bottom-3 left-3 rounded-full border border-gold/40 bg-gold-pale/90 px-2.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.12em] text-gold-dark">
-                    Min. {product.minQuantity} frames
-                  </span>
-                )}
               </div>
 
               {images.length > 1 && (
@@ -159,124 +119,18 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
             {/* Details & request actions */}
             <div className="flex flex-col p-5 sm:p-7 md:w-[54%] md:overflow-y-auto">
               <div className="pr-10">
-                <p className="eyebrow">
-                  {product.dimensions || product.frameSize || 'Devotional Frame'}
-                  {product.orientation && <span className="capitalize"> · {product.orientation} format</span>}
-                </p>
+                <p className="eyebrow">{product.categoryName || 'Devotional gift'}</p>
                 <h2 id="qv-title" className="mt-3 font-display text-[1.9rem] font-medium leading-[1.05] text-ink sm:text-[2.2rem]">
                   {product.name}
                 </h2>
                 <p className="mt-1 text-[0.6875rem] uppercase tracking-[0.12em] text-ink-faint">SKU: {product.sku}</p>
               </div>
 
-              {/* Pricing: everything is ₹999 or less */}
-              <div className="mt-4 flex items-baseline gap-2">
-                <span className="font-display text-[2.2rem] font-semibold leading-none text-burgundy lining-nums">{formatPrice(currentUnitPrice)}</span>
-                <span className="text-sm text-ink-soft">per frame</span>
+              <div className="mt-5">
+                <BuyBox product={product} compact onAdded={() => requestClose(openDrawer)} />
               </div>
 
-              {itemsSubtotal !== null && (
-                <dl className="mt-4 space-y-1.5 rounded-2xl border border-stone-deep bg-white/80 p-3.5 text-[0.8125rem]">
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-ink-soft">Unit price × quantity:</dt>
-                    <dd className="font-medium tabular-nums text-ink">
-                      {formatPrice(currentUnitPrice)} × {quantity}
-                    </dd>
-                  </div>
-                  <div className="flex items-baseline justify-between gap-3 border-t border-stone-deep/70 pt-1.5">
-                    <dt className="font-semibold text-ink">Items subtotal:</dt>
-                    <dd className="font-display text-[1.25rem] font-semibold leading-none text-burgundy lining-nums">{formatPrice(itemsSubtotal)}</dd>
-                  </div>
-                  <div className="flex justify-between gap-3 text-xs">
-                    <dt className="text-ink-soft">Shipping:</dt>
-                    <dd className="font-medium italic text-gold-dark">extra · at actual cost</dd>
-                  </div>
-                </dl>
-              )}
-              <p className="mt-2 text-[0.6875rem] leading-relaxed text-ink-faint">
-                Items subtotal is indicative. Submitting this request does not confirm a purchase or charge payment online.
-              </p>
-
-              {/* Bulk tiers */}
-              {product.bulkTiers && product.bulkTiers.length > 0 && (
-                <div className="mt-4">
-                  <p className="font-sans text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-gold-dark">Volume pricing tiers</p>
-                  <div className="mt-2 grid grid-cols-3 gap-1.5 text-center">
-                    {product.bulkTiers.map(tier => (
-                      <div
-                        key={tier.min_qty}
-                        className={`rounded-xl border px-2 py-2 transition-all duration-300 ${
-                          quantity >= tier.min_qty
-                            ? 'border-burgundy bg-gradient-to-b from-burgundy-accent to-burgundy text-ivory-light'
-                            : 'border-stone-deep bg-white text-ink'
-                        }`}
-                      >
-                        <div className="font-display text-[1.1rem] font-semibold leading-none lining-nums">{formatPrice(tier.unit_price)}</div>
-                        <div className="mt-1 text-[0.625rem] uppercase tracking-[0.08em] opacity-80">{tier.min_qty}+ frames</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Specifications */}
-              <dl className="mt-4 divide-y divide-stone-deep/60 border-y border-stone-deep/70 text-[0.8125rem]">
-                {product.dimensions && (
-                  <div className="flex justify-between gap-3 py-2">
-                    <dt className="text-ink-soft">Dimensions:</dt>
-                    <dd className="text-right font-medium text-ink">{product.dimensions}</dd>
-                  </div>
-                )}
-                {product.borderFinish && (
-                  <div className="flex justify-between gap-3 py-2">
-                    <dt className="text-ink-soft">Border Finish:</dt>
-                    <dd className="text-right font-medium text-ink">{product.borderFinish}</dd>
-                  </div>
-                )}
-                <div className="flex justify-between gap-3 py-2">
-                  <dt className="text-ink-soft">Mixed Designs:</dt>
-                  <dd className="text-right font-medium text-burgundy">Allowed across order</dd>
-                </div>
-              </dl>
-              <p className="mt-2 flex items-center gap-1.5 text-[0.75rem] text-ink-soft">
-                <Truck className="h-3.5 w-3.5 flex-shrink-0 text-gold" aria-hidden />
-                Shipping charges extra, confirmed before dispatch
-              </p>
-
-              {/* Quantity & add */}
-              <div className="mt-5 space-y-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-ink">Quantity</p>
-                    <p className="text-[0.6875rem] text-ink-faint">
-                      {`Order minimum ${MIN_ORDER_FRAMES} frames, any mix`}
-                      {incQty > 1 ? ` · Step ${incQty}` : ''}
-                    </p>
-                  </div>
-                  <QuantityStepper value={quantity} min={minQty} step={incQty} onChange={handleQuantityChange} label="Frame quantity" size="sm" />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleAdd}
-                  disabled={added}
-                  className={`w-full ${added ? 'btn bg-emerald-700 text-white' : 'btn-primary'}`}
-                >
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.span
-                      key={added ? 'added' : 'add'}
-                      className="inline-flex items-center gap-2"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.25 }}
-                    >
-                      {added ? <Check className="h-4 w-4" aria-hidden /> : <ShoppingBag className="h-4 w-4" aria-hidden />}
-                      {added ? 'Added to Request!' : 'Add to Order Request'}
-                    </motion.span>
-                  </AnimatePresence>
-                </button>
-
+              <div className="mt-3">
                 <Link
                   to={`/product/${product.slug}`}
                   onClick={onClose}
@@ -287,17 +141,6 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                 </Link>
               </div>
 
-              {/* Assurance */}
-              <div className="mt-auto flex items-center justify-between gap-3 border-t border-stone-deep/70 pt-3 text-[0.6875rem] text-ink-soft">
-                <span className="flex items-center gap-1.5">
-                  <ShieldCheck className="h-4 w-4 text-gold" aria-hidden />
-                  Authentic Frames
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Truck className="h-4 w-4 text-gold" aria-hidden />
-                  Insured Event Transit
-                </span>
-              </div>
             </div>
           </motion.div>
         </div>

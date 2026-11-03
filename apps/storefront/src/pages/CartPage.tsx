@@ -1,7 +1,7 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Trash2 } from 'lucide-react';
-import { MIN_ORDER_FRAMES, formatPrice } from '@swayari/shared';
+import { BRAND_TAGLINES, formatPrice } from '@swayari/shared';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Link, useRouter } from '../lib/router';
@@ -9,19 +9,19 @@ import { productImageSources } from '../lib/media';
 import { usePageMeta } from '../lib/meta';
 import { EmptyState, PageIntro, RequestSteps } from '../components/States';
 import { EASE_LUXURY } from '../components/motion';
-import { MinimumOrderMeter, OrderDisclaimer, Picture, PriceText, QuantityStepper } from '../components/ui';
+import { OrderDisclaimer, Picture, PriceText, QuantityStepper } from '../components/ui';
 
 export const CartPage: React.FC = () => {
   const { items, updateQuantity, removeItem, subtotal, hasUnpricedItems, itemCount } = useCart();
   const { user, initiateGoogleSignIn } = useAuth();
   const { navigate } = useRouter();
-  usePageMeta('Your bag', undefined, { noindex: true });
+  usePageMeta('Your cart', undefined, { noindex: true });
 
   if (items.length === 0) {
     return (
       <div className="container-content">
         <EmptyState
-          title="Your bag is empty"
+          title="Your cart is empty"
           body={<p>Add the pieces you like and send them to us as one request.</p>}
           action={{ to: '/shop', label: 'Explore the Collection' }}
         />
@@ -31,7 +31,7 @@ export const CartPage: React.FC = () => {
 
   return (
     <div className="container-content pb-20 md:pb-28">
-      <PageIntro eyebrow="Review" title={<>Your <em>bag</em></>} after={<RequestSteps current={1} />}>
+      <PageIntro eyebrow="Review" title={<>Your <em>cart</em></>} after={<RequestSteps current={1} />}>
         {itemCount} {itemCount === 1 ? 'piece' : 'pieces'}. Nothing is charged — you are preparing a request for our team.
       </PageIntro>
 
@@ -45,7 +45,7 @@ export const CartPage: React.FC = () => {
                   <motion.li
                     key={`${item.productId}-${item.selectedVariant || ''}`}
                     layout
-                    initial={{ opacity: 0, y: 18 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE_LUXURY, delay: i * 0.06 } }}
                     exit={{ opacity: 0, x: -24, transition: { duration: 0.3 } }}
                     className="card-luxe grid grid-cols-[88px_1fr] gap-4 p-3.5 sm:grid-cols-[128px_1fr] sm:gap-6 sm:p-5"
@@ -76,9 +76,9 @@ export const CartPage: React.FC = () => {
                           />
                           {item.indicativePrice !== null && (
                             <div className="mt-1 text-xs text-ink-faint">
-                              <span>₹{item.indicativePrice}/frame</span>
+                              <span>{formatPrice(item.indicativePrice)}/pc</span>
                               {item.basePrice && item.indicativePrice < item.basePrice && (
-                                <span className="mt-1 block font-semibold uppercase tracking-[0.1em] text-gold-dark">Bulk discount</span>
+                                <span className="mt-1 block font-semibold text-emerald-800">Bulk price applied</span>
                               )}
                             </div>
                           )}
@@ -118,9 +118,9 @@ export const CartPage: React.FC = () => {
         <aside className="lg:col-span-5" aria-labelledby="summary-title">
           <motion.div
             className="card-luxe relative overflow-hidden p-6 md:p-8 lg:sticky lg:top-28"
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: EASE_LUXURY, delay: 0.1 }}
+            transition={{ duration: 0.4, ease: EASE_LUXURY }}
           >
             <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-gold-light via-gold to-gold-light" />
             <h2 id="summary-title" className="font-display text-[2rem] leading-tight">
@@ -128,7 +128,7 @@ export const CartPage: React.FC = () => {
             </h2>
             <dl className="mt-5 space-y-3.5 text-[0.9375rem]">
               <div className="flex justify-between">
-                <dt className="text-ink-soft">Frames</dt>
+                <dt className="text-ink-soft">Pieces</dt>
                 <dd className="font-medium tabular-nums">{itemCount}</dd>
               </div>
               <div className="flex items-baseline justify-between gap-4 border-t border-stone-deep/70 pt-3.5">
@@ -139,23 +139,18 @@ export const CartPage: React.FC = () => {
                 </dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-ink-soft">Shipping</dt>
-                <dd className="text-right font-medium italic text-gold-dark">Extra · at actual cost</dd>
+                <dt className="text-ink-soft">Delivery</dt>
+                <dd className="text-right font-medium text-ink">Extra, at actual cost</dd>
               </div>
             </dl>
-            <MinimumOrderMeter count={itemCount} className="mt-6" />
+            <p className="mt-5 rounded-xl bg-ivory-light px-3.5 py-2.5 text-[0.8125rem] leading-snug text-ink-soft">{BRAND_TAGLINES.priceNote}</p>
             <OrderDisclaimer className="mt-3" compact />
             <button
               type="button"
               className="btn-primary mt-6 w-full"
-              disabled={itemCount < MIN_ORDER_FRAMES}
               onClick={() => (user ? navigate('/checkout') : initiateGoogleSignIn(undefined, 'checkout'))}
             >
-              {itemCount < MIN_ORDER_FRAMES
-                ? `Add ${MIN_ORDER_FRAMES - itemCount} more frames`
-                : user
-                  ? 'Continue to request details'
-                  : 'Sign in to send request'}
+              {user ? 'Continue to send request' : 'Sign in & send request'}
             </button>
             <p className="mt-4 text-center text-xs text-ink-faint">No payment is taken online.</p>
           </motion.div>

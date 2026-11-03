@@ -7,18 +7,18 @@ import { Reveal, StaggerGroup, StaggerItem } from './motion';
 const STEPS = [
   {
     icon: ShoppingBag,
-    title: 'Choose frames and quantities',
-    body: 'Pick from our silver foil god frames at ₹149 each — everything on SWAYARI is under ₹999. Mix any designs; the minimum order is 25 frames in total.'
+    title: 'Choose your gifts',
+    body: 'Add any design to your cart, from 1 piece. The price per piece drops as your quantity of one product grows — mix designs to reach a bulk slab.'
   },
   {
     icon: Send,
     title: 'Submit your request',
-    body: 'Sign in with Google and submit your request with your occasion, delivery location, and target event date. Zero payment taken online.'
+    body: 'Press “Send request” and sign in with Google. Tell us your occasion, delivery location and event date. No payment is taken online.'
   },
   {
     icon: PhoneCall,
     title: 'Our team confirms the details',
-    body: 'Our team contacts you to verify stock availability, exact shipping charges, optional packaging, and delivery schedule.'
+    body: 'Our team calls you to confirm stock, final price, packing and delivery date. Delivery is extra, charged at actual cost for your location.'
   }
 ];
 
@@ -36,7 +36,7 @@ export const OrderProcessExplanation: React.FC = () => (
               Simple, <em>transparent</em> order requests
             </>
           }
-          intro="We operate as an order-request business with personal coordination. No automatic payments or online card checkout."
+          intro="Every order is a request that our team confirms with you personally. No card checkout and no online payment."
         />
       </Reveal>
 

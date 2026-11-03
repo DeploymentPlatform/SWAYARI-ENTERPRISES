@@ -21,7 +21,12 @@ export interface Category {
 export interface ProductVariant {
   id: string;
   name: string;
+  /** 1-piece price for this size. */
   indicativePrice?: number | null;
+  /** Printed MRP, shown struck through. */
+  mrp?: number | null;
+  /** Quantity slabs for this size (first slab starts at 1). */
+  tiers?: BulkPriceTier[];
   skuSuffix?: string;
 }
 
@@ -51,6 +56,10 @@ export interface Product {
   hasVariants: boolean;
   variants: ProductVariant[];
   indicativePrice: number | null;
+  /** Printed MRP of the default size, shown struck through. */
+  mrp?: number | null;
+  /** Products sharing a price group (and size) count together towards a quantity slab. */
+  priceGroup?: string | null;
   minQuantity: number;
   availabilityLabel: string;
   customisationInfo: string | null;
@@ -203,6 +212,8 @@ export interface CartItem {
   indicativePrice: number | null;
   basePrice?: number | null;
   bulkTiers?: BulkPriceTier[];
+  mrp?: number | null;
+  priceGroup?: string | null;
   minQuantity: number;
   quantity: number;
   selectedVariant?: string | null;

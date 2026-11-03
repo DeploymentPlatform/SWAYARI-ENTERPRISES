@@ -504,41 +504,30 @@ await test('25. Production Vite builds exist for both Storefront and Admin', asy
   assert.ok(fs.existsSync(admDist), 'Admin dist/index.html must exist');
 });
 
-// 11. DEVOTIONAL FRAMES & FILTER TESTS (Strictly <= ₹99)
-await test('26. Price filters return only items inside each band, all ₹999 or less', async () => {
-  const bands = { 'under-199': [0, 199], '200-499': [200, 499], '500-999': [500, 999] };
+// 11. CATALOGUE FILTER TESTS (real kit catalogue from all migrations)
+const kitEnv = { ...env, DB: createMockD1(), MIN_ORDER_FRAMES: undefined };
+await test('26. Price filters return only items inside each band', async () => {
+  const bands = { 'under-299': [0, 299], '300-999': [300, 999], '1000-2999': [1000, 2999], '3000-plus': [3000, 20000] };
   for (const [band, [min, max]] of Object.entries(bands)) {
-    const res = await sfProductsList.onRequestGet(makeContext(makeRequest(`http://storefront/api/products?include_demo=1&budget=${band}`), env));
+    const res = await sfProductsList.onRequestGet(makeContext(makeRequest(`http://storefront/api/products?budget=${band}`), kitEnv));
     const data = await res.json();
     assert.equal(data.success, true);
-    if (band === 'under-199') assert.ok(data.products.length > 0, 'Must have gifts under ₹199');
+    assert.ok(data.products.length > 0, `Band ${band} must have products`);
     for (const p of data.products) {
       assert.ok(p.indicativePrice !== null && p.indicativePrice >= min && p.indicativePrice <= max, `Product ${p.sku} price ${p.indicativePrice} must be between ${min} and ${max}`);
-      assert.equal(p.isQuoteOnly, false);
     }
   }
 
-  // Query deity filter (e.g., Ganesha)
-  const resGanesha = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&deity=Ganesha'), env));
-  const dataGanesha = await resGanesha.json();
-  assert.equal(dataGanesha.success, true);
-  assert.ok(dataGanesha.products.length > 0, 'Must have Ganesha frames');
-  for (const p of dataGanesha.products) {
-    assert.equal(p.deity, 'Ganesha');
-    assert.ok(p.indicativePrice <= 99);
-  }
-
-  // Query frame size filter
-  const resSize = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?include_demo=1&frame_size=Classic%204%22%C3%976%22'), env));
-  const dataSize = await resSize.json();
-  assert.equal(dataSize.success, true);
-  assert.ok(dataSize.products.length > 0, 'Must have Classic 4"×6" frames');
-  for (const p of dataSize.products) {
-    assert.equal(p.frameSize, 'Classic 4"×6"');
+  // Deity filter matches the tag words on each product
+  const resGanesh = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?deity=ganesh'), kitEnv));
+  const dataGanesh = await resGanesh.json();
+  assert.ok(dataGanesh.products.length >= 8, 'Must have Ganesh designs across products');
+  for (const p of dataGanesh.products) {
+    assert.ok(p.deity.toLowerCase().includes('ganesh'), `${p.name} must be tagged Ganesh`);
   }
 });
 
-await test('27. Bulk order requests capture occasion, requiredDate, and tiered pricing within the ₹999 limit', async () => {
+await test('27. Bulk order requests capture occasion, requiredDate, and tiered pricing with tiered pricing', async () => {
   const bulkPayload = {
     idempotencyKey: 'test-bulk-req-12345',
     customerName: 'Priya Sharma',
@@ -582,12 +571,12 @@ await test('27. Bulk order requests capture occasion, requiredDate, and tiered p
   assert.equal(adminData.order.items[0].indicativePrice, 69);
 });
 
-// 12. STRICT ₹99 PRICE RULE ENFORCEMENT
-await test('28. Server-side order request rejects items above the ₹999 limit', async () => {
-  // Directly insert an expensive item into DB for testing rejection
+// 12. PRICE SANITY RULES
+await test('28. Server-side order request rejects implausible prices', async () => {
+  // Directly insert an item with a broken price for testing rejection
   await env.DB.prepare(`
     INSERT OR REPLACE INTO products (id, sku, name, slug, description, indicative_price, min_quantity, status, is_demo, created_at, updated_at)
-    VALUES ('test-expensive-frame', 'SWY-TEST-EXP', 'Overpriced Frame', 'overpriced-frame', 'Test frame', 1500, 1, 'published', 0, '2026-10-18T10:00:00.000Z', '2026-10-18T10:00:00.000Z')
+    VALUES ('test-expensive-frame', 'SWY-TEST-EXP', 'Overpriced Frame', 'overpriced-frame', 'Test frame', 250000, 1, 'published', 0, '2026-10-18T10:00:00.000Z', '2026-10-18T10:00:00.000Z')
   `).run();
 
   const req = makeRequest('http://storefront/api/orders', {
@@ -607,10 +596,11 @@ await test('28. Server-side order request rejects items above the ₹999 limit',
   const res = await sfOrdersIndex.onRequestPost(makeContext(req, env));
   assert.equal(res.status, 400);
   const data = await res.json();
-  assert.ok(data.error.includes('₹999'));
+  assert.ok(data.error.includes('invalid price'));
+  await env.DB.prepare("UPDATE products SET status = 'archived' WHERE id = 'test-expensive-frame'").run();
 });
 
-await test('29. Admin product creation rejects indicative price or variants above ₹999', async () => {
+await test('29. Admin product creation rejects indicative price or variants above the ₹20,000 sanity cap', async () => {
   const reqOver = makeRequest('http://admin/api/admin/products', {
     method: 'POST',
     cookie: adminCookie,
@@ -618,8 +608,8 @@ await test('29. Admin product creation rejects indicative price or variants abov
       sku: 'SWY-OVER-01',
       name: 'Overpriced Devotional Frame',
       slug: 'overpriced-devotional-frame',
-      description: 'Above ₹99 ceiling',
-      indicativePrice: 1200,
+      description: 'Above the sanity cap',
+      indicativePrice: 25000,
       minQuantity: 1,
       status: 'published'
     }
@@ -637,7 +627,7 @@ await test('29. Admin product creation rejects indicative price or variants abov
       description: 'Variant exceeds 99',
       indicativePrice: 79,
       hasVariants: true,
-      variants: [{ id: 'large', name: 'Large', indicative_price: 1500 }],
+      variants: [{ id: 'large', name: 'Large', indicative_price: 25000 }],
       minQuantity: 1,
       status: 'published'
     }
@@ -646,7 +636,7 @@ await test('29. Admin product creation rejects indicative price or variants abov
   assert.equal(resVariantOver.status, 400);
 });
 
-await test('30. Admin quotation revisions reject agreed unit prices above ₹999', async () => {
+await test('30. Admin quotation revisions reject agreed unit prices above the ₹20,000 sanity cap', async () => {
   const reqOverQuote = makeRequest(`http://admin/api/admin/orders/${createdOrderId}`, {
     method: 'PATCH',
     cookie: adminCookie,
@@ -658,7 +648,7 @@ await test('30. Admin quotation revisions reject agreed unit prices above ₹999
             productId: createdProdId,
             productName: 'Mayur Sri Ganesha Devotional Frame',
             quantity: 2,
-            agreedUnitPrice: 1500 // Above ₹999
+            agreedUnitPrice: 25000 // Above the sanity cap
           }
         ],
         shippingCharge: 50,
@@ -669,24 +659,20 @@ await test('30. Admin quotation revisions reject agreed unit prices above ₹999
   const resOverQuote = await admOrderDetails.onRequestPatch(makeContext(reqOverQuote, env, { id: createdOrderId }));
   assert.equal(resOverQuote.status, 400);
   const data = await resOverQuote.json();
-  assert.ok(data.error.includes('₹999'));
+  assert.ok(data.error.includes('₹20,000'));
 });
 
-await test('31. Storefront queries exclude products priced above ₹999 even if published', async () => {
-  // Query storefront without demo filter
-  const sfRes = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products'), env));
+await test('31. Storefront lists grand wall frames above ₹2,999 with their MRP and price group', async () => {
+  const sfRes = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?category=wall-frames'), kitEnv));
   const sfData = await sfRes.json();
   assert.equal(sfData.success, true);
-  for (const p of sfData.products) {
-    if (p.indicativePrice !== null) {
-      assert.ok(p.indicativePrice <= 999, `Product ${p.sku} must not exceed 999 on storefront`);
-    }
-  }
-  // Verify test-expensive-frame is excluded from storefront
+  const twelve = sfData.products.find(p => p.id === 'kit-07-01');
+  assert.ok(twelve, '12 Gods wall frame must be listed');
+  assert.equal(twelve.indicativePrice, 6799);
+  assert.equal(twelve.mrp, 8999);
+  assert.equal(twelve.priceGroup, '07');
   assert.equal(sfData.products.some(p => p.id === 'test-expensive-frame'), false);
 });
-
-// 13. REGRESSION SUITE: BULK PRICING, QUANTITY RULES, UPGRADES, ASSETS, SAMPLE ISOLATION
 
 await test('32. Bulk pricing is consistent across calculation, cart totals, and server order submission', async () => {
   // Sai Baba frame example: Base ₹65, 100-pc tier ₹42
@@ -878,19 +864,17 @@ await test('34. Duplicate lines in cart or order request are aggregated cleanly 
   assert.equal(ord.results[0].snapshot_indicative_price, 42);
 });
 
-await test('35. Monetary calculation enforces integer paise, rejects > 99,900 paise and malformed/over-precision values', async () => {
-  // Check validatePricePaise
+await test('35. Monetary calculation enforces integer paise, rejects > ₹20,000 and malformed/over-precision values', async () => {
   assert.equal(validatePricePaise(99).isValid, true);
   assert.equal(validatePricePaise(99).paise, 9900);
   assert.equal(validatePricePaise(49.50).isValid, true);
   assert.equal(validatePricePaise(49.50).paise, 4950);
+  assert.equal(validatePricePaise(6799).isValid, true);
+  assert.equal(validatePricePaise(20000).isValid, true);
 
-  assert.equal(validatePricePaise(999).isValid, true);
-  assert.equal(validatePricePaise(999).paise, 99900);
-
-  // Above ₹999
-  assert.equal(validatePricePaise(999.01).isValid, false);
-  assert.equal(validatePricePaise(1000).isValid, false);
+  // Above the sanity cap
+  assert.equal(validatePricePaise(20000.01).isValid, false);
+  assert.equal(validatePricePaise(25000).isValid, false);
 
   // Over-precision (more than 2 decimal places)
   assert.equal(validatePricePaise(49.999).isValid, false);
@@ -903,14 +887,14 @@ await test('35. Monetary calculation enforces integer paise, rejects > 99,900 pa
 });
 
 await test('36. Admin quotation revision strictly rejects invalid prices, negative charges, and fractional quantities', async () => {
-  // 1. Quoted unit price above ₹999
+  // 1. Quoted unit price above the ₹20,000 sanity cap
   const overPriceRes = await admOrderDetails.onRequestPatch(makeContext(makeRequest(`http://admin/api/admin/orders/${createdOrderId}`, {
     method: 'PATCH',
     cookie: adminCookie,
     body: {
       status: 'quoted',
       quotation: {
-        items: [{ productId: createdProdId, quantity: 2, agreedUnitPrice: 1005 }],
+        items: [{ productId: createdProdId, quantity: 2, agreedUnitPrice: 20005 }],
         shippingCharge: 50
       }
     }
@@ -1084,16 +1068,34 @@ await test('39. Sample data is strictly isolated when ENVIRONMENT is missing, em
 const liveDb = createMockD1();
 const liveRows = sql => liveDb._rawDb.prepare(sql).all();
 
-await test('40. Live catalogue is exactly the seven No. 1 god frames at ₹149 under one God Frames category', async () => {
+await test('40. Live catalogue is the 94 kit designs in five categories at the exact kit prices', async () => {
   const products = liveRows("SELECT * FROM products WHERE status = 'published' AND is_demo = 0");
-  assert.equal(products.length, 7, 'Exactly seven frames are for sale');
+  assert.equal(products.length, 94, '94 designs are for sale');
+  const byId = Object.fromEntries(products.map(p => [p.id, p]));
+  const tiers = id => JSON.parse(byId[id].bulk_tiers_json).map(t => t.unit_price);
+  // Spot checks against the kit's price table
+  assert.deepEqual(tiers('kit-01-01'), [549, 469, 429, 399]);
+  assert.deepEqual(tiers('kit-01-03'), [499, 419, 389, 359]);
+  assert.deepEqual(tiers('kit-02-04'), [899, 799, 749, 699]);
+  assert.deepEqual(tiers('kit-03-07'), [99, 59, 49, 39]);
+  assert.deepEqual(tiers('kit-07-01'), [6799, 6299, 5999, 5799]);
+  assert.deepEqual(tiers('kit-12-02'), [1449, 1249, 1149, 1099]);
+  assert.equal(byId['kit-02-03'].mrp, 1599);
+  assert.equal(byId['kit-01-03'].price_group, '01B');
+  const stand = JSON.parse(byId['kit-04-02'].variants_json);
+  assert.deepEqual(stand.map(v => [v.name, v.mrp, v.tiers.map(t => t.unit_price)]), [
+    ['No. 1 (small)', 149, [89, 69, 59, 49]],
+    ['No. 2 (medium)', 299, [169, 139, 119, 99]],
+    ['No. 3 (large)', 599, [349, 289, 249, 219]]
+  ]);
+  assert.deepEqual(JSON.parse(byId['kit-09-01'].variants_json).map(v => v.tiers.map(t => t.min_qty)), [[1, 3, 10, 25], [1, 3, 10, 25]]);
   for (const p of products) {
-    assert.equal(p.indicative_price, 149, `${p.name} must cost ₹149`);
-    assert.equal(p.category_id, 'cat-god-frames', `${p.name} must be under God Frames`);
-    assert.ok(p.name.endsWith('Silver Foil Frame'), `${p.name} must be named as a silver foil frame`);
+    const prices = JSON.parse(p.bulk_tiers_json).map(t => t.unit_price);
+    assert.ok(prices.every(x => x % 10 === 9), `${p.name}: every price ends in 9`);
+    assert.ok(!/999 silver|fine silver|pure silver/i.test(p.description), `${p.name}: no purity claims`);
   }
-  const categories = liveRows('SELECT * FROM categories');
-  assert.deepEqual(categories.map(c => c.name), ['God Frames']);
+  const categories = liveRows('SELECT name FROM categories WHERE is_active = 1 ORDER BY display_order');
+  assert.deepEqual(categories.map(c => c.name), ['God Frames', 'Stotram Frames', 'God Stands', 'Stotram Cards', 'Wall Frames']);
 });
 
 await test('41. "Silver" never appears on its own in catalogue or banner text', async () => {
@@ -1113,7 +1115,7 @@ await test('42. Every product and active banner image exists on disk', async () 
   const paths = new Set();
   for (const p of liveRows("SELECT images FROM products WHERE status = 'published'")) {
     const imgs = JSON.parse(p.images);
-    assert.equal(imgs.length, 3, 'Each frame has studio, in-use and back photos');
+    assert.ok(imgs.length >= 1, 'Each product has at least one photo');
     imgs.forEach(i => paths.add(i));
   }
   for (const b of liveRows('SELECT desktop_image, mobile_image FROM campaign_banners WHERE is_active = 1')) {
@@ -1127,26 +1129,43 @@ await test('42. Every product and active banner image exists on disk', async () 
   }
 });
 
-await test('43. Orders under 25 frames are refused; 25 frames in any mix are accepted', async () => {
-  const realEnv = { ...env, MIN_ORDER_FRAMES: undefined };
+await test('43. Designs of one product and size share a slab; a single piece can be requested', async () => {
+  const realEnv = kitEnv;
   const login = await sfDevLogin.onRequestPost(makeContext(makeRequest('http://storefront/api/auth/dev-login', {
-    method: 'POST', body: { customEmail: 'min.order@example.com', customName: 'Min Order' }
+    method: 'POST', body: { customEmail: 'slab.order@example.com', customName: 'Slab Order' }
   }), realEnv));
   const cookie = `swayari_customer_session=${login.headers.get('Set-Cookie').match(/swayari_customer_session=([^;]+)/)[1]}`;
-  const productId = env.DB._rawDb.prepare("SELECT id FROM products WHERE status = 'published' AND min_quantity <= 1 AND order_increment = 1 LIMIT 1").get().id;
-  const order = (key, qty) => sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
+  const order = (key, items) => sfOrdersIndex.onRequestPost(makeContext(makeRequest('http://storefront/api/orders', {
     method: 'POST', cookie,
     body: {
-      idempotencyKey: key, customerName: 'Min Order', customerPhone: '9876543210',
+      idempotencyKey: key, customerName: 'Slab Order', customerPhone: '9876543210',
       deliveryAddress: '12 Temple Street', deliveryCity: 'Tirupati', deliveryState: 'Andhra Pradesh', deliveryPincode: '517501',
-      items: [{ productId, quantity: qty }]
+      items
     }
   }), realEnv));
-  const small = await order('min-order-24-' + Date.now(), 24);
-  assert.equal(small.status, 400);
-  assert.ok((await small.json()).error.includes('25'));
-  const ok = await order('min-order-25-' + Date.now(), 25);
-  assert.equal(ok.status, 201);
+  // The kit's own example: 60 stotram cards in 6 designs → 50–99 slab → ₹49 each → ₹2,940
+  const cards = ['kit-03-01', 'kit-03-02', 'kit-03-03', 'kit-03-04', 'kit-03-05', 'kit-03-06'].map(productId => ({ productId, quantity: 10 }));
+  const res = await order('slab-cards-' + Date.now(), cards);
+  assert.equal(res.status, 201);
+  assert.equal((await res.json()).indicativeSubtotal, 2940);
+
+  // Sizes count separately: 6 + 6 stands of No. 1 (12 → ₹69) and 5 of No. 3 (₹349)
+  const stands = await order('slab-stands-' + Date.now(), [
+    { productId: 'kit-04-02', selectedVariant: 'No. 1 (small)', quantity: 6 },
+    { productId: 'kit-04-03', selectedVariant: 'No. 1 (small)', quantity: 6 },
+    { productId: 'kit-04-05', selectedVariant: 'No. 3 (large)', quantity: 5 }
+  ]);
+  assert.equal(stands.status, 201);
+  assert.equal((await stands.json()).indicativeSubtotal, 12 * 69 + 5 * 349);
+
+  // A product with sizes needs a valid size
+  const noSize = await order('slab-nosize-' + Date.now(), [{ productId: 'kit-04-02', quantity: 2 }]);
+  assert.equal(noSize.status, 400);
+
+  // One piece is fine
+  const one = await order('slab-one-' + Date.now(), [{ productId: 'kit-07-01', quantity: 1 }]);
+  assert.equal(one.status, 201);
+  assert.equal((await one.json()).indicativeSubtotal, 6799);
 });
 
 await test('44. Order requests with oversized fields are refused', async () => {

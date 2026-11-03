@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { CartItem, Category, MIN_ORDER_FRAMES, Product, calculateEffectiveUnitPrice } from '@swayari/shared';
+import { CartItem, Category, Product, resolveVariantPricing } from '@swayari/shared';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { previewCountOverride, withPreview } from './preview';
@@ -77,11 +77,15 @@ export function useCategories() {
   return categories;
 }
 
+/** Sizes a product is sold in (empty when it has a single size). */
+export const productSizes = (product: Product) => (product.variants || []).map(v => v.name);
+
 export function toCartItem(product: Product, quantity?: number, extra: Partial<CartItem> = {}): CartItem {
   const min = product.minQuantity || 1;
   const initialQty = quantity ? Math.max(min, quantity) : min;
-  const basePrice = product.indicativePrice;
-  const effectivePrice = calculateEffectiveUnitPrice(basePrice, product.bulkTiers, initialQty);
+  const sizes = productSizes(product);
+  const selectedVariant = extra.selectedVariant ?? (sizes.length ? sizes[0] : null);
+  const pricing = resolveVariantPricing(product, selectedVariant);
 
   return {
     productId: product.id,
@@ -89,9 +93,11 @@ export function toCartItem(product: Product, quantity?: number, extra: Partial<C
     name: product.name,
     slug: product.slug,
     image: product.images?.[0] || '',
-    indicativePrice: effectivePrice,
-    basePrice,
-    bulkTiers: product.bulkTiers,
+    indicativePrice: pricing.basePrice,
+    basePrice: pricing.basePrice,
+    bulkTiers: pricing.tiers,
+    mrp: pricing.mrp,
+    priceGroup: product.priceGroup ?? null,
     minQuantity: min,
     quantity: initialQty,
     priceType: product.priceType || 'piece',
@@ -101,28 +107,25 @@ export function toCartItem(product: Product, quantity?: number, extra: Partial<C
     deity: product.deity || null,
     frameSize: product.frameSize || null,
     orientation: product.orientation || 'portrait',
-    ...extra
+    ...extra,
+    selectedVariant
   };
 }
 
 /**
- * Shared Add-to-bag behaviour: signed-out visitors are asked to sign in with Google and the
- * intended add is resumed once afterwards. Preview samples can only be added where the server
- * runs in local development (the order API rejects them everywhere else).
+ * Shared Add-to-cart behaviour. Anyone can fill a cart; signing in is only asked for when the
+ * visitor sends the request. Preview samples can only be added where the server runs in local
+ * development (the order API rejects them everywhere else).
  */
 export function useAddToBag() {
-  const { user, initiateGoogleSignIn, config } = useAuth();
-  const { addItem, itemCount } = useCart();
+  const { config } = useAuth();
+  const { addItem } = useCart();
 
   const canRequest = (product: Product) => !product.isDemo || config.devLoginAvailable;
 
   const add = (product: Product, quantity?: number, extra?: Partial<CartItem>) => {
     if (!canRequest(product)) return;
-    // Quick adds (no quantity chosen) fill what is still needed for the order-wide minimum.
-    const qty = quantity ?? (itemCount < MIN_ORDER_FRAMES ? MIN_ORDER_FRAMES - itemCount : 10);
-    const item = toCartItem(product, qty, extra);
-    if (!user) initiateGoogleSignIn(item, 'add');
-    else addItem(item);
+    addItem(toCartItem(product, quantity ?? 1, extra));
   };
 
   return { add, canRequest };

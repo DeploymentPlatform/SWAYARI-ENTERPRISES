@@ -17,7 +17,7 @@ interface AuthContextType {
   config: AuthConfig;
   signInRequest: SignInRequest | null;
   signInError: string | null;
-  /** Opens the sign-in dialog; an optional item is added to the bag once, after sign-in. */
+  /** Opens the sign-in dialog; an optional item is added to the cart once, after sign-in. */
   initiateGoogleSignIn: (pendingItem?: CartItem, reason?: SignInRequest['reason']) => void;
   closeSignIn: () => void;
   /** Hides the dialog but keeps the pending item (used when switching to local dev sign-in). */

@@ -28,13 +28,13 @@ module.exports = {
         },
         ink: {
           DEFAULT: '#211A17',
-          soft: '#5A4E47',
-          faint: '#857870'
+          soft: '#4A3F39',
+          faint: '#6B5F57'
         },
         charcoal: {
           DEFAULT: '#211A17',
-          muted: '#5A4E47',
-          light: '#857870'
+          muted: '#4A3F39',
+          light: '#6B5F57'
         },
         burgundy: {
           DEFAULT: '#5E1A28',
@@ -49,7 +49,7 @@ module.exports = {
           DEFAULT: '#B8924A',
           light: '#E3CC9A',
           pale: '#F4EAD3',
-          dark: '#8C6B2E',
+          dark: '#7A5A22',
           glow: 'rgba(184, 146, 74, 0.22)'
         },
         umber: '#170F0C'

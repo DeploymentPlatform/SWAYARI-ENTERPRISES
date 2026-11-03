@@ -56,9 +56,9 @@ export const EmptyState: React.FC<{
 }> = ({ title, body, action, secondary, eyebrow, art }) => (
   <motion.div
     className="mx-auto max-w-xl py-16 text-center sm:py-20 md:py-28"
-    initial={{ opacity: 0, y: 18 }}
+    initial={{ opacity: 0, y: 8 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.8, ease: EASE_LUXURY }}
+    transition={{ duration: 0.4, ease: EASE_LUXURY }}
   >
     {art ?? (
       <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-gold/30 bg-gradient-to-b from-gold-pale/80 to-ivory-light shadow-gold">
@@ -97,7 +97,7 @@ export const PageIntro: React.FC<{
       className={`pb-8 pt-10 md:pb-12 md:pt-16 ${centered ? 'text-center' : 'border-b border-stone-deep/80'}`}
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: EASE_LUXURY }}
+      transition={{ duration: 0.4, ease: EASE_LUXURY }}
     >
       {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
       <h1 className="display-title">{title}</h1>
@@ -108,9 +108,9 @@ export const PageIntro: React.FC<{
   );
 };
 
-const REQUEST_STEPS = ['Your bag', 'Request details', 'Request sent'];
+const REQUEST_STEPS = ['Your cart', 'Request details', 'Request sent'];
 
-/** Three-step indicator for the request journey: bag → details → sent. `current` is 1-based. */
+/** Three-step indicator for the request journey: cart → details → sent. `current` is 1-based. */
 export const RequestSteps: React.FC<{ current: 1 | 2 | 3; complete?: boolean; className?: string }> = ({
   current,
   complete,
@@ -169,10 +169,10 @@ export const EditorialSections: React.FC<{ sections: { title: string; body: stri
         key={s.title}
         aria-labelledby={`${idPrefix}-${i}`}
         className="grid gap-3 border-t border-stone-deep/80 py-8 first:border-t-0 first:pt-0 sm:grid-cols-[4.5rem_1fr] sm:gap-6 md:py-10"
-        initial={{ opacity: 0, y: 18 }}
+        initial={{ opacity: 0, y: 8 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '0px 0px -60px 0px' }}
-        transition={{ duration: 0.8, ease: EASE_LUXURY }}
+        transition={{ duration: 0.4, ease: EASE_LUXURY }}
       >
         <span aria-hidden className="font-display text-[2.4rem] font-medium italic leading-none text-gold">
           {String(i + 1).padStart(2, '0')}

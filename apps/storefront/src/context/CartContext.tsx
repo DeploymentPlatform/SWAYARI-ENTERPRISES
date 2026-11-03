@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { CartItem, Product, calculateEffectiveUnitPrice, calculateCartTotals } from '@swayari/shared';
+import { CartItem, Product, calculateCartTotals, priceCartItems, resolveVariantPricing } from '@swayari/shared';
 import { useAuth } from './AuthContext';
 import { withPreview } from '../lib/preview';
 
@@ -20,6 +20,8 @@ interface CartContextType {
 }
 
 const STORAGE_KEY = 'swayari_cart';
+/** Per line; bigger orders are a special quote. */
+export const MAX_LINE_QTY = 5000;
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const sameLine = (a: CartItem, productId: string, variant?: string | null) =>
@@ -27,35 +29,33 @@ const sameLine = (a: CartItem, productId: string, variant?: string | null) =>
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, consumePendingAddToCart } = useAuth();
-  const [items, setItems] = useState<CartItem[]>(() => {
+  // Stored lines keep their 1-piece price and slabs; the per-piece price is worked out from the
+  // total quantity of each product + size across the whole cart (see priceCartItems).
+  const [rawItems, setItems] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       const parsed = saved ? JSON.parse(saved) : [];
       if (!Array.isArray(parsed)) return [];
-      // Re-normalize loaded items with bulk tiers
-      return parsed.map((it: CartItem) => {
-        const base = it.basePrice ?? it.indicativePrice;
-        const effective = calculateEffectiveUnitPrice(base, it.bulkTiers, it.quantity);
-        return { ...it, basePrice: base, indicativePrice: effective };
-      });
+      return parsed.map((it: CartItem) => ({ ...it, basePrice: it.basePrice ?? it.indicativePrice }));
     } catch {
       return [];
     }
   });
+  const items = priceCartItems(rawItems);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [lastAddedName, setLastAddedName] = useState<string | null>(null);
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(rawItems));
     } catch {
-      /* storage unavailable — bag still works for this visit */
+      /* storage unavailable — cart still works for this visit */
     }
-  }, [items]);
+  }, [rawItems]);
 
-  // A saved bag can outlive a price change or a retired design: refresh it from the live catalogue once per visit.
+  // A saved cart can outlive a price change or a retired design: refresh it from the live catalogue once per visit.
   useEffect(() => {
-    if (items.length === 0) return;
+    if (rawItems.length === 0) return;
     let cancelled = false;
     fetch(withPreview('/api/products'))
       .then(res => (res.ok ? res.json() : null))
@@ -65,18 +65,24 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const byId = new Map(live.map(p => [p.id, p]));
         setItems(prev =>
           prev
-            .filter(it => byId.has(it.productId))
+            .filter(it => {
+              const p = byId.get(it.productId);
+              // A size that no longer exists can't be priced: drop the line
+              return !!p && (!it.selectedVariant || !p.variants?.length || p.variants.some(v => v.name === it.selectedVariant));
+            })
             .map(it => {
               const p = byId.get(it.productId)!;
-              const base = p.indicativePrice;
+              const pricing = resolveVariantPricing(p, it.selectedVariant);
               return {
                 ...it,
                 name: p.name,
                 slug: p.slug,
                 image: p.images?.[0] || it.image,
-                basePrice: base,
-                bulkTiers: p.bulkTiers,
-                indicativePrice: calculateEffectiveUnitPrice(base, p.bulkTiers, it.quantity)
+                basePrice: pricing.basePrice,
+                indicativePrice: pricing.basePrice,
+                bulkTiers: pricing.tiers,
+                mrp: pricing.mrp,
+                priceGroup: p.priceGroup ?? null
               };
             })
         );
@@ -96,26 +102,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   function addItem(newItem: CartItem) {
     setItems(prev => {
+      const base = newItem.basePrice ?? newItem.indicativePrice;
       const index = prev.findIndex(it => sameLine(it, newItem.productId, newItem.selectedVariant));
-      if (index === -1) {
-        const base = newItem.basePrice ?? newItem.indicativePrice;
-        const effective = calculateEffectiveUnitPrice(base, newItem.bulkTiers, newItem.quantity);
-        return [...prev, { ...newItem, basePrice: base, indicativePrice: effective }];
-      }
-      return prev.map((it, i) => {
-        if (i !== index) return it;
-        const newQty = it.quantity + newItem.quantity;
-        const base = it.basePrice ?? it.indicativePrice ?? newItem.basePrice ?? newItem.indicativePrice;
-        const tiers = it.bulkTiers || newItem.bulkTiers;
-        const effective = calculateEffectiveUnitPrice(base, tiers, newQty);
-        return {
-          ...it,
-          quantity: newQty,
-          basePrice: base,
-          bulkTiers: tiers,
-          indicativePrice: effective
-        };
-      });
+      if (index === -1) return [...prev, { ...newItem, basePrice: base }];
+      return prev.map((it, i) =>
+        i === index ? { ...it, quantity: Math.min(MAX_LINE_QTY, it.quantity + newItem.quantity) } : it
+      );
     });
     setLastAddedName(newItem.name);
     setIsDrawerOpen(true);
@@ -131,13 +123,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!sameLine(it, productId, variant)) return it;
         const min = it.minQuantity || 1;
         const inc = it.orderIncrement || 1;
-        const raw = Math.max(min, Math.min(999, Math.round(quantity)));
+        const raw = Math.max(min, Math.min(MAX_LINE_QTY, Math.round(quantity)));
         // Align to increment
         const rem = (raw - min) % inc;
         const cleanQty = rem === 0 ? raw : raw + (inc - rem);
-        const base = it.basePrice ?? it.indicativePrice;
-        const effective = calculateEffectiveUnitPrice(base, it.bulkTiers, cleanQty);
-        return { ...it, quantity: cleanQty, basePrice: base, indicativePrice: effective };
+        return { ...it, quantity: cleanQty };
       })
     );
   }

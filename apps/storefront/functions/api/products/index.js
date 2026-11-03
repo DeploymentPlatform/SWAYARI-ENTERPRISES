@@ -22,12 +22,12 @@ export async function onRequestGet(context) {
              p.customisation_info, p.status, p.is_demo, p.price_type, p.set_contents,
              p.order_increment, p.is_quote_only, p.bulk_tiers_json, p.packaging_options_json,
              p.shipping_info, p.occasions_json, p.supports_individual, p.supports_bulk,
-             p.deity, p.frame_size, p.orientation, p.border_finish,
+             p.deity, p.frame_size, p.orientation, p.border_finish, p.mrp, p.price_group,
              p.created_at, p.updated_at,
              c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.status = 'published' AND (p.indicative_price IS NULL OR p.indicative_price <= 999)
+      WHERE p.status = 'published'
     `;
     const params = [];
 
@@ -60,8 +60,14 @@ export async function onRequestGet(context) {
       params.push(orientation.trim().toLowerCase());
     }
 
-    // Price bands (same as FRAME_PRICE_BANDS in @swayari/shared); everything is ₹999 or less
-    const PRICE_BANDS = { 'under-199': [0, 199], '200-499': [200, 499], '500-999': [500, 999], 'under-999': [0, 999] };
+    // Price bands (same as FRAME_PRICE_BANDS in @swayari/shared), matched on the 1-piece price
+    const PRICE_BANDS = {
+      'under-299': [0, 299],
+      '300-999': [300, 999],
+      '1000-2999': [1000, 2999],
+      '3000-plus': [3000, 20000],
+      'under-2999': [0, 2999]
+    };
     if (PRICE_BANDS[budgetBand]) {
       query += ' AND p.indicative_price IS NOT NULL AND p.indicative_price >= ? AND p.indicative_price <= ?';
       params.push(...PRICE_BANDS[budgetBand]);
@@ -77,12 +83,15 @@ export async function onRequestGet(context) {
     }
 
     if (searchQuery && searchQuery.trim().length > 0) {
-      query += ' AND (p.name LIKE ? OR p.description LIKE ? OR p.material LIKE ? OR p.deity LIKE ?)';
-      const term = `%${searchQuery.trim()}%`;
-      params.push(term, term, term, term);
+      // Every word must match somewhere, so "ganesh frame" finds Ganesh frames.
+      for (const word of searchQuery.trim().split(/\s+/).slice(0, 6)) {
+        query += ' AND (p.name LIKE ? OR p.description LIKE ? OR p.material LIKE ? OR p.deity LIKE ? OR c.name LIKE ?)';
+        const term = `%${word}%`;
+        params.push(term, term, term, term, term);
+      }
     }
 
-    query += ' ORDER BY p.created_at DESC LIMIT 100';
+    query += ' ORDER BY p.created_at DESC LIMIT 200';
 
     const stmt = env.DB.prepare(query);
     const bound = params.length > 0 ? stmt.bind(...params) : stmt;
@@ -122,6 +131,8 @@ export async function onRequestGet(context) {
       frameSize: row.frame_size || null,
       orientation: row.orientation || 'portrait',
       borderFinish: row.border_finish || null,
+      mrp: row.mrp !== null && row.mrp !== undefined ? Number(row.mrp) : null,
+      priceGroup: row.price_group || null,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     }));

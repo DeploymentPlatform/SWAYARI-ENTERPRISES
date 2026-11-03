@@ -14,26 +14,36 @@ import { LOGO_COMPACT_ON_LIGHT, LOGO_COMPACT_SIZE, LOGO_ON_DARK, LOGO_SIZE, useD
 import { EASE_LUXURY } from './motion';
 
 const NAV_LINKS = [
-  { slug: 'all-frames', label: 'All Frames', href: '/shop' },
-  { slug: 'wedding-return-gifts', label: 'Return Gifts', href: '/shop?bulk=1' },
-  { slug: 'how-to-order', label: 'How to Order', href: '/#how-to-order' },
+  { slug: 'shop', label: 'Shop All', href: '/shop' },
+  { slug: 'wedding-return-gifts', label: 'Return Gifts', href: '/shop?occasion=wedding-return-gifts' },
+  { slug: 'gifting-under-2999', label: 'Under ₹2,999', href: '/shop?budget=under-2999' },
   { slug: 'about', label: 'Our Story', href: '/about' },
   { slug: 'contact', label: 'Contact', href: '/contact' }
 ];
 
+// Second header row: the five collections.
+const COLLECTIONS = [
+  { slug: 'god-frames', label: 'God Frames', href: '/shop?category=god-frames' },
+  { slug: 'stotram-frames', label: 'Stotram Frames', href: '/shop?category=stotram-frames' },
+  { slug: 'god-stands', label: 'God Stands', href: '/shop?category=god-stands' },
+  { slug: 'stotram-cards', label: 'Stotram Cards', href: '/shop?category=stotram-cards' },
+  { slug: 'wall-frames', label: 'Wall Frames', href: '/shop?category=wall-frames' }
+];
+
 const DEITY_SHORTCUTS = [
-  { slug: 'balaji', label: 'Balaji & Padmavathi', href: '/shop?deity=balaji' },
+  { slug: 'balaji', label: 'Balaji', href: '/shop?deity=balaji' },
+  { slug: 'lakshmi', label: 'Lakshmi', href: '/shop?deity=lakshmi' },
+  { slug: 'ganesh', label: 'Ganesh', href: '/shop?deity=ganesh' },
   { slug: 'sai', label: 'Sai Baba', href: '/shop?deity=sai' },
   { slug: 'krishna', label: 'Krishna', href: '/shop?deity=krishna' },
-  { slug: 'ram', label: 'Ram Darbar', href: '/shop?deity=ram' },
   { slug: 'hanuman', label: 'Hanuman', href: '/shop?deity=hanuman' }
 ];
 
 // `short` fits one line on a phone; `full` is shown from the small breakpoint up.
 const ANNOUNCEMENTS = [
-  { full: 'Everything under ₹999 — silver foil god frames from just ₹149', short: 'Everything under ₹999 · Frames ₹149' },
-  { full: 'Bulk quantities for weddings, griha pravesh & festivals — personally coordinated', short: 'Bulk orders for every celebration' },
-  { full: 'Send your request — our team confirms availability, packing & shipping', short: 'We confirm stock, packing & shipping' }
+  { full: 'Devotional gifting under ₹2,999 — return gifts from ₹39', short: 'Gifting under ₹2,999 · from ₹39' },
+  { full: 'Order from 1 piece — mix designs to unlock bulk prices', short: 'From 1 piece · bulk prices as you add' },
+  { full: 'No payment online — send your cart and we confirm stock, packing & delivery', short: 'No payment online · we confirm by call' }
 ];
 
 function useScrolled(threshold = 24) {
@@ -138,10 +148,10 @@ const SearchOverlay: React.FC<{ open: boolean; onClose: () => void; products: Pr
                   type="search"
                   value={query}
                   onChange={e => setQuery(e.target.value)}
-                  placeholder="Balaji, Sai Baba, Krishna…"
-                  aria-label="Search god frames and return gifts"
+                  placeholder="Balaji, stotram card, wall frame…"
+                  aria-label="Search god frames, stotram cards and return gifts"
                   autoComplete="off"
-                  className="w-full border-0 border-b border-stone-shade bg-transparent py-4 pl-10 pr-4 font-display text-[1.75rem] text-ink placeholder:text-ink-faint/60 focus:border-gold focus:outline-none focus:ring-0 sm:text-[2.5rem]"
+                  className="w-full border-0 border-b border-stone-shade bg-transparent py-4 pl-10 pr-4 font-display text-[1.75rem] text-ink placeholder:text-ink-faint focus:border-gold focus:outline-none focus:ring-0 sm:text-[2.5rem]"
                 />
               </form>
 
@@ -172,7 +182,7 @@ const SearchOverlay: React.FC<{ open: boolean; onClose: () => void; products: Pr
                           <span className="min-w-0 flex-1">
                             <span className="block truncate font-display text-lg text-ink group-hover:text-burgundy">{p.name}</span>
                             <span className="mt-0.5 block text-xs text-ink-faint">
-                              {p.dimensions || p.frameSize || 'Devotional frame'}
+                              {p.categoryName || p.dimensions || 'Devotional gift'}
                               {p.indicativePrice ? (
                                 <span className="font-semibold text-burgundy"> · {formatPrice(p.indicativePrice)}</span>
                               ) : null}
@@ -185,7 +195,7 @@ const SearchOverlay: React.FC<{ open: boolean; onClose: () => void; products: Pr
                   </ul>
                 )}
                 {q && suggestions.length === 0 && (
-                  <p className="text-sm text-ink-soft">No frames match “{query}”. Try a deity name such as Balaji or Krishna.</p>
+                  <p className="text-sm text-ink-soft">Nothing matches “{query}”. Try a deity such as Balaji, or a word like “card” or “stand”.</p>
                 )}
                 {!q && (
                   <div className="flex flex-wrap items-center gap-2">
@@ -406,7 +416,7 @@ export const Header: React.FC = () => {
                 type="button"
                 onClick={openDrawer}
                 className={`${iconBtn} -mr-2 sm:mr-0`}
-                aria-label={`View request list (${itemCount} items)`}
+                aria-label={`View cart (${itemCount} items)`}
               >
                 <ShoppingBag className="h-5 w-5" strokeWidth={1.7} />
                 <AnimatePresence>
@@ -428,20 +438,19 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Deity row (desktop) */}
+        {/* Collections row (desktop) */}
         <div
           className={`hidden overflow-hidden border-t border-stone-deep/60 transition-all duration-500 ease-luxury lg:block ${
             scrolled ? 'max-h-0 border-transparent opacity-0' : 'max-h-12 opacity-100'
           }`}
         >
           <div className="container-content flex h-11 items-center justify-center gap-1">
-            <span className="mr-3 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-gold-dark">Shop by deity</span>
-            {DEITY_SHORTCUTS.map(sc => (
+            {COLLECTIONS.map(sc => (
               <Link
                 key={sc.slug}
                 to={sc.href}
-                className={`rounded-full px-3.5 py-1.5 text-[0.8125rem] transition-all duration-300 ${
-                  currentHref === sc.href ? 'bg-burgundy text-ivory-light' : 'text-ink-soft hover:bg-white hover:text-burgundy'
+                className={`rounded-full px-4 py-1.5 text-[0.8125rem] font-medium tracking-[0.02em] transition-all duration-300 ${
+                  currentHref === sc.href ? 'bg-burgundy text-ivory-light' : 'text-ink hover:bg-white hover:text-burgundy'
                 }`}
               >
                 {sc.label}
@@ -511,9 +520,9 @@ export const Header: React.FC = () => {
                   ))}
                 </ul>
 
-                <p className="eyebrow mt-8 px-4">Shop by deity</p>
+                <p className="eyebrow mt-8 px-4">Collections</p>
                 <div className="mt-4 flex flex-wrap gap-2 px-4">
-                  {DEITY_SHORTCUTS.map(sc => (
+                  {COLLECTIONS.map(sc => (
                     <Link key={sc.slug} to={sc.href} className="chip">
                       {sc.label}
                     </Link>
@@ -522,7 +531,7 @@ export const Header: React.FC = () => {
 
                 <div className="mx-4 mt-8 rounded-2xl border border-gold/30 bg-gold-pale/50 p-4 text-[0.8125rem] leading-relaxed text-ink-soft">
                   <p className="font-display text-lg text-burgundy">Planning a celebration?</p>
-                  Everything under ₹999 · god frames ₹149 · minimum 25 frames. Send your request and our team will personally confirm quantities, packing and shipping.
+                  Return gifts from ₹39, order from 1 piece, bulk prices as you add more. Send your cart and our team personally confirms quantities, packing and delivery.
                   <Link to="/contact" className="text-link mt-3 flex">
                     <Phone className="h-3.5 w-3.5" /> Talk to us
                   </Link>
@@ -612,7 +621,7 @@ const MobileTabBar: React.FC<{
               </span>
             )}
           </span>
-          Request
+          Cart
         </button>
         {signedIn ? (
           <Link to="/account/orders" className={`${item} ${path.startsWith('/account') ? on : off}`}>

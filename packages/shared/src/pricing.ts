@@ -1,14 +1,12 @@
-import { BulkPriceTier, CartItem, Product } from './types.js';
-import { MAX_FRAME_PRICE, MAX_FRAME_PRICE_PAISE } from './constants.js';
+import { BulkPriceTier, CartItem, Product, ProductVariant } from './types.js';
+import { MAX_FRAME_PRICE_PAISE } from './constants.js';
 
 /**
- * Calculates the effective unit price for a devotional frame based on quantity and bulk tiers.
- * If quantity reaches or exceeds a bulk tier's min_qty, that tier's unit_price is applied.
- * Otherwise, the base indicative price is returned.
+ * Unit price for a quantity: the highest slab whose min_qty the quantity reaches.
+ * Slabs normally start at 1 piece; below the first slab the base (1-piece) price applies.
  *
- * Example:
- * Base price ₹65, 100-pc tier ₹42:
- * calculateEffectiveUnitPrice(65, [{ min_qty: 100, unit_price: 42 }], 100) -> 42
+ * Example: slabs 1→₹549, 10→₹469, 50→₹429, 100→₹399
+ * calculateEffectiveUnitPrice(549, slabs, 60) -> 429
  */
 export function calculateEffectiveUnitPrice(
   basePrice: number | null | undefined,
@@ -48,8 +46,36 @@ export function calculateLineSubtotal(unitPrice: number | null | undefined, quan
 }
 
 /**
- * Combines duplicate cart items sharing the same productId and selectedVariant.
- * Quantities are summed, and effective unit prices are updated according to bulk tiers.
+ * Which quantity count a line belongs to. Designs of the same product (price group) and the
+ * same size share one count, so a buyer can mix designs to reach a cheaper slab.
+ */
+export function slabKey(item: { productId: string; priceGroup?: string | null; selectedVariant?: string | null }): string {
+  return `${item.priceGroup || item.productId}::${item.selectedVariant || ''}`;
+}
+
+/** Total pieces per slab key across the whole cart. */
+export function slabQuantities(items: CartItem[]): Map<string, number> {
+  const totals = new Map<string, number>();
+  for (const item of items) {
+    const key = slabKey(item);
+    totals.set(key, (totals.get(key) || 0) + Math.max(0, Number(item.quantity) || 0));
+  }
+  return totals;
+}
+
+/** Re-prices every line with the slab reached by its whole group (product + size). */
+export function priceCartItems(items: CartItem[]): CartItem[] {
+  const totals = slabQuantities(items);
+  return items.map(item => {
+    const basePrice = item.basePrice ?? item.indicativePrice;
+    const groupQty = totals.get(slabKey(item)) || item.quantity;
+    return { ...item, basePrice, indicativePrice: calculateEffectiveUnitPrice(basePrice, item.bulkTiers, groupQty) };
+  });
+}
+
+/**
+ * Combines duplicate cart items sharing the same productId and selectedVariant, then prices
+ * every line with its group slab.
  */
 export function aggregateCartItems(items: CartItem[]): CartItem[] {
   const map = new Map<string, CartItem>();
@@ -58,28 +84,18 @@ export function aggregateCartItems(items: CartItem[]): CartItem[] {
     const key = `${item.productId}:::${item.selectedVariant || ''}`;
     const existing = map.get(key);
     if (existing) {
-      const combinedQty = existing.quantity + item.quantity;
-      const basePrice = existing.basePrice ?? existing.indicativePrice;
-      const effectivePrice = calculateEffectiveUnitPrice(basePrice, existing.bulkTiers, combinedQty);
-      existing.quantity = combinedQty;
-      existing.indicativePrice = effectivePrice;
+      existing.quantity += item.quantity;
       if (item.customisationNote && item.customisationNote !== existing.customisationNote) {
         existing.customisationNote = existing.customisationNote
           ? `${existing.customisationNote}; ${item.customisationNote}`
           : item.customisationNote;
       }
     } else {
-      const basePrice = item.basePrice ?? item.indicativePrice;
-      const effectivePrice = calculateEffectiveUnitPrice(basePrice, item.bulkTiers, item.quantity);
-      map.set(key, {
-        ...item,
-        basePrice,
-        indicativePrice: effectivePrice
-      });
+      map.set(key, { ...item, basePrice: item.basePrice ?? item.indicativePrice });
     }
   }
 
-  return Array.from(map.values());
+  return priceCartItems(Array.from(map.values()));
 }
 
 /**
@@ -98,10 +114,8 @@ export function calculateCartTotals(items: CartItem[]): {
 
   for (const item of aggregated) {
     totalQuantity += item.quantity;
-    const basePrice = item.basePrice ?? item.indicativePrice;
-    const effectivePrice = calculateEffectiveUnitPrice(basePrice, item.bulkTiers, item.quantity);
-    if (effectivePrice !== null && effectivePrice !== undefined) {
-      subtotal += effectivePrice * item.quantity;
+    if (item.indicativePrice !== null && item.indicativePrice !== undefined) {
+      subtotal += item.indicativePrice * item.quantity;
       pricedCount++;
     }
   }
@@ -113,6 +127,41 @@ export function calculateCartTotals(items: CartItem[]): {
     itemCount: totalQuantity,
     hasUnpricedItems
   };
+}
+
+/** Pricing for one size of a product (falls back to the product-level price). */
+export function resolveVariantPricing(
+  product: Pick<Product, 'variants' | 'indicativePrice' | 'mrp' | 'bulkTiers'>,
+  variantName?: string | null
+): { variant: ProductVariant | null; basePrice: number | null; mrp: number | null; tiers: BulkPriceTier[] } {
+  const variant = (variantName && product.variants?.find(v => v.name === variantName)) || null;
+  if (variant && variant.indicativePrice != null) {
+    return { variant, basePrice: variant.indicativePrice, mrp: variant.mrp ?? null, tiers: variant.tiers || [] };
+  }
+  return { variant, basePrice: product.indicativePrice, mrp: product.mrp ?? null, tiers: product.bulkTiers || [] };
+}
+
+/** Lowest per-piece price across the slabs (the "Best price"). */
+export function bestSlabPrice(basePrice: number | null | undefined, tiers?: BulkPriceTier[] | null): number | null {
+  const prices = (tiers || []).map(t => t.unit_price).filter(p => typeof p === 'number' && p > 0);
+  if (basePrice != null) prices.push(basePrice);
+  return prices.length ? Math.min(...prices) : null;
+}
+
+/** "Save up to N%": from the 1-piece price down to the best slab price. */
+export function savingsPercent(basePrice: number | null | undefined, best: number | null | undefined): number {
+  if (!basePrice || !best || best >= basePrice) return 0;
+  return Math.round(((basePrice - best) / basePrice) * 100);
+}
+
+/** Slab rows with readable ranges, e.g. [{ from: 1, to: 9, price: 549 }, …, { from: 100, to: null, price: 399 }]. */
+export function describeSlabs(
+  basePrice: number | null | undefined,
+  tiers?: BulkPriceTier[] | null
+): { from: number; to: number | null; price: number }[] {
+  const sorted = [...(tiers || [])].filter(t => t.unit_price > 0).sort((a, b) => a.min_qty - b.min_qty);
+  if (basePrice != null && (sorted.length === 0 || sorted[0].min_qty > 1)) sorted.unshift({ min_qty: 1, unit_price: basePrice });
+  return sorted.map((t, i) => ({ from: t.min_qty, to: i < sorted.length - 1 ? sorted[i + 1].min_qty - 1 : null, price: t.unit_price }));
 }
 
 /**
@@ -152,7 +201,7 @@ export function validateQuantityRules(
 
 /**
  * Validates monetary amount in rupees and converts to integer paise.
- * Strictly verifies <= 99,900 paise (₹999), the highest price on SWAYARI.
+ * Rejects anything above MAX_FRAME_PRICE (a sanity cap, not a range promise).
  */
 export function validatePricePaise(
   priceInRupees: unknown,
@@ -176,7 +225,7 @@ export function validatePricePaise(
   if (rounded > maxPricePaise) {
     return {
       isValid: false,
-      error: `Price ₹${num} exceeds maximum devotional frame limit of ₹${maxPricePaise / 100}`
+      error: `Price ₹${num} is above the ₹${maxPricePaise / 100} limit`
     };
   }
 

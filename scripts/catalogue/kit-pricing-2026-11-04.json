@@ -1,0 +1,1433 @@
+{
+ "brand": "Swayari",
+ "business": "B2B / wholesale",
+ "currency": "INR",
+ "prices_valid_from": "4 November 2026",
+ "price_rule": "price per piece = the slab price for the TOTAL quantity of that product + size in the order; designs can be mixed; delivery extra",
+ "slab_sets": {
+  "gift": [
+   "1–9 pcs",
+   "10–49 pcs",
+   "50–99 pcs",
+   "100+ pcs"
+  ],
+  "frame": [
+   "1–2 pcs",
+   "3–9 pcs",
+   "10–24 pcs",
+   "25+ pcs"
+  ]
+ },
+ "products": [
+  {
+   "id": "01",
+   "name": "Desk Stotram Flip Frame",
+   "category": "Stotram Frames",
+   "description": "Spiral-bound flip book of 999 silver foil pages with the full stotram or vratam pooja vidhanam in Telugu, set in a gold textured gift box with a red base and clear window. Stands on a desk or pooja shelf. Designs: Lalitha Sahasranamam, Vishnu Sahasranamam, Sri Vinayaka Vratakalpam, Sri Varalakshmi Vratam, Hanuman Chalisa, Sai Chalisa, Venkateswara Govinda Namalu. A meaningful gift for housewarmings, Varalakshmi Vratam, Vinayaka Chavithi and festivals.",
+   "folder": "products/01_Desk-Stotram-Flip-Frame",
+   "slabs": [
+    "1–9 pcs",
+    "10–49 pcs",
+    "50–99 pcs",
+    "100+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "Lalitha / Vishnu Sahasranamam, Vinayaka Vratakalpam, Varalakshmi Vratam",
+     "mrp": 899,
+     "prices": [
+      549,
+      469,
+      429,
+      399
+     ]
+    },
+    {
+     "label": "Hanuman Chalisa / Sai Chalisa / Venkateswara Govinda Namalu",
+     "mrp": 799,
+     "prices": [
+      499,
+      419,
+      389,
+      359
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "Lalitha Sahasranamam",
+     "folder": "products/01_Desk-Stotram-Flip-Frame/Lalitha-Sahasranamam",
+     "photos": [
+      "products/01_Desk-Stotram-Flip-Frame/Lalitha-Sahasranamam/01-01_lalitha-sahasranamam.jpg"
+     ],
+     "variants": [
+      "Lalitha / Vishnu Sahasranamam, Vinayaka Vratakalpam, Varalakshmi Vratam"
+     ]
+    },
+    {
+     "name": "Vishnu Sahasranamam",
+     "folder": "products/01_Desk-Stotram-Flip-Frame/Vishnu-Sahasranamam",
+     "photos": [
+      "products/01_Desk-Stotram-Flip-Frame/Vishnu-Sahasranamam/01-02_vishnu-sahasranamam.jpg"
+     ],
+     "variants": [
+      "Lalitha / Vishnu Sahasranamam, Vinayaka Vratakalpam, Varalakshmi Vratam"
+     ]
+    },
+    {
+     "name": "Hanuman Chalisa",
+     "folder": "products/01_Desk-Stotram-Flip-Frame/Hanuman-Chalisa",
+     "photos": [
+      "products/01_Desk-Stotram-Flip-Frame/Hanuman-Chalisa/01-03_hanuman-chalisa.jpg"
+     ],
+     "variants": [
+      "Hanuman Chalisa / Sai Chalisa / Venkateswara Govinda Namalu"
+     ]
+    },
+    {
+     "name": "Sai Chalisa",
+     "folder": "products/01_Desk-Stotram-Flip-Frame/Sai-Chalisa",
+     "photos": [
+      "products/01_Desk-Stotram-Flip-Frame/Sai-Chalisa/01-04_sai-chalisa.jpg"
+     ],
+     "variants": [
+      "Hanuman Chalisa / Sai Chalisa / Venkateswara Govinda Namalu"
+     ]
+    },
+    {
+     "name": "Venkateswara Govinda Namalu",
+     "folder": "products/01_Desk-Stotram-Flip-Frame/Venkateswara-Govinda-Namalu",
+     "photos": [
+      "products/01_Desk-Stotram-Flip-Frame/Venkateswara-Govinda-Namalu/01-05_venkateswara-govinda-namalu.jpg"
+     ],
+     "variants": [
+      "Hanuman Chalisa / Sai Chalisa / Venkateswara Govinda Namalu"
+     ]
+    },
+    {
+     "name": "Sri Vinayaka Vratakalpam",
+     "folder": "products/01_Desk-Stotram-Flip-Frame/Sri-Vinayaka-Vratakalpam",
+     "photos": [
+      "products/01_Desk-Stotram-Flip-Frame/Sri-Vinayaka-Vratakalpam/01-06_sri-vinayaka-vratakalpam-1.jpg",
+      "products/01_Desk-Stotram-Flip-Frame/Sri-Vinayaka-Vratakalpam/01-07_sri-vinayaka-vratakalpam-2.jpg",
+      "products/01_Desk-Stotram-Flip-Frame/Sri-Vinayaka-Vratakalpam/01-08_sri-vinayaka-vratakalpam-3.jpg"
+     ],
+     "variants": [
+      "Lalitha / Vishnu Sahasranamam, Vinayaka Vratakalpam, Varalakshmi Vratam"
+     ]
+    },
+    {
+     "name": "Sri Varalakshmi Vratam",
+     "folder": "products/01_Desk-Stotram-Flip-Frame/Sri-Varalakshmi-Vratam",
+     "photos": [
+      "products/01_Desk-Stotram-Flip-Frame/Sri-Varalakshmi-Vratam/01-09_sri-varalakshmi-vratam-1.jpg",
+      "products/01_Desk-Stotram-Flip-Frame/Sri-Varalakshmi-Vratam/01-10_sri-varalakshmi-vratam-2.jpg",
+      "products/01_Desk-Stotram-Flip-Frame/Sri-Varalakshmi-Vratam/01-11_sri-varalakshmi-vratam-3.jpg",
+      "products/01_Desk-Stotram-Flip-Frame/Sri-Varalakshmi-Vratam/01-12_sri-varalakshmi-vratam-4.jpg",
+      "products/01_Desk-Stotram-Flip-Frame/Sri-Varalakshmi-Vratam/01-13_sri-varalakshmi-vratam-5.jpg"
+     ],
+     "variants": [
+      "Lalitha / Vishnu Sahasranamam, Vinayaka Vratakalpam, Varalakshmi Vratam"
+     ]
+    }
+   ],
+   "common_photos": []
+  },
+  {
+   "id": "02",
+   "name": "Gold Border Stotram Frame",
+   "category": "Stotram Frames",
+   "description": "999 silver foil stotram book with a colour image of the deity, framed in a broad gold textured border with a red inner lining. Ideal for the pooja room or as a premium gift.",
+   "folder": "products/02_Gold-Border-Stotram-Frame",
+   "slabs": [
+    "1–9 pcs",
+    "10–49 pcs",
+    "50–99 pcs",
+    "100+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "Ganesh / Vara Lakshmi",
+     "mrp": 1499,
+     "prices": [
+      899,
+      799,
+      749,
+      699
+     ]
+    },
+    {
+     "label": "Lalitha Sahasranamam / Vishnu Sahasranamam",
+     "mrp": 1599,
+     "prices": [
+      999,
+      849,
+      799,
+      749
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "Vara Lakshmi",
+     "folder": "products/02_Gold-Border-Stotram-Frame/Vara-Lakshmi",
+     "photos": [
+      "products/02_Gold-Border-Stotram-Frame/Vara-Lakshmi/02-01_vara-lakshmi.jpg"
+     ],
+     "variants": [
+      "Ganesh / Vara Lakshmi"
+     ]
+    },
+    {
+     "name": "Vishnu Sahasranamam",
+     "folder": "products/02_Gold-Border-Stotram-Frame/Vishnu-Sahasranamam",
+     "photos": [
+      "products/02_Gold-Border-Stotram-Frame/Vishnu-Sahasranamam/02-02_vishnu-sahasranamam.jpg"
+     ],
+     "variants": [
+      "Lalitha Sahasranamam / Vishnu Sahasranamam"
+     ]
+    },
+    {
+     "name": "Lalitha Sahasranamam",
+     "folder": "products/02_Gold-Border-Stotram-Frame/Lalitha-Sahasranamam",
+     "photos": [
+      "products/02_Gold-Border-Stotram-Frame/Lalitha-Sahasranamam/02-03_lalitha-sahasranamam.jpg"
+     ],
+     "variants": [
+      "Lalitha Sahasranamam / Vishnu Sahasranamam"
+     ]
+    },
+    {
+     "name": "Ganesh",
+     "folder": "products/02_Gold-Border-Stotram-Frame/Ganesh",
+     "photos": [
+      "products/02_Gold-Border-Stotram-Frame/Ganesh/02-04_ganesh.jpg"
+     ],
+     "variants": [
+      "Ganesh / Vara Lakshmi"
+     ]
+    }
+   ],
+   "common_photos": []
+  },
+  {
+   "id": "03",
+   "name": "Silver Stotram Card with Red Cover",
+   "category": "Return Gifts",
+   "description": "999 fine silver foil card printed with a stotram in Telugu and a colour image of the deity, in a clear sleeve with a red 'Fine Silver 999' gift cover. 18 stotrams available. A popular return gift for functions and vratams.",
+   "folder": "products/03_Silver-Stotram-Card-With-Red-Cover",
+   "slabs": [
+    "1–9 pcs",
+    "10–49 pcs",
+    "50–99 pcs",
+    "100+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "Each card",
+     "mrp": 199,
+     "prices": [
+      99,
+      59,
+      49,
+      39
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "Lalitha Harathi",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Lalitha-Harathi",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Lalitha-Harathi/03-01_lalitha-harathi.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Ganesha Ashtottara Shatanamavali",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Ganesha-Ashtottara-Shatanamavali",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Ganesha-Ashtottara-Shatanamavali/03-02_ganesha-ashtottara-shatanamavali.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Shirdi Sai Baba",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Shirdi-Sai-Baba",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Shirdi-Sai-Baba/03-03_shirdi-sai-baba.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Shirdi Sai Baba Aarti",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Shirdi-Sai-Baba-Aarti",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Shirdi-Sai-Baba-Aarti/03-04_shirdi-sai-baba-aarti.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Shiva Mangalashtakam",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Shiva-Mangalashtakam",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Shiva-Mangalashtakam/03-05_shiva-mangalashtakam.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Sri Durga Chalisa",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Sri-Durga-Chalisa",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Sri-Durga-Chalisa/03-06_sri-durga-chalisa.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Lingashtakam",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Lingashtakam",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Lingashtakam/03-07_lingashtakam.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Krishnashtakam",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Krishnashtakam",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Krishnashtakam/03-08_krishnashtakam.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Kanakadhara Stotram",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Kanakadhara-Stotram",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Kanakadhara-Stotram/03-09_kanakadhara-stotram.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Narayana Stotram",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Narayana-Stotram",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Narayana-Stotram/03-10_narayana-stotram.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Satyanarayana Aarti",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Satyanarayana-Aarti",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Satyanarayana-Aarti/03-11_satyanarayana-aarti.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Mahishasura Mardini Stotram",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Mahishasura-Mardini-Stotram",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Mahishasura-Mardini-Stotram/03-12_mahishasura-mardini-stotram.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Sri Rama Raksha Stotram",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Sri-Rama-Raksha-Stotram",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Sri-Rama-Raksha-Stotram/03-13_sri-rama-raksha-stotram.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Vasavi Kanyaka Parameswari Ashtottaram",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Vasavi-Kanyaka-Parameswari-Ashtottaram",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Vasavi-Kanyaka-Parameswari-Ashtottaram/03-14_vasavi-kanyaka-parameswari-ashtottaram.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Ashta Lakshmi Stotram",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Ashta-Lakshmi-Stotram",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Ashta-Lakshmi-Stotram/03-15_ashta-lakshmi-stotram.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Lakshmi Ashtottaram",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Lakshmi-Ashtottaram",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Lakshmi-Ashtottaram/03-16_lakshmi-ashtottaram.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Aditya Hrudayam",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Aditya-Hrudayam",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Aditya-Hrudayam/03-17_aditya-hrudayam.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    },
+    {
+     "name": "Sri Ayyappa Stuti",
+     "folder": "products/03_Silver-Stotram-Card-With-Red-Cover/Sri-Ayyappa-Stuti",
+     "photos": [
+      "products/03_Silver-Stotram-Card-With-Red-Cover/Sri-Ayyappa-Stuti/03-18_sri-ayyappa-stuti.jpg"
+     ],
+     "variants": [
+      "Each card"
+     ]
+    }
+   ],
+   "common_photos": []
+  },
+  {
+   "id": "04",
+   "name": "Silver God Photo Stand",
+   "category": "God Stands",
+   "description": "Colour-enamelled 999 silver foil god image in a clear acrylic table stand. Three sizes. Many gods available. A favourite return gift and car/desk idol.",
+   "folder": "products/04_Silver-God-Photo-Stand",
+   "slabs": [
+    "1–9 pcs",
+    "10–49 pcs",
+    "50–99 pcs",
+    "100+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "No. 1 (small)",
+     "mrp": 149,
+     "prices": [
+      89,
+      69,
+      59,
+      49
+     ]
+    },
+    {
+     "label": "No. 2 (medium)",
+     "mrp": 299,
+     "prices": [
+      169,
+      139,
+      119,
+      99
+     ]
+    },
+    {
+     "label": "No. 3 (large)",
+     "mrp": 599,
+     "prices": [
+      349,
+      289,
+      249,
+      219
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "Shiva Parivar",
+     "folder": "products/04_Silver-God-Photo-Stand/Shiva-Parivar",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Shiva-Parivar/04-01_shiva-parivar.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Ganesh",
+     "folder": "products/04_Silver-God-Photo-Stand/Ganesh",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Ganesh/04-02_ganesh.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Ram Darbar",
+     "folder": "products/04_Silver-God-Photo-Stand/Ram-Darbar",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Ram-Darbar/04-03_ram-darbar.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Lakshmi Narasimha",
+     "folder": "products/04_Silver-God-Photo-Stand/Lakshmi-Narasimha",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Lakshmi-Narasimha/04-04_lakshmi-narasimha.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Radha Krishna",
+     "folder": "products/04_Silver-God-Photo-Stand/Radha-Krishna",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Radha-Krishna/04-05_radha-krishna.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Multi-god design",
+     "folder": "products/04_Silver-God-Photo-Stand/Multi-god-Design",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Multi-god-Design/04-06_multi-god-design.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Venkateswara & Padmavathi",
+     "folder": "products/04_Silver-God-Photo-Stand/Venkateswara-And-Padmavathi",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Venkateswara-And-Padmavathi/04-08_venkateswara-padmavathi.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Bal Krishna",
+     "folder": "products/04_Silver-God-Photo-Stand/Bal-Krishna",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Bal-Krishna/04-09_bal-krishna.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Sai Baba",
+     "folder": "products/04_Silver-God-Photo-Stand/Sai-Baba",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Sai-Baba/04-10_sai-baba.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Jesus",
+     "folder": "products/04_Silver-God-Photo-Stand/Jesus",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Jesus/04-12_jesus.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Lakshmi",
+     "folder": "products/04_Silver-God-Photo-Stand/Lakshmi",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Lakshmi/04-13_lakshmi.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Makkah Madina",
+     "folder": "products/04_Silver-God-Photo-Stand/Makkah-Madina",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Makkah-Madina/04-14_makkah-madina.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    },
+    {
+     "name": "Venkateswara (Balaji)",
+     "folder": "products/04_Silver-God-Photo-Stand/Venkateswara-Balaji",
+     "photos": [
+      "products/04_Silver-God-Photo-Stand/Venkateswara-Balaji/04-15_venkateswara-balaji.jpg"
+     ],
+     "variants": [
+      "No. 1 (small)",
+      "No. 2 (medium)",
+      "No. 3 (large)"
+     ]
+    }
+   ],
+   "common_photos": [
+    {
+     "shows": "No.1 stand in gift box",
+     "file": "products/04_Silver-God-Photo-Stand/_Common-Photos/04-07_no-1-stand-in-gift-box.jpg"
+    },
+    {
+     "shows": "Size comparison No.1, No.2, No.3",
+     "file": "products/04_Silver-God-Photo-Stand/_Common-Photos/04-11_size-comparison-no-1-no-2-no-3.jpg"
+    }
+   ]
+  },
+  {
+   "id": "05",
+   "name": "Long 5 Gods Silver Frame",
+   "category": "Wall Frames",
+   "description": "Long wall frame with five embossed silver-finish deities on a maroon background, in a gold-trimmed wooden frame. Fits above a door or pooja room entrance.",
+   "folder": "products/05_Long-5-Gods-Silver-Frame",
+   "slabs": [
+    "1–2 pcs",
+    "3–9 pcs",
+    "10–24 pcs",
+    "25+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "11 x 24 in",
+     "mrp": 4499,
+     "prices": [
+      3299,
+      2999,
+      2899,
+      2799
+     ]
+    },
+    {
+     "label": "13 x 34 in",
+     "mrp": 6999,
+     "prices": [
+      5199,
+      4899,
+      4699,
+      4499
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "5 gods",
+     "folder": "products/05_Long-5-Gods-Silver-Frame/5-Gods",
+     "photos": [
+      "products/05_Long-5-Gods-Silver-Frame/5-Gods/05-01_5-gods-1.jpg",
+      "products/05_Long-5-Gods-Silver-Frame/5-Gods/05-02_5-gods-2.jpg",
+      "products/05_Long-5-Gods-Silver-Frame/5-Gods/05-03_5-gods-3.jpg"
+     ],
+     "variants": [
+      "11 x 24 in",
+      "13 x 34 in"
+     ]
+    }
+   ],
+   "common_photos": []
+  },
+  {
+   "id": "06",
+   "name": "10 Gods Silver Frame",
+   "category": "Wall Frames",
+   "description": "Large wall frame with ten embossed silver-finish deities in two rows on a maroon background, gold-trimmed wooden frame. A grand piece for the pooja room or hall.",
+   "folder": "products/06_10-Gods-Silver-Frame",
+   "slabs": [
+    "1–2 pcs",
+    "3–9 pcs",
+    "10–24 pcs",
+    "25+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "20 x 26 in",
+     "mrp": 7499,
+     "prices": [
+      5499,
+      5099,
+      4899,
+      4699
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "10 gods",
+     "folder": "products/06_10-Gods-Silver-Frame/10-Gods",
+     "photos": [
+      "products/06_10-Gods-Silver-Frame/10-Gods/06-01_10-gods.jpg"
+     ],
+     "variants": [
+      "20 x 26 in"
+     ]
+    }
+   ],
+   "common_photos": []
+  },
+  {
+   "id": "07",
+   "name": "12 Gods Silver Frame",
+   "category": "Wall Frames",
+   "description": "Large wall frame with twelve embossed silver-finish deities in two rows on a maroon background, gold-trimmed wooden frame. A grand piece for the pooja room or hall.",
+   "folder": "products/07_12-Gods-Silver-Frame",
+   "slabs": [
+    "1–2 pcs",
+    "3–9 pcs",
+    "10–24 pcs",
+    "25+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "20 x 30 in",
+     "mrp": 8999,
+     "prices": [
+      6799,
+      6299,
+      5999,
+      5799
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "12 gods",
+     "folder": "products/07_12-Gods-Silver-Frame/12-Gods",
+     "photos": [
+      "products/07_12-Gods-Silver-Frame/12-Gods/07-01_12-gods.jpg"
+     ],
+     "variants": [
+      "20 x 30 in"
+     ]
+    }
+   ],
+   "common_photos": []
+  },
+  {
+   "id": "08",
+   "name": "German Silver God Frame 8x10",
+   "category": "God Frames",
+   "description": "Embossed German silver deity with silver corner ornaments on a maroon background, in a carved gold-trimmed frame. Many gods available.",
+   "folder": "products/08_German-Silver-God-Frame-8x10",
+   "slabs": [
+    "1–2 pcs",
+    "3–9 pcs",
+    "10–24 pcs",
+    "25+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "8 x 10 in",
+     "mrp": 999,
+     "prices": [
+      649,
+      549,
+      499,
+      479
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "Venkateswara & Padmavathi",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Venkateswara-And-Padmavathi",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Venkateswara-And-Padmavathi/08-01_venkateswara-padmavathi.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Ganesh",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Ganesh",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Ganesh/08-02_ganesh.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Lakshmi Narasimha",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Lakshmi-Narasimha",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Lakshmi-Narasimha/08-03_lakshmi-narasimha.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Sai Baba",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Sai-Baba",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Sai-Baba/08-04_sai-baba.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Krishna with cow",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Krishna-With-Cow",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Krishna-With-Cow/08-05_krishna-with-cow.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Mother Mary",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Mother-Mary",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Mother-Mary/08-06_mother-mary.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Makkah Madina",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Makkah-Madina",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Makkah-Madina/08-07_makkah-madina.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Saraswati",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Saraswati",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Saraswati/08-08_saraswati.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Lakshmi Ganesh Saraswati",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Lakshmi-Ganesh-Saraswati",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Lakshmi-Ganesh-Saraswati/08-09_lakshmi-ganesh-saraswati.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Standing deity with devotees",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Standing-Deity-With-Devotees",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Standing-Deity-With-Devotees/08-11_standing-deity-with-devotees.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Shiva Parvati",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Shiva-Parvati",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Shiva-Parvati/08-10_shiva-parvati.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Hanuman",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Hanuman",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Hanuman/08-12_hanuman.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Lakshmi",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Lakshmi",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Lakshmi/08-13_lakshmi.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Venkateswara (Balaji)",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Venkateswara-Balaji",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Venkateswara-Balaji/08-14_venkateswara-balaji.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    },
+    {
+     "name": "Durga",
+     "folder": "products/08_German-Silver-God-Frame-8x10/Durga",
+     "photos": [
+      "products/08_German-Silver-God-Frame-8x10/Durga/08-15_durga.jpg"
+     ],
+     "variants": [
+      "8 x 10 in"
+     ]
+    }
+   ],
+   "common_photos": []
+  },
+  {
+   "id": "09",
+   "name": "German Silver God Frame 10x12 / 12x14",
+   "category": "God Frames",
+   "description": "Embossed German silver deity with lamps and silver ornaments on a maroon background, in a carved gold-trimmed frame. Two sizes, many gods available.",
+   "folder": "products/09_German-Silver-God-Frame-10x12-12x14",
+   "slabs": [
+    "1–2 pcs",
+    "3–9 pcs",
+    "10–24 pcs",
+    "25+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "10 x 12 in",
+     "mrp": 1399,
+     "prices": [
+      899,
+      749,
+      699,
+      659
+     ]
+    },
+    {
+     "label": "12 x 14 in",
+     "mrp": 1599,
+     "prices": [
+      1049,
+      899,
+      849,
+      789
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "Ganesh",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Ganesh",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Ganesh/09-01_ganesh.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Lakshmi Narasimha",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Lakshmi-Narasimha",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Lakshmi-Narasimha/09-02_lakshmi-narasimha.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Shiva Parvati",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Shiva-Parvati",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Shiva-Parvati/09-03_shiva-parvati-1.jpg",
+      "products/09_German-Silver-God-Frame-10x12-12x14/Shiva-Parvati/09-18_shiva-parvati-2.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Makkah Madina",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Makkah-Madina",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Makkah-Madina/09-04_makkah-madina.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Hanuman",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Hanuman",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Hanuman/09-05_hanuman.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Mother Mary",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Mother-Mary",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Mother-Mary/09-06_mother-mary-1.jpg",
+      "products/09_German-Silver-God-Frame-10x12-12x14/Mother-Mary/09-20_mother-mary-2.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Lakshmi",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Lakshmi",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Lakshmi/09-07_lakshmi.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Durga",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Durga",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Durga/09-08_durga.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Lakshmi Ganesh Saraswati",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Lakshmi-Ganesh-Saraswati",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Lakshmi-Ganesh-Saraswati/09-09_lakshmi-ganesh-saraswati.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Sai Baba",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Sai-Baba",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Sai-Baba/09-10_sai-baba.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Saraswati",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Saraswati",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Saraswati/09-11_saraswati-1.jpg",
+      "products/09_German-Silver-God-Frame-10x12-12x14/Saraswati/09-15_saraswati-2.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Shiva Parivar",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Shiva-Parivar",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Shiva-Parivar/09-12_shiva-parivar.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Venkateswara (Balaji)",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Venkateswara-Balaji",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Venkateswara-Balaji/09-13_venkateswara-balaji.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Standing deity with devotees",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Standing-Deity-With-Devotees",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Standing-Deity-With-Devotees/09-14_standing-deity-with-devotees-1.jpg",
+      "products/09_German-Silver-God-Frame-10x12-12x14/Standing-Deity-With-Devotees/09-19_standing-deity-with-devotees-2.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Venkateswara & Padmavathi",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Venkateswara-And-Padmavathi",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Venkateswara-And-Padmavathi/09-16_venkateswara-padmavathi.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    },
+    {
+     "name": "Krishna with cow",
+     "folder": "products/09_German-Silver-God-Frame-10x12-12x14/Krishna-With-Cow",
+     "photos": [
+      "products/09_German-Silver-God-Frame-10x12-12x14/Krishna-With-Cow/09-17_krishna-with-cow.jpg"
+     ],
+     "variants": [
+      "10 x 12 in",
+      "12 x 14 in"
+     ]
+    }
+   ],
+   "common_photos": []
+  },
+  {
+   "id": "10",
+   "name": "Colour God Frame No. 2",
+   "category": "God Frames",
+   "description": "Colour-enamelled 999 silver foil god image in a carved maroon-and-gold frame. Comes with a red gift box.",
+   "folder": "products/10_Colour-God-Frame-No-2",
+   "slabs": [
+    "1–9 pcs",
+    "10–49 pcs",
+    "50–99 pcs",
+    "100+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "No. 2",
+     "mrp": 599,
+     "prices": [
+      329,
+      279,
+      259,
+      249
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "Venkateswara (Balaji)",
+     "folder": "products/10_Colour-God-Frame-No-2/Venkateswara-Balaji",
+     "photos": [
+      "products/10_Colour-God-Frame-No-2/Venkateswara-Balaji/10-01_venkateswara-balaji.jpg"
+     ],
+     "variants": [
+      "No. 2"
+     ]
+    },
+    {
+     "name": "Hanuman",
+     "folder": "products/10_Colour-God-Frame-No-2/Hanuman",
+     "photos": [
+      "products/10_Colour-God-Frame-No-2/Hanuman/10-02_hanuman.jpg"
+     ],
+     "variants": [
+      "No. 2"
+     ]
+    },
+    {
+     "name": "Ram Darbar",
+     "folder": "products/10_Colour-God-Frame-No-2/Ram-Darbar",
+     "photos": [
+      "products/10_Colour-God-Frame-No-2/Ram-Darbar/10-03_ram-darbar.jpg"
+     ],
+     "variants": [
+      "No. 2"
+     ]
+    },
+    {
+     "name": "Sai Baba",
+     "folder": "products/10_Colour-God-Frame-No-2/Sai-Baba",
+     "photos": [
+      "products/10_Colour-God-Frame-No-2/Sai-Baba/10-04_sai-baba.jpg"
+     ],
+     "variants": [
+      "No. 2"
+     ]
+    },
+    {
+     "name": "Radha Krishna",
+     "folder": "products/10_Colour-God-Frame-No-2/Radha-Krishna",
+     "photos": [
+      "products/10_Colour-God-Frame-No-2/Radha-Krishna/10-05_radha-krishna.jpg"
+     ],
+     "variants": [
+      "No. 2"
+     ]
+    },
+    {
+     "name": "Venkateswara & Padmavathi",
+     "folder": "products/10_Colour-God-Frame-No-2/Venkateswara-And-Padmavathi",
+     "photos": [
+      "products/10_Colour-God-Frame-No-2/Venkateswara-And-Padmavathi/10-06_venkateswara-padmavathi.jpg"
+     ],
+     "variants": [
+      "No. 2"
+     ]
+    }
+   ],
+   "common_photos": [
+    {
+     "shows": "Gift box",
+     "file": "products/10_Colour-God-Frame-No-2/_Common-Photos/10-07_gift-box.jpg"
+    }
+   ]
+  },
+  {
+   "id": "11",
+   "name": "Colour God Frame No. 3",
+   "category": "God Frames",
+   "description": "Colour-enamelled 999 silver foil god image with a cream mount in a carved maroon-and-gold frame. Larger than No. 2. Comes with a red gift box.",
+   "folder": "products/11_Colour-God-Frame-No-3",
+   "slabs": [
+    "1–9 pcs",
+    "10–49 pcs",
+    "50–99 pcs",
+    "100+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "No. 3",
+     "mrp": 999,
+     "prices": [
+      649,
+      589,
+      559,
+      529
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "Sai Baba",
+     "folder": "products/11_Colour-God-Frame-No-3/Sai-Baba",
+     "photos": [
+      "products/11_Colour-God-Frame-No-3/Sai-Baba/11-01_sai-baba.jpg"
+     ],
+     "variants": [
+      "No. 3"
+     ]
+    },
+    {
+     "name": "Bal Krishna",
+     "folder": "products/11_Colour-God-Frame-No-3/Bal-Krishna",
+     "photos": [
+      "products/11_Colour-God-Frame-No-3/Bal-Krishna/11-02_bal-krishna.jpg"
+     ],
+     "variants": [
+      "No. 3"
+     ]
+    },
+    {
+     "name": "Venkateswara & Padmavathi",
+     "folder": "products/11_Colour-God-Frame-No-3/Venkateswara-And-Padmavathi",
+     "photos": [
+      "products/11_Colour-God-Frame-No-3/Venkateswara-And-Padmavathi/11-03_venkateswara-padmavathi.jpg"
+     ],
+     "variants": [
+      "No. 3"
+     ]
+    },
+    {
+     "name": "Ganesh",
+     "folder": "products/11_Colour-God-Frame-No-3/Ganesh",
+     "photos": [
+      "products/11_Colour-God-Frame-No-3/Ganesh/11-04_ganesh.jpg"
+     ],
+     "variants": [
+      "No. 3"
+     ]
+    },
+    {
+     "name": "Hanuman",
+     "folder": "products/11_Colour-God-Frame-No-3/Hanuman",
+     "photos": [
+      "products/11_Colour-God-Frame-No-3/Hanuman/11-05_hanuman.jpg"
+     ],
+     "variants": [
+      "No. 3"
+     ]
+    },
+    {
+     "name": "Venkateswara (Balaji)",
+     "folder": "products/11_Colour-God-Frame-No-3/Venkateswara-Balaji",
+     "photos": [
+      "products/11_Colour-God-Frame-No-3/Venkateswara-Balaji/11-07_venkateswara-balaji.jpg"
+     ],
+     "variants": [
+      "No. 3"
+     ]
+    },
+    {
+     "name": "Radha Krishna",
+     "folder": "products/11_Colour-God-Frame-No-3/Radha-Krishna",
+     "photos": [
+      "products/11_Colour-God-Frame-No-3/Radha-Krishna/11-08_radha-krishna.jpg"
+     ],
+     "variants": [
+      "No. 3"
+     ]
+    }
+   ],
+   "common_photos": [
+    {
+     "shows": "Gift box",
+     "file": "products/11_Colour-God-Frame-No-3/_Common-Photos/11-06_gift-box.jpg"
+    }
+   ]
+  },
+  {
+   "id": "12",
+   "name": "German Silver God Frame 14x17",
+   "category": "God Frames",
+   "description": "Large embossed German silver deity with lamps and a decorative base on a maroon background, in a carved gold-trimmed frame.",
+   "folder": "products/12_German-Silver-God-Frame-14x17",
+   "slabs": [
+    "1–2 pcs",
+    "3–9 pcs",
+    "10–24 pcs",
+    "25+ pcs"
+   ],
+   "variants": [
+    {
+     "label": "14 x 17 in",
+     "mrp": 2199,
+     "prices": [
+      1449,
+      1249,
+      1149,
+      1099
+     ]
+    }
+   ],
+   "designs": [
+    {
+     "name": "Standing deity with devotees",
+     "folder": "products/12_German-Silver-God-Frame-14x17/Standing-Deity-With-Devotees",
+     "photos": [
+      "products/12_German-Silver-God-Frame-14x17/Standing-Deity-With-Devotees/12-01_standing-deity-with-devotees.jpg"
+     ],
+     "variants": [
+      "14 x 17 in"
+     ]
+    },
+    {
+     "name": "Ganesh",
+     "folder": "products/12_German-Silver-God-Frame-14x17/Ganesh",
+     "photos": [
+      "products/12_German-Silver-God-Frame-14x17/Ganesh/12-02_ganesh.jpg"
+     ],
+     "variants": [
+      "14 x 17 in"
+     ]
+    },
+    {
+     "name": "Ram Darbar",
+     "folder": "products/12_German-Silver-God-Frame-14x17/Ram-Darbar",
+     "photos": [
+      "products/12_German-Silver-God-Frame-14x17/Ram-Darbar/12-03_ram-darbar.jpg"
+     ],
+     "variants": [
+      "14 x 17 in"
+     ]
+    },
+    {
+     "name": "Shiva Parvati",
+     "folder": "products/12_German-Silver-God-Frame-14x17/Shiva-Parvati",
+     "photos": [
+      "products/12_German-Silver-God-Frame-14x17/Shiva-Parvati/12-04_shiva-parvati.jpg"
+     ],
+     "variants": [
+      "14 x 17 in"
+     ]
+    },
+    {
+     "name": "Venkateswara (Balaji)",
+     "folder": "products/12_German-Silver-God-Frame-14x17/Venkateswara-Balaji",
+     "photos": [
+      "products/12_German-Silver-God-Frame-14x17/Venkateswara-Balaji/12-05_venkateswara-balaji.jpg"
+     ],
+     "variants": [
+      "14 x 17 in"
+     ]
+    }
+   ],
+   "common_photos": []
+  }
+ ]
+}

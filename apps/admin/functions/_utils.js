@@ -179,9 +179,9 @@ export function validateFramePrice(val, fieldLabel = 'Price') {
   if (Math.abs(num * 100 - paise) > 0.0001) {
     return { isValid: false, error: `${fieldLabel} cannot have more than 2 decimal places` };
   }
-  // Everything on SWAYARI is priced under ₹999.
-  if (paise > 99900) {
-    return { isValid: false, error: `${fieldLabel} (₹${num}) is above the ₹999 limit. Every item on SWAYARI must be ₹999 or less.` };
+  // Sanity cap (the largest wall frame is well below it); catches typing mistakes like an extra zero.
+  if (paise > 2000000) {
+    return { isValid: false, error: `${fieldLabel} (₹${num}) is above the ₹20,000 limit. Please check the amount.` };
   }
   return { isValid: true, paise, amount: paise / 100 };
 }

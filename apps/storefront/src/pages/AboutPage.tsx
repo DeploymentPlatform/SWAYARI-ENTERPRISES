@@ -9,7 +9,7 @@ import { LotusMark } from '../components/ui';
 const PRINCIPLES = [
   {
     title: 'Blessings to give',
-    text: 'Seven much-loved deities in silver foil relief, framed to stand on a table or hang on a wall — for pooja rooms, griha pravesh and every wedding guest.'
+    text: 'Silver foil god frames, stotram frames, god stands and stotram cards — for the pooja room, a new home and every wedding guest.'
   },
   {
     title: 'Only what we can confirm',
@@ -17,14 +17,17 @@ const PRINCIPLES = [
   },
   {
     title: 'A person, not a checkout',
-    text: 'Every request is read and answered by our team. We confirm availability, final price, shipping and delivery with you before anything goes ahead.'
+    text: 'Every request is read and answered by our team. We confirm stock, final price and delivery with you before anything goes ahead.'
   }
 ];
 
 const NUMERALS = ['I', 'II', 'III'];
 
 export const AboutPage: React.FC = () => {
-  usePageMeta('Our Story', 'SWAYARI brings you devotional gifts under ₹999 — silver foil god frames at ₹149 each — with personal assistance for every order.');
+  usePageMeta(
+    'Our Story',
+    'SWAYARI brings you devotional gifting under ₹2,999 — silver foil god frames, stotram frames and return gifts from ₹39 — with personal help for every order.'
+  );
 
   return (
     <>
@@ -46,9 +49,10 @@ export const AboutPage: React.FC = () => {
               <br />
               <em className="text-gold-light">Gifts to remember.</em>
             </h1>
-            <p className="mt-7 max-w-lg text-[1.0625rem] leading-relaxed text-ivory/80">
-              SWAYARI brings you devotional gifts under ₹999, starting with silver foil god frames at ₹149 each — Balaji, Padmavathi Srinivasa, Sai Baba, Radha Krishna, Bal
-              Krishna, Ram Darbar and Hanuman — chosen for wedding return gifts, housewarmings, poojas and celebrations.
+            <p className="mt-7 max-w-lg text-[1.0625rem] leading-relaxed text-ivory/90">
+              SWAYARI brings you devotional gifting under ₹2,999 — silver foil god frames, stotram frames, god stands and stotram cards, with
+              return gifts from ₹39. For the pooja room, our long wall frames are the grand pick. Chosen for weddings, griha pravesh,
+              festivals and vratams.
             </p>
           </motion.div>
           <motion.div
@@ -71,7 +75,7 @@ export const AboutPage: React.FC = () => {
                 className="relative aspect-editorial w-full rounded-card object-cover object-[40%_50%] shadow-dialog"
               />
             </div>
-            <p className="mt-5 text-right text-[0.6875rem] uppercase tracking-[0.16em] text-ivory/55">Padmavathi Srinivasa · No. 1 silver foil frame</p>
+            <p className="mt-5 text-right text-[0.75rem] uppercase tracking-[0.16em] text-ivory/85">Padmavathi Srinivasa · silver foil god frame</p>
           </motion.div>
         </div>
       </section>
@@ -86,12 +90,13 @@ export const AboutPage: React.FC = () => {
           </Reveal>
           <Reveal className="space-y-5 text-[1.0625rem] leading-[1.8] text-ink-soft md:col-span-7 md:col-start-6 md:text-lg" delay={0.1}>
             <p className="first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-display first-letter:text-[3.6rem] first-letter:font-semibold first-letter:leading-[0.8] first-letter:text-burgundy">
-              SWAYARI is run by SWAYARI ENTERPRISES. Rather than an automated checkout, we work on order requests: you choose the frames
-              you like, send them to us in one short form, and our team contacts you personally.
+              SWAYARI is run by SWAYARI ENTERPRISES. Rather than an automated checkout, we work on order requests: you add the gifts you
+              like to your cart — from 1 piece — send them to us in one short form, and our team contacts you personally.
             </p>
             <p>
-              That conversation is where we confirm what matters — whether your designs are in stock, its final price, how it will be packed
-              and sent, and when it can reach you. No payment is taken on this website.
+              That conversation is where we confirm what matters — whether your designs are in stock, the final price, how they will be
+              packed and sent, and when they can reach you. Mix designs to reach a bulk price. Delivery is extra, at actual cost, and no
+              payment is taken on this website.
             </p>
           </Reveal>
         </div>
@@ -124,7 +129,7 @@ export const AboutPage: React.FC = () => {
               alt="Radha Krishna silver foil frames tied with ribbon on a wedding return-gift table"
               className="aspect-[4/3] w-full rounded-card object-cover object-[50%_60%] shadow-card"
             />
-            <p className="mt-3 text-[0.75rem] uppercase tracking-[0.14em] text-ink-faint">Wedding return-gift table</p>
+            <p className="mt-3 text-[0.75rem] uppercase tracking-[0.14em] text-ink-soft">Wedding return-gift table</p>
           </Reveal>
           <Reveal className="md:col-span-4 md:col-start-9" delay={0.1}>
             <LotusMark className="h-6 w-10 text-gold" />

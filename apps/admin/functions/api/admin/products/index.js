@@ -19,7 +19,7 @@ export async function onRequestGet(context) {
              p.images, p.material, p.dimensions, p.has_variants, p.variants_json,
              p.indicative_price, p.min_quantity, p.availability_label,
              p.customisation_info, p.status, p.is_demo, p.price_type, p.set_contents,
-             p.order_increment, p.is_quote_only, p.bulk_tiers_json, p.packaging_options_json,
+             p.order_increment, p.is_quote_only, p.bulk_tiers_json, p.packaging_options_json, p.mrp, p.price_group,
              p.shipping_info, p.occasions_json, p.supports_individual, p.supports_bulk,
              p.deity, p.frame_size, p.orientation, p.border_finish,
              p.created_at, p.updated_at,
@@ -71,6 +71,8 @@ export async function onRequestGet(context) {
       orderIncrement: row.order_increment || 1,
       isQuoteOnly: Boolean(row.is_quote_only),
       bulkTiers: JSON.parse(row.bulk_tiers_json || '[]'),
+      mrp: row.mrp !== null && row.mrp !== undefined ? Number(row.mrp) : null,
+      priceGroup: row.price_group || null,
       packagingOptions: JSON.parse(row.packaging_options_json || '[]'),
       shippingInfo: row.shipping_info || 'Standard dispatched in 2–4 business days across India',
       occasions: JSON.parse(row.occasions_json || '[]'),
@@ -136,7 +138,9 @@ export async function onRequestPost(context) {
       deity = null,
       frameSize = null,
       orientation = 'portrait',
-      borderFinish = null
+      borderFinish = null,
+      mrp = null,
+      priceGroup = null
     } = body;
 
     if (!sku || !name || !description) {
@@ -146,14 +150,14 @@ export async function onRequestPost(context) {
     // Require valid price and photo before publishing live inventory
     if (status === 'published' && !isDemo) {
       if (indicativePrice === undefined || indicativePrice === null || indicativePrice === '') {
-        return errorResponse('A published item needs a price of ₹999 or less. Save it as a draft if the price is not set yet.', 400);
+        return errorResponse('A published item needs a price. Save it as a draft if the price is not set yet.', 400);
       }
       if (!Array.isArray(images) || images.length === 0) {
         return errorResponse('Published devotional frames must have at least one authentic product photograph attached.', 400);
       }
     }
 
-    // ₹999 limit: integer paise validation
+    // Price sanity check: integer paise, at most ₹20,000
     const priceCheck = validateFramePrice(indicativePrice, 'Frame indicative price');
     if (!priceCheck.isValid) {
       return errorResponse(priceCheck.error, 400);
@@ -244,6 +248,14 @@ export async function onRequestPost(context) {
       nowIso,
       nowIso
     ).run();
+
+    // MRP (struck-through price) and price group (designs that share quantity slabs).
+    const mrpCheck = validateFramePrice(mrp, 'MRP');
+    if (mrpCheck.isValid && (mrpCheck.paise || priceGroup)) {
+      await env.DB.prepare('UPDATE products SET mrp = ?, price_group = ? WHERE id = ?')
+        .bind(mrpCheck.paise ? mrpCheck.paise / 100 : null, priceGroup ? String(priceGroup).trim().slice(0, 40) : null, id)
+        .run();
+    }
 
     await logAudit(env, 'product', id, 'admin_create_product', session.user.email, { sku, name, status });
 

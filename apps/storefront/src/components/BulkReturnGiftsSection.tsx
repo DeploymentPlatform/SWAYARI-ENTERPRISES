@@ -1,5 +1,5 @@
 import React from 'react';
-import { Product, MAX_FRAME_PRICE } from '@swayari/shared';
+import { Product, GIFTING_PRICE_CAP } from '@swayari/shared';
 import { ProductCard } from './ProductCard';
 import { Link } from '../lib/router';
 import { Heart, Sparkles, Truck, ArrowRight, MessageSquareQuote, CheckCircle2 } from 'lucide-react';
@@ -12,23 +12,23 @@ interface BulkReturnGiftsSectionProps {
 const PILLARS = [
   {
     icon: CheckCircle2,
-    title: 'Seven auspicious designs',
-    body: 'Balaji, Padmavathi Srinivasa, Sai Baba, Radha Krishna, Bal Krishna, Ram Darbar and Hanuman. Mix them freely.'
+    title: 'Return gifts from ₹39',
+    body: 'Silver foil stotram cards from ₹39 and god stands from ₹49 in bulk — gifts every guest will keep.'
   },
   {
     icon: Sparkles,
-    title: 'Everything under ₹999',
-    body: 'God frames are just ₹149 each. Minimum order is 25 frames in total, in any mix of designs.'
+    title: 'Mix designs, unlock bulk prices',
+    body: 'Order from 1 piece. Cards, stands and flip frames get better prices at 10, 50 and 100 pieces; frames at 3, 10 and 25.'
   },
   {
     icon: Truck,
-    title: 'Shipping charged extra',
-    body: 'Shipping is worked out for your quantity and delivery PIN code, and confirmed before dispatch.'
+    title: 'Delivery at actual cost',
+    body: 'Delivery is extra, worked out for your quantity and PIN code, and confirmed with you before dispatch.'
   }
 ];
 
 export const BulkReturnGiftsSection: React.FC<BulkReturnGiftsSectionProps> = ({ products }) => {
-  const displayItems = products.filter(p => p.indicativePrice !== null && p.indicativePrice <= MAX_FRAME_PRICE).slice(0, 4);
+  const displayItems = products.filter(p => p.indicativePrice !== null && p.indicativePrice <= GIFTING_PRICE_CAP).slice(0, 4);
 
   return (
     <section aria-labelledby="wedding-return-title" className="section">
@@ -53,11 +53,11 @@ export const BulkReturnGiftsSection: React.FC<BulkReturnGiftsSectionProps> = ({ 
                 <h2 id="wedding-return-title" className="mt-5 text-ivory-light font-display text-[2.2rem] font-medium leading-[1.02] sm:text-[3rem] lg:text-[3.4rem]">
                   A blessing in every guest’s hands, <span className="italic text-gold-light">beautifully framed.</span>
                 </h2>
-                <p className="mt-5 max-w-xl text-[0.95rem] leading-relaxed text-ivory-light/80 sm:text-base">
-                  Planning a wedding, griha pravesh or family celebration? Choose silver foil god frames at ₹149 each — everything here is under ₹999. Mix designs or pick one deity, tell us your quantity (25 frames or more), and our team handles personal confirmation and safe dispatch.
+                <p className="mt-5 max-w-xl text-[0.95rem] leading-relaxed text-ivory-light/90 sm:text-base">
+                  Planning a wedding, griha pravesh or vratam? Choose silver foil stotram cards, god stands and god frames, mix designs to reach a bulk price, and send us your request. Our team confirms every detail with you and packs each gift with care.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
-                  <Link to="/shop?bulk=1" className="btn-gold">
+                  <Link to="/shop?occasion=wedding-return-gifts" className="btn-gold">
                     Plan your return gifts <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link to="/contact" className="btn-ghost-light">
@@ -74,7 +74,7 @@ export const BulkReturnGiftsSection: React.FC<BulkReturnGiftsSectionProps> = ({ 
                     </span>
                     <span>
                       <span className="block font-display text-[1.25rem] text-ivory-light">{p.title}</span>
-                      <span className="mt-1 block text-[0.8125rem] leading-relaxed text-ivory-light/70">{p.body}</span>
+                      <span className="mt-1 block text-[0.8125rem] leading-relaxed text-ivory-light/85">{p.body}</span>
                     </span>
                   </li>
                 ))}
@@ -90,8 +90,8 @@ export const BulkReturnGiftsSection: React.FC<BulkReturnGiftsSectionProps> = ({ 
                 <p className="eyebrow">Guest favourites</p>
                 <h3 className="mt-3 font-display text-[1.9rem] leading-tight sm:text-[2.4rem]">Popular return gift designs</h3>
               </div>
-              <Link to="/shop?bulk=1" className="text-link group hidden sm:inline-flex">
-                View all bulk frames <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <Link to="/shop?occasion=wedding-return-gifts" className="text-link group hidden sm:inline-flex">
+                View all return gifts <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </Reveal>
             <StaggerGroup className="mt-8 grid grid-cols-2 gap-3.5 sm:gap-6 lg:grid-cols-4">

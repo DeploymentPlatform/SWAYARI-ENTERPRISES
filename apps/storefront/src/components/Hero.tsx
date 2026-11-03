@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Pause, Play, ArrowRight, MessageSquareQuote } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play, ArrowRight, Gift } from 'lucide-react';
 import { Link } from '../lib/router';
 
 interface Slide {
@@ -16,67 +16,76 @@ interface Slide {
   alt: string;
 }
 
+// Shown until /api/banners answers (and if it can't); matches migration 0014.
 const CONFIRMED_SLIDES: Slide[] = [
   {
-    id: 'devotional-99',
-    badge: 'Auspicious Celebrations',
-    headline: 'Silver foil god frames',
-    emphasis: '₹149 each',
-    supporting: 'Balaji, Padmavathi Srinivasa, Sai Baba, Radha Krishna, Bal Krishna, Ram Darbar and Hanuman. Mix any designs in one order.',
+    id: 'banner-devotional-99',
+    badge: 'Silver foil god frames',
+    headline: 'Blessings, beautifully',
+    emphasis: 'framed.',
+    supporting: 'Balaji, Lakshmi, Ganesh, Sai Baba and more in carved frames — from ₹329, bulk prices from ₹249.',
+    ctaText: 'Shop god frames',
+    ctaHref: '/shop?category=god-frames',
     desktopImage: '/assets/editorial/hero-god-frames-desktop.webp',
     mobileImage: '/assets/editorial/hero-god-frames-mobile.webp',
-    alt: 'Five silver foil god frames on a pooja table with brass diyas and marigolds'
+    alt: 'Silver foil god frames on a pooja table with brass diyas and marigolds'
   },
   {
-    id: 'thoughtful-thank-you',
-    badge: 'Cherished Keepsakes',
-    headline: 'A thoughtful thank-you',
-    emphasis: 'for every guest.',
-    supporting: 'Silver foil frames that stand on a table or hang on a wall. Minimum order 25 frames; shipping charged extra.',
+    id: 'banner-wedding-guest',
+    badge: 'Wedding return gifts',
+    headline: 'A blessing in every',
+    emphasis: "guest's hands.",
+    supporting: 'Silver foil stotram cards from ₹39 and god stands from ₹49 in bulk. Mix designs to reach a slab.',
+    ctaText: 'Shop return gifts',
+    ctaHref: '/shop?occasion=wedding-return-gifts',
     desktopImage: '/assets/editorial/hero-return-gifts-desktop.webp',
     mobileImage: '/assets/editorial/hero-return-gifts-mobile.webp',
-    alt: 'Rows of silver foil god frames tied with ribbon on a wedding return-gift table'
+    alt: 'Silver foil gifts tied with ribbon on a wedding return-gift table'
   },
   {
-    id: 'bulk-quantity-choice',
-    badge: 'Seamless Bulk Requests',
-    headline: 'Choose your frames.',
-    emphasis: 'Tell us your quantity.',
-    supporting: 'Pick your designs, tell us how many, and our team calls you to confirm stock, packing and shipping.',
+    id: 'banner-bulk-process',
+    badge: 'Order from 1 piece',
+    headline: 'Fill your cart.',
+    emphasis: 'We confirm the rest.',
+    supporting: 'Send your cart as a request — no payment online. We call to confirm stock, packing and delivery at actual cost.',
+    ctaText: 'How ordering works',
+    ctaHref: '/ordering-policy',
     desktopImage: '/assets/editorial/hero-bulk-order-desktop.webp',
     mobileImage: '/assets/editorial/hero-bulk-order-mobile.webp',
-    alt: 'Silver foil god frames packed in gift boxes for a bulk order'
+    alt: 'Silver foil gifts packed in gift boxes for a bulk order'
   }
 ];
 
+const EASE = [0.22, 1, 0.36, 1] as const;
 const heroItem = {
-  hidden: { opacity: 0, y: 26 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } }
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } }
 };
 
-// The store-wide promise. It stays put while the slides change, so "under ₹999" is always the hero's headline.
+// The collection promise stays put while the slides change. It renders immediately (no entrance
+// animation) so the first thing a visitor sees is the full message, not text fading in.
 const GOLD_TEXT =
-  'bg-[linear-gradient(110deg,#B8924A_15%,#F4EAD3_38%,#E3CC9A_52%,#B8924A_72%)] bg-[length:200%_100%] bg-clip-text text-transparent motion-safe:animate-shimmer [animation-duration:8s]';
+  'bg-[linear-gradient(110deg,#C9A45C_10%,#F7EBCB_36%,#E8CF98_52%,#C9A45C_74%)] bg-[length:200%_100%] bg-clip-text text-transparent motion-safe:animate-shimmer [animation-duration:9s]';
 
 const PricePromise: React.FC = () => (
-  <motion.div
-    initial={{ opacity: 0, y: 22 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-  >
-    <p className="flex items-center gap-3 text-[0.625rem] font-semibold uppercase tracking-[0.32em] text-gold-light sm:text-[0.6875rem]">
-      <span className="h-px w-8 bg-gradient-to-r from-transparent to-gold-light/70" aria-hidden />
-      The SWAYARI promise
+  <div>
+    <p className="flex items-center gap-3 text-[0.6875rem] font-semibold uppercase tracking-[0.3em] text-gold-light">
+      <span className="h-px w-8 bg-gradient-to-r from-transparent to-gold-light" aria-hidden />
+      Devotional gifting
     </p>
     <h1 className="mt-3 font-display font-medium text-ivory-light sm:mt-4">
-      <span className="block text-[1.75rem] leading-none tracking-[-0.01em] sm:text-[2.4rem] lg:text-[2.9rem]">Everything under</span>
+      <span className="block text-[1.9rem] leading-none tracking-[-0.01em] sm:text-[2.5rem] lg:text-[3rem]">Gifting under</span>
       <span
-        className={`-ml-1 block pb-1 text-[4.75rem] font-semibold leading-[0.95] tracking-[-0.035em] [filter:drop-shadow(0_8px_28px_rgba(227,204,154,0.28))] sm:text-[6.25rem] lg:text-[7.5rem] ${GOLD_TEXT}`}
+        className={`-ml-1 block pb-1 text-[4.6rem] font-semibold leading-[0.95] tracking-[-0.035em] [filter:drop-shadow(0_8px_28px_rgba(227,204,154,0.3))] sm:text-[6rem] lg:text-[7.25rem] ${GOLD_TEXT}`}
       >
-        ₹999
+        ₹2,999
       </span>
     </h1>
-  </motion.div>
+    <p className="mt-3 text-[0.8125rem] font-medium tracking-[0.04em] text-ivory-light sm:text-[0.9375rem]">
+      Return gifts from ₹39 <span className="mx-1.5 text-gold-light" aria-hidden>·</span> Order from 1 piece
+      <span className="mx-1.5 text-gold-light" aria-hidden>·</span> Bulk prices as you add more
+    </p>
+  </div>
 );
 
 export const Hero: React.FC = () => {
@@ -179,7 +188,7 @@ export const Hero: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
       tabIndex={0}
       aria-roledescription="carousel"
-      aria-label="Devotional frames campaigns"
+      aria-label="SWAYARI collections"
       className="relative select-none overflow-hidden bg-umber text-ivory-light touch-pan-y focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
     >
       <div
@@ -197,7 +206,7 @@ export const Hero: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.8, ease: EASE }}
             className="absolute inset-0"
           >
             <picture className="absolute inset-0 block h-full w-full overflow-hidden">
@@ -205,7 +214,7 @@ export const Hero: React.FC = () => {
               <source media="(max-width: 767px)" srcSet={slide.mobileImage} />
               <img
                 src={slide.desktopImage}
-                alt={slide.alt || 'Devotional frame'}
+                alt={slide.alt || 'SWAYARI devotional gifts'}
                 loading={current === 0 ? 'eager' : 'lazy'}
                 className={`h-full w-full object-cover object-[72%_50%] ${reduceMotion ? '' : 'animate-ken-burns'}`}
               />
@@ -214,7 +223,7 @@ export const Hero: React.FC = () => {
         </AnimatePresence>
 
         {/* Legibility veils: warm vignette + bottom fade */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-umber/90 via-umber/55 to-umber/5" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-umber/90 via-umber/60 to-umber/10" aria-hidden />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-umber/85 to-transparent" aria-hidden />
         <div className="pointer-events-none absolute -left-24 top-1/3 h-80 w-80 rounded-full bg-gold/15 blur-[100px]" aria-hidden />
 
@@ -223,7 +232,7 @@ export const Hero: React.FC = () => {
           <div className="container-content w-full">
             <div className="max-w-[640px] pb-16 sm:pb-10">
               <PricePromise />
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={slide.id}
                   initial="hidden"
@@ -231,15 +240,15 @@ export const Hero: React.FC = () => {
                   exit="exit"
                   variants={{
                     hidden: {},
-                    show: { transition: { staggerChildren: 0.12, delayChildren: 0.25 } },
-                    exit: { opacity: 0, y: -10, transition: { duration: 0.35 } }
+                    show: { transition: { staggerChildren: 0.05, delayChildren: 0.02 } },
+                    exit: { opacity: 0, transition: { duration: 0.18 } }
                   }}
                 >
                   <motion.div variants={heroItem} className="mt-6 flex items-center gap-3 sm:mt-7" aria-hidden>
                     <span className="block h-1.5 w-1.5 rotate-45 bg-gold-light" />
                     <span className="h-px w-16 bg-gradient-to-r from-gold-light/70 to-transparent" />
                   </motion.div>
-                  <motion.p variants={heroItem} className="mt-4 text-[0.625rem] font-semibold uppercase tracking-[0.24em] text-gold-light/85 sm:text-[0.6875rem]">
+                  <motion.p variants={heroItem} className="mt-4 text-[0.6875rem] font-semibold uppercase tracking-[0.24em] text-gold-light">
                     {slide.badge}
                   </motion.p>
                   <motion.h2
@@ -248,7 +257,7 @@ export const Hero: React.FC = () => {
                   >
                     {slide.headline} <span className="italic text-gold-light">{slide.emphasis}</span>
                   </motion.h2>
-                  <motion.p variants={heroItem} className="mt-3 max-w-[480px] text-[0.9rem] leading-relaxed text-ivory-light/80 sm:text-[1rem]">
+                  <motion.p variants={heroItem} className="mt-3 max-w-[480px] text-[0.9375rem] leading-relaxed text-ivory-light/90 sm:text-[1.0625rem]">
                     {slide.supporting}
                   </motion.p>
                   <motion.div variants={heroItem} className="mt-7 flex flex-wrap items-center gap-3">
@@ -259,18 +268,18 @@ export const Hero: React.FC = () => {
                       }}
                       className="btn-gold"
                     >
-                      {slide.ctaText || 'Explore frames'}
+                      {slide.ctaText || 'Explore the collection'}
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                     <Link
-                      to="/shop?bulk=1"
+                      to="/shop?budget=under-2999"
                       onClick={e => {
                         if (isDragging) e.preventDefault();
                       }}
                       className="btn-ghost-light"
                     >
-                      <MessageSquareQuote className="h-4 w-4 text-gold-light" />
-                      Bulk quote
+                      <Gift className="h-4 w-4 text-gold-light" />
+                      Gifts under ₹2,999
                     </Link>
                   </motion.div>
                 </motion.div>
@@ -285,8 +294,8 @@ export const Hero: React.FC = () => {
             <div className="flex flex-1 items-center gap-4 sm:max-w-md">
               <span className="font-display text-sm tabular-nums text-gold-light">
                 {String(current + 1).padStart(2, '0')}
-                <span className="mx-1.5 text-ivory-light/40">/</span>
-                <span className="text-ivory-light/60">{String(total).padStart(2, '0')}</span>
+                <span className="mx-1.5 text-ivory-light/75">/</span>
+                <span className="text-ivory-light/75">{String(total).padStart(2, '0')}</span>
               </span>
               <div className="flex flex-1 items-center gap-2" role="tablist" aria-label="Slide selectors">
                 {slides.map((s, idx) => (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from '../lib/router';
 import { Mail, Phone, ShieldCheck, ArrowUpRight, ArrowUp } from 'lucide-react';
-import { LotusMark } from './ui';
+import { LOGO_ON_DARK } from './ui';
 
 const COLLECTIONS = [
   { label: 'All god frames', to: '/shop?category=god-frames' },
@@ -41,11 +41,9 @@ export const Footer: React.FC = () => (
     <div className="container-content relative pb-28 pt-16 md:pb-10 md:pt-20">
       {/* Signature */}
       <div className="flex flex-col items-center text-center">
-        <LotusMark className="h-6 w-10 text-gold" />
-        <p className="mt-3 pl-[0.3em] font-wordmark text-[2.2rem] font-semibold tracking-[0.3em] text-ivory-light sm:text-[2.8rem]">SWAYARI</p>
-        <p className="mt-2 text-[0.6875rem] font-semibold uppercase tracking-[0.42em] text-gold-light">Décor &amp; Gifting</p>
+        <img src={LOGO_ON_DARK} alt="SWAYARI — Décor & Gifting" width={825} height={304} loading="lazy" className="h-24 w-auto sm:h-32" draggable={false} />
         <p className="mt-6 max-w-xl font-display text-[1.25rem] italic leading-snug text-ivory-light/80 sm:text-[1.45rem]">
-          Silver foil god frames at ₹99 each — auspicious return gifts for weddings, griha pravesh and family celebrations.
+          Devotional gifts under ₹999 — silver foil god frames from ₹99, auspicious return gifts for weddings, griha pravesh and family celebrations.
         </p>
       </div>
 

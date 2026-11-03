@@ -10,7 +10,7 @@ import { Reveal, StaggerGroup, StaggerItem } from '../components/motion';
 import { Link } from '../lib/router';
 import { usePageMeta } from '../lib/meta';
 import { useProducts } from '../lib/products';
-import { Product, BRAND_TAGLINES } from '@swayari/shared';
+import { Product, BRAND_TAGLINES, MAX_FRAME_PRICE } from '@swayari/shared';
 import { productCardImage, uniqueProductImages } from '../lib/media';
 
 // Short names for the "Shop by deity" row; one tile per frame in the catalogue.
@@ -39,7 +39,7 @@ const SkeletonCard: React.FC = () => (
 export const HomePage: React.FC = () => {
   usePageMeta(
     BRAND_TAGLINES.headline,
-    `${BRAND_TAGLINES.supporting} No. 1 silver foil god frames at ₹99 each for wedding return gifts, griha pravesh and poojas. Minimum order 25 frames; shipping extra.`
+    `${BRAND_TAGLINES.supporting} Everything under ₹999, including No. 1 silver foil god frames at ₹99 each for wedding return gifts, griha pravesh and poojas. Minimum order 25 frames; shipping extra.`
   );
 
   const { products, status } = useProducts();
@@ -53,7 +53,7 @@ export const HomePage: React.FC = () => {
         const ids: string[] = JSON.parse(stored);
         const matches = ids
           .map(id => products.find(p => p.id === id))
-          .filter((p): p is Product => Boolean(p) && (p.indicativePrice === null || p.indicativePrice <= 99))
+          .filter((p): p is Product => Boolean(p) && (p.indicativePrice === null || p.indicativePrice <= MAX_FRAME_PRICE))
           .slice(0, 4);
         setRecentlyViewed(matches);
       }
@@ -62,7 +62,7 @@ export const HomePage: React.FC = () => {
     }
   }, [products]);
 
-  const eligibleFrames = products.filter(p => p.indicativePrice !== null && p.indicativePrice <= 99);
+  const eligibleFrames = products.filter(p => p.indicativePrice !== null && p.indicativePrice <= MAX_FRAME_PRICE);
   const featuredFrames = (eligibleFrames.length > 0 ? eligibleFrames : products).slice(0, 8);
 
   // One tile per frame, linking straight to that design.
@@ -187,8 +187,8 @@ export const HomePage: React.FC = () => {
                 />
               </div>
               <div className="absolute -bottom-6 -right-2 hidden rounded-2xl border border-gold/30 bg-ivory-light/95 px-6 py-5 shadow-card backdrop-blur sm:block lg:-right-8">
-                <p className="font-display text-4xl text-burgundy">₹99</p>
-                <p className="mt-1 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-gold-dark">Every frame, every design</p>
+                <p className="font-display text-4xl text-burgundy">₹999</p>
+                <p className="mt-1 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-gold-dark">Everything is under</p>
               </div>
             </div>
           </Reveal>

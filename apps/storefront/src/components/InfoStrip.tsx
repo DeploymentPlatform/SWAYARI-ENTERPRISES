@@ -2,7 +2,7 @@ import React from 'react';
 import { BadgeIndianRupee, Users, Truck, ShieldCheck, Sparkles, HandHeart } from 'lucide-react';
 
 const ASSURANCES = [
-  { icon: BadgeIndianRupee, label: '₹99 per frame, every design' },
+  { icon: BadgeIndianRupee, label: 'Everything under ₹999' },
   { icon: Users, label: 'Minimum 25 frames — mix any designs' },
   { icon: Truck, label: 'Shipping charged extra' },
   { icon: ShieldCheck, label: 'No online payment — order by request' },

@@ -17,7 +17,7 @@ export async function onRequestGet({ request, env }) {
   try {
     const { results } = await env.DB.prepare(
       `SELECT slug, updated_at FROM products
-       WHERE status = 'published' AND is_demo = 0 AND (indicative_price IS NULL OR indicative_price <= 99)
+       WHERE status = 'published' AND is_demo = 0 AND (indicative_price IS NULL OR indicative_price <= 999)
        ORDER BY updated_at DESC`
     ).all();
     products = results || [];

@@ -155,7 +155,7 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
   const minQty = product.minQuantity || 1;
   const inc = product.orderIncrement || 1;
 
-  // Bulk tier pricing calculation (strictly <= 99)
+  // Bulk tier pricing calculation (everything is ₹999 or less)
   const currentUnitPrice = calculateEffectiveUnitPrice(product.indicativePrice, product.bulkTiers, quantity);
   const calculatedSubtotal = currentUnitPrice !== null ? currentUnitPrice * quantity : null;
   const bulkApplied = currentUnitPrice !== null && product.indicativePrice !== null && currentUnitPrice < product.indicativePrice;

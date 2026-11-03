@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Check, X, AlertCircle, Upload, Image as ImageIcon, Star, ArrowUp, ArrowDown, Trash2, Plus } from 'lucide-react';
-import { Category, DEITIES, FRAME_SIZES, MIN_ORDER_FRAMES, ORIENTATIONS, Product } from '@swayari/shared';
+import { Category, DEITIES, FRAME_SIZES, MAX_FRAME_PRICE, MIN_ORDER_FRAMES, ORIENTATIONS, Product } from '@swayari/shared';
 import { Drawer, ErrorBanner } from './ui';
 
 interface ProductEditorModalProps {
@@ -59,7 +59,7 @@ function parseBulkTiers(text: string) {
     .filter(Boolean);
 }
 
-/** Structured devotional frame product editor with strict <= 99 ceiling enforcement. */
+/** Structured product editor; every item on SWAYARI must be priced at ₹999 or less. */
 export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productId, onClose, onSaved }) => {
   const editing = Boolean(productId);
   const [state, setState] = useState<'loading' | 'ready' | 'error'>(editing ? 'loading' : 'ready');
@@ -247,16 +247,16 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
       return;
     }
 
-    // Strict ₹99 rule: Frame price cannot exceed ₹99
-    if (f.indicativePrice !== '' && Number(f.indicativePrice) > 99) {
-      setError('God frames are sold at ₹99 each. Enter a price of ₹99 or less.');
+    // ₹999 rule: no item may cost more than ₹999
+    if (f.indicativePrice !== '' && Number(f.indicativePrice) > MAX_FRAME_PRICE) {
+      setError(`Everything on SWAYARI is under ₹${MAX_FRAME_PRICE}. Enter a price of ₹${MAX_FRAME_PRICE} or less.`);
       return;
     }
 
     const tiers = parseBulkTiers(bulkTiersText);
     for (const t of tiers) {
-      if (t.unit_price > 99) {
-        setError(`Bulk tier unit price ₹${t.unit_price} exceeds the maximum frame price limit of ₹99.`);
+      if (t.unit_price > MAX_FRAME_PRICE) {
+        setError(`Bulk tier unit price ₹${t.unit_price} is above the ₹${MAX_FRAME_PRICE} limit.`);
         return;
       }
     }
@@ -312,7 +312,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
       onClose={onClose}
       width="max-w-[760px]"
       title={editing ? `Edit ${f.name || 'product'}` : 'New Devotional Frame'}
-      subtitle={editing ? f.sku : 'God frames at ₹99 each. Minimum order 25 frames in total; shipping extra.'}
+      subtitle={editing ? f.sku : 'Everything is ₹999 or less (god frames are ₹99). Minimum order 25 frames in total; shipping extra.'}
       footer={
         <div className="flex items-center justify-between gap-2 sm:justify-end">
           <button type="button" className="adm-btn-quiet" onClick={onClose}>
@@ -606,26 +606,26 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
             </label>
           </Section>
 
-          {/* Strict <= 99 Pricing Section */}
+          {/* Pricing section: ₹999 limit */}
           <Section step={4} title="Price & Quantity">
             <div className="flex items-start gap-3 rounded-xl border border-gold/40 bg-gold-pale/50 px-4 py-3 text-[0.8125rem] leading-relaxed text-gold-dark">
               <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-gold" />
               <span>
-                <strong>Business rule:</strong> frames are priced at <strong>₹99</strong> (never more). Customers must order at least <strong>{MIN_ORDER_FRAMES} frames in total</strong>, mixing any designs; shipping is charged extra.
+                <strong>Business rule:</strong> every item must be priced at <strong>₹{MAX_FRAME_PRICE} or less</strong> (god frames are ₹99). Customers must order at least <strong>{MIN_ORDER_FRAMES} frames in total</strong>, mixing any designs; shipping is charged extra.
               </span>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
               <label>
-                <span className="adm-label">Indicative price (₹) · Max ₹99</span>
+                <span className="adm-label">Indicative price (₹) · Max ₹{MAX_FRAME_PRICE}</span>
                 <input
                   type="number"
                   min={0}
-                  max={99}
+                  max={MAX_FRAME_PRICE}
                   className="adm-input font-semibold tabular-nums text-burgundy"
                   value={f.indicativePrice}
                   onChange={set('indicativePrice')}
-                  placeholder="Max ₹99"
+                  placeholder={`Max ₹${MAX_FRAME_PRICE}`}
                   disabled={f.isQuoteOnly}
                 />
               </label>
@@ -655,13 +655,13 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({ productI
 
             <div>
               <span className="adm-label">Volume discounts (optional — leave empty for one flat price)</span>
-              <p className="adm-hint">One per line as MinQty: UnitPrice, e.g. 100: 95. Every price must be ≤ ₹99.</p>
+              <p className="adm-hint">One per line as MinQty: UnitPrice, e.g. 100: 95. Every price must be ₹999 or less.</p>
               <textarea
                 className="adm-textarea font-mono text-xs"
                 rows={3}
                 value={bulkTiersText}
                 onChange={e => setBulkTiersText(e.target.value)}
-                placeholder="Leave empty for flat ₹99"
+                placeholder="Leave empty for one flat price"
               />
             </div>
           </Section>

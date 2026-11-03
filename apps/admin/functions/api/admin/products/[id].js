@@ -130,14 +130,14 @@ export async function onRequestPut(context) {
     // Require valid price and photo before publishing live inventory
     if (finalStatus === 'published' && !finalIsDemo) {
       if (finalIndicativePrice === undefined || finalIndicativePrice === null || finalIndicativePrice === '') {
-        return errorResponse('A published god frame needs a price of ₹99 or less. Save it as a draft if the price is not set yet.', 400);
+        return errorResponse('A published item needs a price of ₹999 or less. Save it as a draft if the price is not set yet.', 400);
       }
       if (!Array.isArray(finalImages) || finalImages.length === 0) {
         return errorResponse('Published devotional frames must have at least one authentic product photograph attached.', 400);
       }
     }
 
-    // Strict ₹99 rule: Integer paise validation
+    // ₹999 limit: integer paise validation
     const priceCheck = validateFramePrice(finalIndicativePrice, 'Frame indicative price');
     if (!priceCheck.isValid) {
       return errorResponse(priceCheck.error, 400);

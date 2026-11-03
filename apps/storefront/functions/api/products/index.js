@@ -27,7 +27,7 @@ export async function onRequestGet(context) {
              c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.status = 'published' AND (p.indicative_price IS NULL OR p.indicative_price <= 99)
+      WHERE p.status = 'published' AND (p.indicative_price IS NULL OR p.indicative_price <= 999)
     `;
     const params = [];
 
@@ -60,15 +60,11 @@ export async function onRequestGet(context) {
       params.push(orientation.trim().toLowerCase());
     }
 
-    // Price Band filtering: strictly <= 99
-    if (budgetBand === 'under-49') {
-      query += ' AND p.indicative_price IS NOT NULL AND p.indicative_price <= 49';
-    } else if (budgetBand === '50-79') {
-      query += ' AND p.indicative_price IS NOT NULL AND p.indicative_price >= 50 AND p.indicative_price <= 79';
-    } else if (budgetBand === '80-99') {
-      query += ' AND p.indicative_price IS NOT NULL AND p.indicative_price >= 80 AND p.indicative_price <= 99';
-    } else if (budgetBand === 'under-99' || budgetBand === 'all-99') {
-      query += ' AND p.indicative_price IS NOT NULL AND p.indicative_price <= 99';
+    // Price bands (same as FRAME_PRICE_BANDS in @swayari/shared); everything is ₹999 or less
+    const PRICE_BANDS = { 'under-199': [0, 199], '200-499': [200, 499], '500-999': [500, 999], 'under-999': [0, 999] };
+    if (PRICE_BANDS[budgetBand]) {
+      query += ' AND p.indicative_price IS NOT NULL AND p.indicative_price >= ? AND p.indicative_price <= ?';
+      params.push(...PRICE_BANDS[budgetBand]);
     }
 
     if (occasion && occasion.trim().length > 0) {

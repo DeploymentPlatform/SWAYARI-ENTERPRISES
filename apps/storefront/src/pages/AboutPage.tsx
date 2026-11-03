@@ -25,7 +25,7 @@ const PRINCIPLES = [
 const NUMERALS = ['I', 'II', 'III'];
 
 export const AboutPage: React.FC = () => {
-  usePageMeta('Our Story', 'SWAYARI makes silver foil god frames at ₹99 each, with personal assistance for every order of 25 frames or more.');
+  usePageMeta('Our Story', 'SWAYARI brings you devotional gifts under ₹999 — silver foil god frames at ₹99 each — with personal assistance for every order.');
 
   return (
     <>
@@ -48,7 +48,7 @@ export const AboutPage: React.FC = () => {
               <em className="text-gold-light">Gifts to remember.</em>
             </h1>
             <p className="mt-7 max-w-lg text-[1.0625rem] leading-relaxed text-ivory/80">
-              SWAYARI brings you silver foil god frames at ₹99 each — Balaji, Padmavathi Srinivasa, Sai Baba, Radha Krishna, Bal
+              SWAYARI brings you devotional gifts under ₹999, starting with silver foil god frames at ₹99 each — Balaji, Padmavathi Srinivasa, Sai Baba, Radha Krishna, Bal
               Krishna, Ram Darbar and Hanuman — chosen for wedding return gifts, housewarmings, poojas and celebrations.
             </p>
           </motion.div>

@@ -85,18 +85,6 @@ export async function onRequestPost(context) {
       }
     }
 
-    // Rate limit: at most 5 new requests per customer per hour.
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    const recent = await env.DB.prepare(
-      'SELECT COUNT(*) AS n FROM orders WHERE customer_id = ? AND created_at > ?'
-    ).bind(session.user.id, oneHourAgo).first();
-    if (recent && Number(recent.n) >= 5) {
-      const repeat = await env.DB.prepare('SELECT id FROM orders WHERE idempotency_key = ? AND customer_id = ?').bind(idempotencyKey, session.user.id).first();
-      if (!repeat) {
-        return errorResponse('You have sent several requests in the last hour. Please wait a little or contact our team.', 429);
-      }
-    }
-
     // 3. Idempotency Check: Return existing order if identical idempotency token submitted
     const existingOrder = await env.DB.prepare(`
       SELECT id, customer_id, status, initial_indicative_subtotal, created_at
@@ -188,13 +176,13 @@ export async function onRequestPost(context) {
         return errorResponse(`${prod.name} is a preview sample and cannot be requested`, 400);
       }
 
-      // Validate base price: must be positive and <= 9,900 paise (₹99)
+      // Validate base price: must be positive and <= 99,900 paise (₹999)
       if (prod.indicative_price === null || prod.indicative_price === undefined) {
         hasUnpricedItem = true;
       } else {
         const basePrice = Number(prod.indicative_price);
-        if (!Number.isFinite(basePrice) || basePrice <= 0 || basePrice > 99) {
-          return errorResponse(`Product ${prod.name} does not meet the ₹99 devotional frame price limit`, 400);
+        if (!Number.isFinite(basePrice) || basePrice <= 0 || basePrice > 999) {
+          return errorResponse(`Product ${prod.name} is above the ₹999 price limit`, 400);
         }
       }
 
@@ -226,8 +214,8 @@ export async function onRequestPost(context) {
         }
       }
 
-      if (unitPrice !== null && unitPrice > 99) {
-        return errorResponse(`Product ${prod.name} unit price ₹${unitPrice} exceeds the maximum frame price limit of ₹99`, 400);
+      if (unitPrice !== null && unitPrice > 999) {
+        return errorResponse(`Product ${prod.name} unit price ₹${unitPrice} is above the ₹999 price limit`, 400);
       }
 
       if (unitPrice !== null) {
@@ -255,6 +243,15 @@ export async function onRequestPost(context) {
 
     // 5. Generate Order Reference
     const orderId = generateOrderReference();
+    // Rate limit: at most 5 new requests per customer per hour (re-sends were answered above).
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const recent = await env.DB.prepare(
+      'SELECT COUNT(*) AS n FROM orders WHERE customer_id = ? AND created_at > ?'
+    ).bind(session.user.id, oneHourAgo).first();
+    if (recent && Number(recent.n) >= 5) {
+      return errorResponse('You have sent several requests in the last hour. Please wait a little or contact our team.', 429);
+    }
+
     const nowIso = new Date().toISOString();
     const finalSubtotal = hasUnpricedItem && calculatedSubtotalPaise === 0 ? null : (calculatedSubtotalPaise / 100);
 

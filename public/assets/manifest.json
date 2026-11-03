@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-03T09:03:47.858Z",
-  "totalAssets": 102,
+  "generatedAt": "2026-11-03T09:44:33.504Z",
+  "totalAssets": 107,
   "assets": [
     {
       "id": "brand_apple-touch-icon_png",
@@ -8,35 +8,80 @@
       "path": "/assets/brand/apple-touch-icon.png",
       "category": "brand",
       "label": "apple touch icon",
-      "sizeBytes": 12470,
-      "updatedAt": "2026-11-03T05:34:02.508Z"
+      "sizeBytes": 15391,
+      "updatedAt": "2026-11-03T09:41:08.009Z"
     },
     {
-      "id": "brand_favicon_svg",
-      "filename": "favicon.svg",
-      "path": "/assets/brand/favicon.svg",
+      "id": "brand_favicon-32_png",
+      "filename": "favicon-32.png",
+      "path": "/assets/brand/favicon-32.png",
       "category": "brand",
-      "label": "SWAYARI lotus favicon",
-      "sizeBytes": 1391,
-      "updatedAt": "2026-11-03T03:11:27.244Z"
+      "label": "favicon",
+      "sizeBytes": 1367,
+      "updatedAt": "2026-11-03T09:41:08.074Z"
     },
     {
-      "id": "brand_swayari-logo_svg",
-      "filename": "swayari-logo.svg",
-      "path": "/assets/brand/swayari-logo.svg",
+      "id": "brand_favicon-48_png",
+      "filename": "favicon-48.png",
+      "path": "/assets/brand/favicon-48.png",
       "category": "brand",
-      "label": "SWAYARI wordmark (SVG)",
-      "sizeBytes": 2770,
-      "updatedAt": "2026-11-03T03:11:27.245Z"
+      "label": "favicon",
+      "sizeBytes": 2324,
+      "updatedAt": "2026-11-03T09:41:08.073Z"
     },
     {
-      "id": "brand_swayari_brand_card_jpeg",
-      "filename": "swayari_brand_card.jpeg",
-      "path": "/assets/brand/swayari_brand_card.jpeg",
+      "id": "brand_icon-512_png",
+      "filename": "icon-512.png",
+      "path": "/assets/brand/icon-512.png",
       "category": "brand",
-      "label": "SWAYARI brand card (reference artwork)",
-      "sizeBytes": 162991,
-      "updatedAt": "2026-11-03T03:11:27.245Z"
+      "label": "icon",
+      "sizeBytes": 75418,
+      "updatedAt": "2026-11-03T09:41:08.072Z"
+    },
+    {
+      "id": "brand_swayari-logo-card_jpg",
+      "filename": "swayari-logo-card.jpg",
+      "path": "/assets/brand/swayari-logo-card.jpg",
+      "category": "brand",
+      "label": "swayari logo card",
+      "sizeBytes": 186588,
+      "updatedAt": "2026-11-03T09:40:52.867Z"
+    },
+    {
+      "id": "brand_swayari-logo-gold_png",
+      "filename": "swayari-logo-gold.png",
+      "path": "/assets/brand/swayari-logo-gold.png",
+      "category": "brand",
+      "label": "swayari logo gold",
+      "sizeBytes": 285704,
+      "updatedAt": "2026-11-03T09:40:47.156Z"
+    },
+    {
+      "id": "brand_swayari-logo-gold_webp",
+      "filename": "swayari-logo-gold.webp",
+      "path": "/assets/brand/swayari-logo-gold.webp",
+      "category": "brand",
+      "label": "swayari logo gold",
+      "sizeBytes": 50734,
+      "updatedAt": "2026-11-03T09:40:47.037Z"
+    },
+    {
+      "id": "brand_swayari-logo-light_png",
+      "filename": "swayari-logo-light.png",
+      "path": "/assets/brand/swayari-logo-light.png",
+      "category": "brand",
+      "label": "swayari logo light",
+      "sizeBytes": 273753,
+      "updatedAt": "2026-11-03T09:40:52.852Z"
+    },
+    {
+      "id": "brand_swayari-logo-light_webp",
+      "filename": "swayari-logo-light.webp",
+      "path": "/assets/brand/swayari-logo-light.webp",
+      "category": "brand",
+      "label": "swayari logo light",
+      "sizeBytes": 46502,
+      "updatedAt": "2026-11-03T09:40:52.698Z"
     },
     {
       "id": "categories_cat-decorative-lamps_jpg",

@@ -14,7 +14,7 @@ const SECTIONS = [
   },
   {
     title: 'Prices and minimum order',
-    body: 'Every No. 1 devotional frame is ₹99. The minimum order is 25 frames in total, and you can mix any designs to reach it. The final amount is confirmed by our team. If we send you a quotation, it appears in your account; any later revision is added as a new version rather than changing the original request.'
+    body: 'Everything on SWAYARI is priced at ₹999 or less, and every No. 1 god frame is ₹99. The minimum order is 25 frames in total, and you can mix any designs to reach it. The final amount is confirmed by our team. If we send you a quotation, it appears in your account; any later revision is added as a new version rather than changing the original request.'
   },
   {
     title: 'Delivery',

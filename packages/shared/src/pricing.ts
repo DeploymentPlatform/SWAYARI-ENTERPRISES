@@ -152,7 +152,7 @@ export function validateQuantityRules(
 
 /**
  * Validates monetary amount in rupees and converts to integer paise.
- * Strictly verifies <= 9,900 paise (₹99) for devotional frames.
+ * Strictly verifies <= 99,900 paise (₹999), the highest price on SWAYARI.
  */
 export function validatePricePaise(
   priceInRupees: unknown,

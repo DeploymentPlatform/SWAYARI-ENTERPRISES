@@ -21,8 +21,9 @@ export const BRAND = {
   }
 };
 
-export const MAX_FRAME_PRICE = 99;
-export const MAX_FRAME_PRICE_PAISE = 9900;
+/** Highest price allowed for any item on SWAYARI (everything is under ₹999). */
+export const MAX_FRAME_PRICE = 999;
+export const MAX_FRAME_PRICE_PAISE = 99900;
 
 /** Smallest order we accept, counted across every design in one request. */
 export const MIN_ORDER_FRAMES = 25;
@@ -46,21 +47,37 @@ export const SESSION_COOKIE_NAMES = {
 };
 
 export const BRAND_TAGLINES = {
-  headline: 'Silver foil god frames at ₹99',
+  headline: 'Devotional gifts under ₹999',
   supporting: 'Thoughtful return gifts for your special celebrations.',
-  proposition: 'Silver foil god frames at ₹99',
+  proposition: 'Everything under ₹999 — silver foil god frames from ₹99',
   minimumOrder: 'Minimum order 25 frames — mix any designs',
   shippingNote: 'Shipping charges are extra and confirmed by our team.'
 };
 
 export const FRAME_PRICE_BANDS = [
   {
-    id: 'all-99',
-    label: 'All frames · ₹99',
-    shortLabel: '₹99',
+    id: 'under-199',
+    label: 'Under ₹199',
+    shortLabel: '< ₹199',
     minPrice: 0,
-    maxPrice: 99,
-    description: 'Every No. 1 god frame is ₹99'
+    maxPrice: 199,
+    description: 'Return gifts for every guest, including our ₹99 god frames'
+  },
+  {
+    id: '200-499',
+    label: '₹200 – ₹499',
+    shortLabel: '₹200–499',
+    minPrice: 200,
+    maxPrice: 499,
+    description: 'Special gifts for close family and friends'
+  },
+  {
+    id: '500-999',
+    label: '₹500 – ₹999',
+    shortLabel: '₹500–999',
+    minPrice: 500,
+    maxPrice: 999,
+    description: 'Premium keepsakes, still under ₹999'
   }
 ];
 

@@ -25,7 +25,7 @@ export async function onRequestGet(context) {
              c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.slug = ? AND p.status = 'published' AND (p.indicative_price IS NULL OR p.indicative_price <= 99) ${demoFilter}
+      WHERE p.slug = ? AND p.status = 'published' AND (p.indicative_price IS NULL OR p.indicative_price <= 999) ${demoFilter}
     `).bind(slug).first();
 
     if (!row) {

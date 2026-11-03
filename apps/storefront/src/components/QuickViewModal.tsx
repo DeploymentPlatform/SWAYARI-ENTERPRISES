@@ -169,7 +169,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                 <p className="mt-1 text-[0.6875rem] uppercase tracking-[0.12em] text-ink-faint">SKU: {product.sku}</p>
               </div>
 
-              {/* Pricing: strict <= 99 */}
+              {/* Pricing: everything is ₹999 or less */}
               <div className="mt-4 flex items-baseline gap-2">
                 <span className="font-display text-[2.2rem] font-semibold leading-none text-burgundy lining-nums">{formatPrice(currentUnitPrice)}</span>
                 <span className="text-sm text-ink-soft">per frame</span>

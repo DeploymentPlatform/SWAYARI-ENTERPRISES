@@ -29,10 +29,10 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
                 <span>Shop by Budget</span>
               </div>
               <h2 id="budget-navigation-title" className="font-display text-[1.5rem] sm:text-[1.875rem] font-bold text-[#292421] leading-tight">
-                Devotional Frames ≤ ₹99
+                Everything under ₹999
               </h2>
               <p className="text-[13px] sm:text-[14px] text-[#7A6E66] mt-1">
-                Explore auspicious deity frames strictly under ₹99 with transparent unit pricing and bulk volume tiers.
+                Explore auspicious god frames and gifts, all under ₹999, with transparent unit pricing.
               </p>
             </div>
             
@@ -40,7 +40,7 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
               to="/shop"
               className="text-[13px] font-semibold text-[#571C2A] hover:text-[#441420] flex items-center gap-1.5 group transition-colors self-start sm:self-end"
             >
-              <span>View All Frames ≤ ₹99</span>
+              <span>View everything under ₹999</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>

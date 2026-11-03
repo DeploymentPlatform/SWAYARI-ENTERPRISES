@@ -10,7 +10,7 @@ import { Link, useRouter } from '../lib/router';
 import { productCardImage, uniqueProductImages } from '../lib/media';
 import { useProducts } from '../lib/products';
 import { formatPrice, Product } from '@swayari/shared';
-import { LotusMark, useDialogBehaviour } from './ui';
+import { LOGO_ON_DARK, LOGO_ON_LIGHT, useDialogBehaviour } from './ui';
 import { EASE_LUXURY } from './motion';
 
 const NAV_LINKS = [
@@ -30,7 +30,7 @@ const DEITY_SHORTCUTS = [
 ];
 
 const ANNOUNCEMENTS = [
-  'Silver foil god frames at ₹99 each — thoughtful return gifts for every celebration',
+  'Everything under ₹999 — silver foil god frames from just ₹99',
   'Bulk quantities for weddings, griha pravesh & festivals — personally coordinated',
   'Send your request — our team confirms availability, packing & shipping'
 ];
@@ -49,25 +49,19 @@ function useScrolled(threshold = 24) {
 /* ------------------------------------------------------------------ Brand lockup */
 
 const BrandLockup: React.FC<{ compact?: boolean }> = ({ compact }) => (
-  <Link to="/" className="group flex flex-col items-center leading-none">
-    <LotusMark className={`text-gold transition-all duration-500 ease-luxury group-hover:text-gold-dark ${compact ? 'h-0 w-6 opacity-0' : 'mb-1 h-3.5 w-6 opacity-100'}`} />
-    <span
-      className={`font-wordmark font-semibold tracking-[0.24em] text-burgundy-deep transition-all duration-500 ease-luxury pl-[0.24em] ${
-        compact ? 'text-[1.25rem] sm:text-[1.4rem]' : 'text-[1.35rem] sm:text-[1.75rem]'
+  <Link to="/" className="group flex items-center leading-none" aria-label="SWAYARI — home">
+    <img
+      src={LOGO_ON_LIGHT}
+      alt="SWAYARI — Décor & Gifting"
+      width={825}
+      height={304}
+      fetchPriority="high"
+      decoding="async"
+      draggable={false}
+      className={`w-auto select-none transition-all duration-500 ease-luxury group-hover:brightness-110 ${
+        compact ? 'h-10 sm:h-12' : 'h-12 sm:h-[4.5rem]'
       }`}
-    >
-      SWAYARI
-    </span>
-    <span
-      className={`flex items-center gap-2 overflow-hidden transition-all duration-500 ease-luxury ${compact ? 'mt-0 max-h-0 opacity-0' : 'mt-1.5 max-h-4 opacity-100'}`}
-    >
-      <span className="h-px w-4 bg-gold/70 sm:w-6" />
-      <span className="font-sans text-[0.55rem] font-semibold uppercase tracking-[0.42em] text-gold-dark sm:text-[0.6rem]">
-        Décor &amp; Gifting
-      </span>
-      <span className="h-px w-4 bg-gold/70 sm:w-6" />
-    </span>
-    <span className="sr-only"> — home</span>
+    />
   </Link>
 );
 
@@ -484,11 +478,7 @@ export const Header: React.FC = () => {
               <div className="relative overflow-hidden bg-burgundy-deep px-6 pb-7 pt-6 text-ivory-light">
                 <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gold/20 blur-3xl" />
                 <div className="relative flex items-start justify-between">
-                  <div>
-                    <LotusMark className="mb-1.5 h-4 w-7 text-gold-light" />
-                    <p className="font-wordmark text-2xl font-semibold tracking-[0.24em]">SWAYARI</p>
-                    <p className="mt-1 text-[0.6rem] font-semibold uppercase tracking-[0.4em] text-gold-light">Décor &amp; Gifting</p>
-                  </div>
+                  <img src={LOGO_ON_DARK} alt="SWAYARI — Décor & Gifting" width={825} height={304} className="h-14 w-auto" draggable={false} />
                   <button
                     type="button"
                     onClick={() => setMenuOpen(false)}
@@ -531,7 +521,7 @@ export const Header: React.FC = () => {
 
                 <div className="mx-4 mt-8 rounded-2xl border border-gold/30 bg-gold-pale/50 p-4 text-[0.8125rem] leading-relaxed text-ink-soft">
                   <p className="font-display text-lg text-burgundy">Planning a celebration?</p>
-                  Every frame ₹99 · minimum 25 frames. Send your request and our team will personally confirm quantities, packing and shipping.
+                  Everything under ₹999 · god frames ₹99 · minimum 25 frames. Send your request and our team will personally confirm quantities, packing and shipping.
                   <Link to="/contact" className="text-link mt-3 flex">
                     <Phone className="h-3.5 w-3.5" /> Talk to us
                   </Link>

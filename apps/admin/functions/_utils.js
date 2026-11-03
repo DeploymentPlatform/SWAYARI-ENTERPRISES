@@ -179,8 +179,9 @@ export function validateFramePrice(val, fieldLabel = 'Price') {
   if (Math.abs(num * 100 - paise) > 0.0001) {
     return { isValid: false, error: `${fieldLabel} cannot have more than 2 decimal places` };
   }
-  if (paise > 9900) {
-    return { isValid: false, error: `${fieldLabel} (₹${num}) exceeds the maximum devotional frame limit of ₹99 (9,900 paise)` };
+  // Everything on SWAYARI is priced under ₹999.
+  if (paise > 99900) {
+    return { isValid: false, error: `${fieldLabel} (₹${num}) is above the ₹999 limit. Every item on SWAYARI must be ₹999 or less.` };
   }
   return { isValid: true, paise, amount: paise / 100 };
 }

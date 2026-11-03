@@ -34,7 +34,7 @@ export function editorialSources(name: string, widths: number[]): ImageSources {
   };
 }
 
-export const PLACEHOLDER_PRODUCT_IMAGE = '/assets/brand/favicon.svg';
+export const PLACEHOLDER_PRODUCT_IMAGE = '/assets/brand/icon-512.png';
 
 /** Drops repeated photographs listed in several formats (name.webp + name.jpg), keeping WebP. */
 export function uniqueProductImages(images: string[] | undefined | null): string[] {

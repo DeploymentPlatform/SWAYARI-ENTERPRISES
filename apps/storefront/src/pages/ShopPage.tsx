@@ -93,12 +93,12 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
     title = sObj ? `${sObj.name} Frames` : `${frameSize} Frames`;
   } else if (budget) {
     const band = FRAME_PRICE_BANDS.find(b => b.id === budget);
-    title = band ? `Frames ${band.label}` : 'God Frames · ₹99';
+    title = band ? `Gifts ${band.label}` : 'Everything under ₹999';
   }
 
   usePageMeta(
     title,
-    'No. 1 silver foil god frames at ₹99 each. Auspicious return gifts for weddings, griha pravesh and family celebrations. Minimum order 25 frames; shipping extra.',
+    'Devotional gifts under ₹999, including No. 1 silver foil god frames at ₹99 each. Auspicious return gifts for weddings, griha pravesh and family celebrations. Minimum order 25 frames; shipping extra.',
     { noindex: isSearch }
   );
 
@@ -179,7 +179,7 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
             transition={{ duration: 0.8, ease: EASE_LUXURY }}
           >
             <div className="max-w-2xl">
-              <p className="eyebrow mb-4">{isSearch ? 'Search the collection' : '₹99 each · any mix'}</p>
+              <p className="eyebrow mb-4">{isSearch ? 'Search the collection' : 'Everything under ₹999'}</p>
               <h1 className="display-title">
                 {isSearch || isBulk || deity || occasion || frameSize || budget ? (
                   title
@@ -190,8 +190,8 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
                 )}
               </h1>
               <p className="lede mt-4 max-w-xl">
-                Auspicious frames for weddings, griha pravesh and family poojas — every design is ₹99 per frame.
-                Minimum order 25 frames in any mix; shipping is charged extra.
+                Auspicious god frames and gifts for weddings, griha pravesh and family poojas — everything is ₹999 or less, and our
+                god frames are just ₹99 each. Minimum order 25 frames in any mix; shipping is charged extra.
               </p>
             </div>
 
@@ -285,7 +285,7 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
                     <span className="font-display text-[1.25rem] font-semibold text-ink lining-nums">{products.length}</span>{' '}
                     <span className="hidden sm:inline">{products.length === 1 ? 'frame design' : 'frame designs'}</span>
                     <span className="sm:hidden">{products.length === 1 ? 'design' : 'designs'}</span>
-                    <span className="hidden lg:inline"> · ₹99 each · Minimum 25 frames · Shipping extra</span>
+                    <span className="hidden lg:inline"> · Everything under ₹999 · Minimum 25 frames · Shipping extra</span>
                   </>
                 ) : status === 'loading' ? (
                   <span className="text-ink-faint">Loading…</span>
@@ -354,7 +354,7 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
             <EmptyState
               eyebrow="Nothing here just yet"
               title="No devotional frames matched your filters"
-              body={<p>Try clearing one or more filters, or explore our full collection of ₹99 frames.</p>}
+              body={<p>Try clearing one or more filters, or explore our full collection — everything is under ₹999.</p>}
               action={{ to: '/shop', label: 'View All Frames' }}
             />
           )}
@@ -457,6 +457,20 @@ const FilterGroups: React.FC<{
         return (
           <Chip key={d.id} active={active} onClick={() => updateQuery({ deity: active ? '' : d.id })}>
             {d.name}
+          </Chip>
+        );
+      })}
+    </FilterRow>
+
+    <FilterRow label="Price">
+      <Chip active={!budget} onClick={() => updateQuery({ budget: '' })}>
+        All (under ₹999)
+      </Chip>
+      {FRAME_PRICE_BANDS.map(band => {
+        const active = budget === band.id;
+        return (
+          <Chip key={band.id} active={active} onClick={() => updateQuery({ budget: active ? '' : band.id })}>
+            {band.label}
           </Chip>
         );
       })}

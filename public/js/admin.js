@@ -411,7 +411,7 @@ async function loadProducts() {
     tbody.innerHTML = prods.map(p => `
       <tr>
         <td>
-          <img src="${(p.images && p.images[0]) || '/assets/brand/swayari_brand_card.jpeg'}" alt="${p.name}" style="width:44px; height:44px; object-fit:cover; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+          <img src="${(p.images && p.images[0]) || '/assets/brand/swayari-logo-card.jpg'}" alt="${p.name}" style="width:44px; height:44px; object-fit:cover; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
         </td>
         <td><code>${p.sku}</code></td>
         <td><strong>${p.name}</strong></td>

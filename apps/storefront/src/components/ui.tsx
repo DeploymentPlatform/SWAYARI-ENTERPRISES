@@ -19,24 +19,26 @@ export const LotusMark: React.FC<{ className?: string; title?: string }> = ({ cl
   </svg>
 );
 
-/** Text wordmark — crisp at every size and uses the loaded Cinzel face (an <img> SVG cannot). */
-export const Wordmark: React.FC<{ tone?: 'dark' | 'light'; size?: 'sm' | 'md' | 'lg' }> = ({ tone = 'dark', size = 'md' }) => {
-  const main = tone === 'dark' ? 'text-burgundy-deep' : 'text-ivory';
-  const sub = tone === 'dark' ? 'text-ink-soft' : 'text-gold-light';
-  const sizes = {
-    sm: ['text-[1.3rem] tracking-[0.2em]', 'text-[0.56rem] tracking-[0.38em]', 'h-3 w-5'],
-    md: ['text-[1.6rem] sm:text-[1.95rem] tracking-[0.2em]', 'text-[0.58rem] sm:text-[0.66rem] tracking-[0.42em]', 'h-3.5 w-6'],
-    lg: ['text-[2.4rem] tracking-[0.2em]', 'text-[0.75rem] tracking-[0.45em]', 'h-4 w-7']
-  }[size];
+/** The SWAYARI logo artwork: gold lockup for dark backgrounds, the deeper-gold version for light ones. */
+export const LOGO_ON_LIGHT = '/assets/brand/swayari-logo-light.webp';
+export const LOGO_ON_DARK = '/assets/brand/swayari-logo-gold.webp';
+
+export const Wordmark: React.FC<{ tone?: 'dark' | 'light'; size?: 'sm' | 'md' | 'lg'; className?: string }> = ({
+  tone = 'dark',
+  size = 'md',
+  className = ''
+}) => {
+  const height = { sm: 'h-9', md: 'h-12 sm:h-14', lg: 'h-20 sm:h-24' }[size];
   return (
-    <span className="inline-flex flex-col items-center leading-none">
-      <span className={`font-wordmark font-semibold ${sizes[0]} ${main} pl-[0.2em]`}>SWAYARI</span>
-      <span className="mt-1.5 flex items-center gap-2">
-        <span className={`h-px w-4 sm:w-6 ${tone === 'dark' ? 'bg-gold' : 'bg-gold-light/70'}`} />
-        <span className={`font-sans font-medium uppercase ${sizes[1]} ${sub} pl-[0.4em]`}>Décor &amp; Gifting</span>
-        <span className={`h-px w-4 sm:w-6 ${tone === 'dark' ? 'bg-gold' : 'bg-gold-light/70'}`} />
-      </span>
-    </span>
+    <img
+      src={tone === 'dark' ? LOGO_ON_LIGHT : LOGO_ON_DARK}
+      alt="SWAYARI — Décor & Gifting"
+      width={825}
+      height={304}
+      decoding="async"
+      className={`${height} w-auto select-none ${className}`}
+      draggable={false}
+    />
   );
 };
 

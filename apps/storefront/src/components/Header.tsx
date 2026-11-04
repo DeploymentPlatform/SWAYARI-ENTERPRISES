@@ -17,17 +17,19 @@ const NAV_LINKS = [
   { slug: 'shop', label: 'Shop All', href: '/shop' },
   { slug: 'wedding-return-gifts', label: 'Return Gifts', href: '/shop?occasion=wedding-return-gifts' },
   { slug: 'gifting-under-2999', label: 'Under ₹2,999', href: '/shop?budget=under-2999' },
-  { slug: 'about', label: 'Our Story', href: '/about' },
+  { slug: 'blog', label: 'Gift Guides', href: '/blog' },
+  // Shown in the desktop bar only on very wide screens; always in the menu and footer.
+  { slug: 'about', label: 'Our Story', href: '/about', wideOnly: true },
   { slug: 'contact', label: 'Contact', href: '/contact' }
 ];
 
-// Second header row: the five collections.
+// Second header row: the four collections and the return-gift range.
 const COLLECTIONS = [
   { slug: 'god-frames', label: 'God Frames', href: '/shop?category=god-frames' },
   { slug: 'stotram-frames', label: 'Stotram Frames', href: '/shop?category=stotram-frames' },
   { slug: 'god-stands', label: 'God Stands', href: '/shop?category=god-stands' },
   { slug: 'stotram-cards', label: 'Stotram Cards', href: '/shop?category=stotram-cards' },
-  { slug: 'wall-frames', label: 'Wall Frames', href: '/shop?category=wall-frames' }
+  { slug: 'under-299', label: 'Under ₹299', href: '/shop?budget=under-299' }
 ];
 
 const DEITY_SHORTCUTS = [
@@ -148,7 +150,7 @@ const SearchOverlay: React.FC<{ open: boolean; onClose: () => void; products: Pr
                   type="search"
                   value={query}
                   onChange={e => setQuery(e.target.value)}
-                  placeholder="Balaji, stotram card, wall frame…"
+                  placeholder="Balaji, stotram card, god stand…"
                   aria-label="Search god frames, stotram cards and return gifts"
                   autoComplete="off"
                   className="w-full border-0 border-b border-stone-shade bg-transparent py-4 pl-10 pr-4 font-display text-[1.75rem] text-ink placeholder:text-ink-faint focus:border-gold focus:outline-none focus:ring-0 sm:text-[2.5rem]"
@@ -257,7 +259,11 @@ export const Header: React.FC = () => {
   }, []);
 
   const currentHref = path + (search.toString() ? `?${search.toString()}` : '');
-  const isActive = (href: string) => (href === '/shop' ? path === '/shop' && !search.toString() : currentHref === href);
+  const isActive = (href: string) => {
+    if (href === '/shop') return path === '/shop' && !search.toString();
+    if (href === '/blog') return path === '/blog' || path.startsWith('/blog/');
+    return currentHref === href;
+  };
 
   const iconBtn =
     'relative grid h-11 w-11 place-items-center rounded-full text-ink transition-all duration-300 ease-luxury hover:bg-white hover:text-burgundy hover:shadow-soft';
@@ -309,7 +315,7 @@ export const Header: React.FC = () => {
                     <li key={link.slug}>
                       <Link
                         to={link.href}
-                        className={`group relative py-2 text-[0.8125rem] font-semibold uppercase tracking-[0.14em] transition-colors ${
+                        className={`group relative whitespace-nowrap py-2 text-[0.8125rem] font-semibold uppercase tracking-[0.14em] transition-colors ${
                           isActive(link.href) ? 'text-burgundy' : 'text-ink hover:text-burgundy'
                         }`}
                       >
@@ -337,10 +343,10 @@ export const Header: React.FC = () => {
               <nav aria-label="Secondary" className="mr-4 hidden xl:block">
                 <ul className="flex items-center gap-7">
                   {NAV_LINKS.slice(3).map(link => (
-                    <li key={link.slug}>
+                    <li key={link.slug} className={'wideOnly' in link && link.wideOnly ? 'hidden 2xl:block' : undefined}>
                       <Link
                         to={link.href}
-                        className={`group relative py-2 text-[0.8125rem] font-semibold uppercase tracking-[0.14em] transition-colors ${
+                        className={`group relative whitespace-nowrap py-2 text-[0.8125rem] font-semibold uppercase tracking-[0.14em] transition-colors ${
                           isActive(link.href) ? 'text-burgundy' : 'text-ink hover:text-burgundy'
                         }`}
                       >

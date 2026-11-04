@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
+import { PAGES, canonicalUrl, fullTitle } from '../content/seo.js';
 
-const SITE = 'SWAYARI — Devotional Gifting under ₹2,999';
-const DEFAULT_DESCRIPTION =
-  'Silver foil god frames, stotram frames, god stands, stotram cards and wall frames. Devotional gifting under ₹2,999, with return gifts from ₹39 for weddings, griha pravesh and festivals. Order from 1 piece; delivery extra.';
+const DEFAULT_DESCRIPTION = PAGES['/'].description;
 
 function setMeta(selector: string, attr: 'name' | 'property', key: string, value: string) {
   let el = document.head.querySelector<HTMLMetaElement>(selector);
@@ -14,28 +13,34 @@ function setMeta(selector: string, attr: 'name' | 'property', key: string, value
   el.setAttribute('content', value);
 }
 
-/** Keeps the document title, description and Open Graph tags in sync with the current page. */
-export function usePageMeta(title: string | null, description?: string, options?: { noindex?: boolean }) {
+/**
+ * Keeps the document title, description and Open Graph tags in sync with the current page.
+ * The server writes the same details into the first HTML (functions/_middleware.js, from content/seo.js);
+ * this keeps them right while visitors move between pages inside the app.
+ */
+export function usePageMeta(title: string | null, description?: string, options?: { noindex?: boolean; image?: string }) {
   useEffect(() => {
-    const fullTitle = title ? `${title} | SWAYARI` : SITE;
-    document.title = fullTitle;
+    const pageTitle = fullTitle(title);
+    document.title = pageTitle;
     const desc = description || DEFAULT_DESCRIPTION;
     setMeta('meta[name="description"]', 'name', 'description', desc);
-    setMeta('meta[property="og:title"]', 'property', 'og:title', fullTitle);
+    setMeta('meta[property="og:title"]', 'property', 'og:title', pageTitle);
     setMeta('meta[property="og:description"]', 'property', 'og:description', desc);
-    setMeta('meta[name="robots"]', 'name', 'robots', options?.noindex ? 'noindex, nofollow' : 'index, follow');
-    // Canonical URL is always on the public domain (query strings are filters, not separate pages),
-    // so the pages.dev copy and www never compete with swayari.com in search results.
-    const canonicalUrl = `https://swayari.com${window.location.pathname}`;
-    setMeta('meta[property="og:url"]', 'property', 'og:url', canonicalUrl);
+    if (options?.image) setMeta('meta[property="og:image"]', 'property', 'og:image', new URL(options.image, 'https://swayari.com').href);
+    setMeta('meta[name="robots"]', 'name', 'robots', options?.noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large');
+    // Canonical URL is always on the public domain; only a single landing filter (category, occasion,
+    // budget or deity) makes a shop page a page of its own, so the pages.dev copy, www and filter
+    // combinations never compete with swayari.com in search results.
+    const canonicalHref = canonicalUrl(window.location.pathname, new URLSearchParams(window.location.search));
+    setMeta('meta[property="og:url"]', 'property', 'og:url', canonicalHref);
     let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!canonical) {
       canonical = document.createElement('link');
       canonical.rel = 'canonical';
       document.head.appendChild(canonical);
     }
-    canonical.href = canonicalUrl;
-  }, [title, description, options?.noindex]);
+    canonical.href = canonicalHref;
+  }, [title, description, options?.noindex, options?.image]);
 }
 
 /** Injects JSON-LD structured data for the lifetime of the component. */

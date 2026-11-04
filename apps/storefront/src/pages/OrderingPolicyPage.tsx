@@ -53,8 +53,8 @@ const Steps: React.FC = () => (
 );
 
 const SLAB_GROUPS = [
-  { caption: 'Gift items', note: 'Stotram frames and flip frames, stotram cards, photo stands', slabs: ['1–9', '10–49', '50–99', '100+'] },
-  { caption: 'God frames and wall frames', note: 'Silver foil and colour god frames, large wall frames', slabs: ['1–2', '3–9', '10–24', '25+'] }
+  { caption: 'Gift items', note: 'Stotram frames and flip frames, stotram cards, god stands, colour god frames', slabs: ['1–9', '10–49', '50–99', '100+'] },
+  { caption: 'Silver foil god frames', note: '8×10, 10×12, 12×14 and 14×17 inch god frames', slabs: ['1–2', '3–9', '10–24', '25+'] }
 ];
 
 const SlabTables: React.FC = () => (
@@ -177,7 +177,7 @@ const SECTIONS: PolicySection[] = [
     title: 'Very large orders',
     content: (
       <p>
-        The last slab (100+ pieces for gift items, 25+ for god frames and wall frames) is the best listed price. For larger quantities — weddings, functions,
+        The last slab (100+ pieces for gift items, 25+ for silver foil god frames) is the best listed price. For larger quantities — weddings, functions,
         shops and corporate gifting — ask us for a <strong>special quote</strong>. Mention the products, quantities and the date you need them by.
       </p>
     )

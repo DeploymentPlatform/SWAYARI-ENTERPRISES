@@ -13,9 +13,12 @@ import { SectionHeading } from '../components/ui';
 import { Reveal, StaggerGroup, StaggerItem } from '../components/motion';
 import { Link } from '../lib/router';
 import { usePageMeta } from '../lib/meta';
+import { PAGES } from '../content/seo.js';
 import { useProducts } from '../lib/products';
 import { Product, BRAND_TAGLINES, DEITIES, GIFTING_PRICE_CAP } from '@swayari/shared';
 import { productCardImage, uniqueProductImages } from '../lib/media';
+import { BlogPost, loadBlogPosts } from '../lib/blog';
+import { PostCard } from '../components/PostCard';
 
 // Featured cards wrap in a centred row, so an odd last row sits in the middle instead of leaving a gap.
 const FEATURED_CELL = 'w-[calc(50%-0.4375rem)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1.125rem)]';
@@ -51,11 +54,53 @@ const ProductRow: React.FC<{ products: Product[]; loading: boolean; count?: numb
   </StaggerGroup>
 );
 
-export const HomePage: React.FC = () => {
-  usePageMeta(
-    BRAND_TAGLINES.headline,
-    'Silver foil god frames, Telugu stotram frames, god stands and stotram cards. Return gifts from ₹39, order from 1 piece, bulk prices as you add more — for weddings, griha pravesh, vratams and festivals.'
+/** The three newest gift-guide articles; the articles load in their own chunk after the page. */
+const GiftGuides: React.FC = () => {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    loadBlogPosts()
+      .then(list => !cancelled && setPosts(list.slice(0, 3)))
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  if (!posts.length) return null;
+  return (
+    <section aria-labelledby="guides-title" className="section">
+      <div className="container-content">
+        <Reveal>
+          <SectionHeading
+            id="guides-title"
+            eyebrow="Gift guides"
+            title={
+              <>
+                Ideas for every <em>celebration</em>
+              </>
+            }
+            intro="What to give at weddings, gruhapravesam and vratams — with honest tips on quantities and budgets."
+            action={
+              <Link to="/blog" className="text-link">
+                All gift guides <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            }
+          />
+        </Reveal>
+        <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map(post => (
+            <StaggerItem key={post.slug}>
+              <PostCard post={post} />
+            </StaggerItem>
+          ))}
+        </StaggerGroup>
+      </div>
+    </section>
   );
+};
+
+export const HomePage: React.FC = () => {
+  usePageMeta(PAGES['/'].title, PAGES['/'].description);
 
   const { products, status } = useProducts();
   const loading = status === 'loading';
@@ -86,7 +131,8 @@ export const HomePage: React.FC = () => {
     () => products.filter(p => (productPricing(p).best ?? Infinity) <= 99).sort((a, b) => (productPricing(a).best ?? 0) - (productPricing(b).best ?? 0)),
     [products]
   );
-  const wallFrames = useMemo(() => products.filter(p => p.categorySlug === 'wall-frames'), [products]);
+  // The grandest pieces on the store: 14×17 god frames, then the frames with diyas.
+  const grandFrames = useMemo(() => ['12', '09'].flatMap(g => products.filter(p => p.priceGroup === g)), [products]);
   const giftable = useMemo(() => products.filter(p => p.indicativePrice !== null && p.indicativePrice <= GIFTING_PRICE_CAP), [products]);
 
   // One tile per god, using a god frame photo where there is one.
@@ -221,7 +267,7 @@ export const HomePage: React.FC = () => {
                   src="/assets/editorial/hero-housewarming-desktop.webp"
                   srcSet="/assets/editorial/hero-housewarming-mobile.webp 900w, /assets/editorial/hero-housewarming-desktop.webp 1376w"
                   sizes="(min-width: 1024px) 460px, 420px"
-                  alt="A silver foil Balaji and Padmavathi wall frame between brass lamps"
+                  alt="A silver foil Balaji and Padmavathi god frame between brass lamps"
                   loading="lazy"
                   decoding="async"
                   className="aspect-[4/5] w-full object-cover object-[78%_50%] transition-transform duration-[2000ms] ease-luxury hover:scale-105"
@@ -266,22 +312,22 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {wallFrames.length > 0 && (
-        <section aria-labelledby="wall-title" className="section">
+      {grandFrames.length > 0 && (
+        <section aria-labelledby="grand-title" className="section">
           <div className="container-content">
             <Reveal>
               <SectionHeading
-                id="wall-title"
+                id="grand-title"
                 eyebrow="For the pooja room"
                 title={
                   <>
-                    Grand <em>wall frames</em>
+                    Grand <em>god frames</em>
                   </>
                 }
-                intro="Five, ten and twelve gods in one long silver foil frame — a centrepiece for the pooja room entrance or the hall, and a gift to remember for a griha pravesh."
+                intro="Embossed silver foil deities with lamps and foil ornaments on deep maroon, in carved gold-trimmed frames — a centrepiece for the pooja room and a gift to remember for a griha pravesh."
               />
             </Reveal>
-            <ProductRow products={wallFrames} loading={false} count={4} />
+            <ProductRow products={grandFrames} loading={false} count={4} />
           </div>
         </section>
       )}
@@ -291,6 +337,8 @@ export const HomePage: React.FC = () => {
       <BulkReturnGiftsSection products={returnGifts} />
 
       <OrderProcessExplanation />
+
+      <GiftGuides />
 
       {/* Concierge band */}
       <section aria-labelledby="contact-strip-title" className="section">

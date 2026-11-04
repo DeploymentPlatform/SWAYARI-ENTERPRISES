@@ -13,6 +13,18 @@ function getGoogleJWKS() {
 
 export const CUSTOMER_COOKIE_NAME = 'swayari_customer_session';
 
+// The store sells only items whose 1-piece price is ₹2,999 or less (GIFTING_PRICE_CAP in @swayari/shared).
+// Anything above it stays in the admin portal but is never listed, shown or accepted in a request.
+// Items with no price yet ("price on request") are still shown.
+export const STORE_PRICE_CAP = 2999;
+
+/** Sizes the store may sell: those priced within the cap (a size with no price of its own follows the product). */
+export function sizesWithinCap(variants) {
+  return (Array.isArray(variants) ? variants : []).filter(
+    v => v && (v.indicativePrice === null || v.indicativePrice === undefined || Number(v.indicativePrice) <= STORE_PRICE_CAP)
+  );
+}
+
 export function jsonResponse(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
     status,

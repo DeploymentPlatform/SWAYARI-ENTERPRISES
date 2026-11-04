@@ -1,4 +1,4 @@
-import { jsonResponse, errorResponse, requireCustomerAuth, generateOrderReference, generateCryptoId, logAudit } from '../../_utils.js';
+import { jsonResponse, errorResponse, requireCustomerAuth, generateOrderReference, generateCryptoId, logAudit, STORE_PRICE_CAP } from '../../_utils.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -159,7 +159,6 @@ export async function onRequestPost(context) {
     if (totalPieces > 100000) {
       return errorResponse('For orders this large please contact our team for a special quote.', 400);
     }
-    const MAX_UNIT_PRICE = 20000; // sanity cap; the largest wall frame is well below it
     let calculatedSubtotalPaise = 0;
     let hasUnpricedItem = false;
 
@@ -219,8 +218,12 @@ export async function onRequestPost(context) {
         }
       }
 
-      if (basePrice !== null && (!Number.isFinite(basePrice) || basePrice <= 0 || basePrice > MAX_UNIT_PRICE)) {
+      if (basePrice !== null && (!Number.isFinite(basePrice) || basePrice <= 0)) {
         return errorResponse(`Product ${prod.name} has an invalid price. Please contact our team.`, 400);
+      }
+      // Everything on the store is ₹2,999 or less per piece; anything above it is no longer sold.
+      if (basePrice !== null && basePrice > STORE_PRICE_CAP) {
+        return errorResponse(`${prod.name}${variantName ? ` (${variantName})` : ''} is no longer available. Please remove it from your cart.`, 400);
       }
 
       lines.push({ item, prod, basePrice, tiers, variantName, slabKey: `${prod.price_group || prod.id}::${variantName || ''}` });

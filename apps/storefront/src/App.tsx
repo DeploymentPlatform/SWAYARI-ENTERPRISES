@@ -25,6 +25,8 @@ const CartPage = named(() => import('./pages/CartPage'), 'CartPage');
 const CheckoutPage = named(() => import('./pages/CheckoutPage'), 'CheckoutPage');
 const OrderConfirmationPage = named(() => import('./pages/OrderConfirmationPage'), 'OrderConfirmationPage');
 const AccountOrdersPage = named(() => import('./pages/AccountOrdersPage'), 'AccountOrdersPage');
+const BlogIndexPage = named(() => import('./pages/BlogIndexPage'), 'BlogIndexPage');
+const BlogPostPage = named(() => import('./pages/BlogPostPage'), 'BlogPostPage');
 const AboutPage = named(() => import('./pages/AboutPage'), 'AboutPage');
 const ContactPage = named(() => import('./pages/ContactPage'), 'ContactPage');
 const OrderingPolicyPage = named(() => import('./pages/OrderingPolicyPage'), 'OrderingPolicyPage');
@@ -75,6 +77,8 @@ function RouteSwitch() {
   if (path === '/checkout') return <CheckoutPage />;
   if (path.startsWith('/order-confirmation/')) return <OrderConfirmationPage orderId={decodeURIComponent(path.slice('/order-confirmation/'.length))} />;
   if (path === '/orders' || path === '/account' || path === '/account/orders') return <AccountOrdersPage />;
+  if (path === '/blog') return <BlogIndexPage />;
+  if (path.startsWith('/blog/')) return <BlogPostPage slug={decodeURIComponent(path.slice('/blog/'.length))} />;
   if (path === '/about') return <AboutPage />;
   if (path === '/contact') return <ContactPage />;
   if (path === '/ordering-policy') return <OrderingPolicyPage />;

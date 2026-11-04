@@ -1,3 +1,8 @@
+import { planSeo, applySeo } from './_seo.js';
+
+const isPageRequest = (request, url) =>
+  request.method === 'GET' && !url.pathname.startsWith('/api/') && !/\.[a-z0-9]{2,5}$/i.test(url.pathname);
+
 export async function onRequest(context) {
   const { request, next, env } = context;
   const url = new URL(request.url);
@@ -35,7 +40,34 @@ export async function onRequest(context) {
     }
   }
 
-  const response = await next();
+  // Pages: work out the page's own title, canonical address and structured data (or a redirect).
+  let seo = null;
+  if (isPageRequest(request, url)) {
+    try {
+      seo = await planSeo(url, env);
+    } catch (err) {
+      console.error('SEO plan failed:', err);
+      seo = null;
+    }
+    if (seo?.redirect) {
+      return new Response(null, { status: 301, headers: { Location: new URL(seo.redirect, url.origin).toString(), 'Cache-Control': 'public, max-age=3600' } });
+    }
+  }
+
+  // Each page gets its own HTML now, so never answer "not modified" from the shared app shell.
+  let forwarded = request;
+  if (seo) {
+    const plain = new Headers(request.headers);
+    plain.delete('If-None-Match');
+    plain.delete('If-Modified-Since');
+    forwarded = new Request(request, { headers: plain });
+  }
+  let response = await next(forwarded);
+  let status = response.status;
+  if (seo && typeof HTMLRewriter !== 'undefined' && (response.headers.get('Content-Type') || '').includes('text/html')) {
+    response = applySeo(response, seo);
+    status = seo.status;
+  }
 
   // Security Headers
   const headers = new Headers(response.headers);
@@ -43,17 +75,25 @@ export async function onRequest(context) {
   headers.set('X-Frame-Options', 'DENY');
   headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  if (seo) {
+    headers.delete('ETag');
+    headers.delete('Last-Modified');
+    headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
+  }
+  // Only swayari.com is indexed; the pages.dev copy stays out of search results.
+  if (url.hostname.endsWith('.pages.dev')) headers.set('X-Robots-Tag', 'noindex, nofollow');
 
-  // Content Security Policy compatible with Google Identity Services & fonts
+  // Content Security Policy compatible with Google Identity Services, fonts and Cloudflare Web Analytics
   headers.set(
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' https://accounts.google.com https://apis.google.com",
+      "script-src 'self' https://accounts.google.com https://apis.google.com https://static.cloudflareinsights.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https://lh3.googleusercontent.com https://*.googleusercontent.com",
-      "connect-src 'self' https://accounts.google.com/gsi/",
+      "connect-src 'self' https://accounts.google.com/gsi/ https://cloudflareinsights.com",
       "frame-src https://accounts.google.com/gsi/",
       "object-src 'none'",
       "base-uri 'self'",
@@ -63,8 +103,8 @@ export async function onRequest(context) {
   );
 
   return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
+    status,
+    statusText: status === response.status ? response.statusText : '',
     headers
   });
 }

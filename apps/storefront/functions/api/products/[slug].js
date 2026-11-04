@@ -1,4 +1,4 @@
-import { jsonResponse, errorResponse } from '../../_utils.js';
+import { jsonResponse, errorResponse, STORE_PRICE_CAP, sizesWithinCap } from '../../_utils.js';
 
 export async function onRequestGet(context) {
   const { params, env, request } = context;
@@ -25,8 +25,9 @@ export async function onRequestGet(context) {
              c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.slug = ? AND p.status = 'published' ${demoFilter}
-    `).bind(slug).first();
+      WHERE p.slug = ? AND p.status = 'published'
+        AND (p.indicative_price IS NULL OR p.indicative_price <= ?) ${demoFilter}
+    `).bind(slug, STORE_PRICE_CAP).first();
 
     if (!row) {
       return errorResponse('Product not found', 404);
@@ -45,7 +46,7 @@ export async function onRequestGet(context) {
       material: row.material,
       dimensions: row.dimensions,
       hasVariants: Boolean(row.has_variants),
-      variants: JSON.parse(row.variants_json || '[]'),
+      variants: sizesWithinCap(JSON.parse(row.variants_json || '[]')),
       indicativePrice: row.indicative_price !== null ? Number(row.indicative_price) : null,
       minQuantity: row.min_quantity || 1,
       availabilityLabel: row.availability_label,

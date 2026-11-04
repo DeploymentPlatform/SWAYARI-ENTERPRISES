@@ -16,6 +16,9 @@ import * as sfCategoriesList from '../apps/storefront/functions/api/categories/i
 import * as sfOrdersIndex from '../apps/storefront/functions/api/orders/index.js';
 import * as sfOrderDetails from '../apps/storefront/functions/api/orders/[id].js';
 import * as sfAuthConfig from '../apps/storefront/functions/api/auth/config.js';
+import { planSeo } from '../apps/storefront/functions/_seo.js';
+import * as sfSitemap from '../apps/storefront/functions/sitemap.xml.js';
+import { BLOG_POSTS } from '../apps/storefront/src/content/blog-posts.js';
 
 // Admin backend imports
 import * as admMiddleware from '../apps/admin/functions/_middleware.js';
@@ -507,7 +510,7 @@ await test('25. Production Vite builds exist for both Storefront and Admin', asy
 // 11. CATALOGUE FILTER TESTS (real kit catalogue from all migrations)
 const kitEnv = { ...env, DB: createMockD1(), MIN_ORDER_FRAMES: undefined };
 await test('26. Price filters return only items inside each band', async () => {
-  const bands = { 'under-299': [0, 299], '300-999': [300, 999], '1000-2999': [1000, 2999], '3000-plus': [3000, 20000] };
+  const bands = { 'under-299': [0, 299], '300-999': [300, 999], '1000-2999': [1000, 2999], 'under-2999': [0, 2999] };
   for (const [band, [min, max]] of Object.entries(bands)) {
     const res = await sfProductsList.onRequestGet(makeContext(makeRequest(`http://storefront/api/products?budget=${band}`), kitEnv));
     const data = await res.json();
@@ -596,7 +599,7 @@ await test('28. Server-side order request rejects implausible prices', async () 
   const res = await sfOrdersIndex.onRequestPost(makeContext(req, env));
   assert.equal(res.status, 400);
   const data = await res.json();
-  assert.ok(data.error.includes('invalid price'));
+  assert.ok(data.error.includes('no longer available'), 'Items above the ₹2,999 store limit cannot be requested');
   await env.DB.prepare("UPDATE products SET status = 'archived' WHERE id = 'test-expensive-frame'").run();
 });
 
@@ -662,16 +665,22 @@ await test('30. Admin quotation revisions reject agreed unit prices above the �
   assert.ok(data.error.includes('₹20,000'));
 });
 
-await test('31. Storefront lists grand wall frames above ₹2,999 with their MRP and price group', async () => {
-  const sfRes = await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?category=wall-frames'), kitEnv));
-  const sfData = await sfRes.json();
-  assert.equal(sfData.success, true);
-  const twelve = sfData.products.find(p => p.id === 'kit-07-01');
-  assert.ok(twelve, '12 Gods wall frame must be listed');
-  assert.equal(twelve.indicativePrice, 6799);
-  assert.equal(twelve.mrp, 8999);
-  assert.equal(twelve.priceGroup, '07');
-  assert.equal(sfData.products.some(p => p.id === 'test-expensive-frame'), false);
+await test('31. Storefront lists only items under ₹2,999; the wall frames above it are hidden', async () => {
+  const all = await (await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products'), kitEnv))).json();
+  assert.equal(all.success, true);
+  assert.ok(all.products.every(p => p.indicativePrice === null || p.indicativePrice <= 2999), 'Every listed item is ₹2,999 or less');
+  assert.equal(all.products.some(p => ['kit-05-01', 'kit-06-01', 'kit-07-01'].includes(p.id)), false, 'Wall frames are not listed');
+  const grand = all.products.find(p => p.id === 'kit-12-02');
+  assert.ok(grand, 'Grand 14×17 god frames stay on the store');
+  assert.equal(grand.indicativePrice, 1449);
+  assert.equal(grand.mrp, 2199);
+  assert.equal(grand.priceGroup, '12');
+  const wall = await (await sfProductsList.onRequestGet(makeContext(makeRequest('http://storefront/api/products?category=wall-frames'), kitEnv))).json();
+  assert.equal(wall.products.length, 0);
+  const slug = '12-gods-silver-foil-wall-frame';
+  const page = await sfProductSlug.onRequestGet(makeContext(makeRequest(`http://storefront/api/products/${slug}`), kitEnv, { slug }));
+  assert.equal(page.status, 404, 'A wall frame page is not served');
+  assert.equal(all.products.some(p => p.id === 'test-expensive-frame'), false);
 });
 
 await test('32. Bulk pricing is consistent across calculation, cart totals, and server order submission', async () => {
@@ -1068,10 +1077,15 @@ await test('39. Sample data is strictly isolated when ENVIRONMENT is missing, em
 const liveDb = createMockD1();
 const liveRows = sql => liveDb._rawDb.prepare(sql).all();
 
-await test('40. Live catalogue is the 94 kit designs in five categories at the exact kit prices', async () => {
+await test('40. Live catalogue is the 91 kit designs under ₹2,999 in four categories at the exact kit prices', async () => {
   const products = liveRows("SELECT * FROM products WHERE status = 'published' AND is_demo = 0");
-  assert.equal(products.length, 94, '94 designs are for sale');
-  const byId = Object.fromEntries(products.map(p => [p.id, p]));
+  assert.equal(products.length, 91, '91 designs are for sale');
+  assert.ok(products.every(p => p.indicative_price <= 2999), 'Nothing above ₹2,999 is for sale');
+  // The wall frames are archived (kept for earlier requests), with their kit prices intact
+  const kit = liveRows("SELECT * FROM products WHERE id LIKE 'kit-%'");
+  assert.equal(kit.length, 94);
+  const byId = Object.fromEntries(kit.map(p => [p.id, p]));
+  assert.deepEqual(['kit-05-01', 'kit-06-01', 'kit-07-01'].map(id => byId[id].status), ['archived', 'archived', 'archived']);
   const tiers = id => JSON.parse(byId[id].bulk_tiers_json).map(t => t.unit_price);
   // Spot checks against the kit's price table
   assert.deepEqual(tiers('kit-01-01'), [549, 469, 429, 399]);
@@ -1095,7 +1109,7 @@ await test('40. Live catalogue is the 94 kit designs in five categories at the e
     assert.ok(!/999 silver|fine silver|pure silver/i.test(p.description), `${p.name}: no purity claims`);
   }
   const categories = liveRows('SELECT name FROM categories WHERE is_active = 1 ORDER BY display_order');
-  assert.deepEqual(categories.map(c => c.name), ['God Frames', 'Stotram Frames', 'God Stands', 'Stotram Cards', 'Wall Frames']);
+  assert.deepEqual(categories.map(c => c.name), ['God Frames', 'Stotram Frames', 'God Stands', 'Stotram Cards']);
 });
 
 await test('41. "Silver" never appears on its own in catalogue or banner text', async () => {
@@ -1163,9 +1177,13 @@ await test('43. Designs of one product and size share a slab; a single piece can
   assert.equal(noSize.status, 400);
 
   // One piece is fine
-  const one = await order('slab-one-' + Date.now(), [{ productId: 'kit-07-01', quantity: 1 }]);
+  const one = await order('slab-one-' + Date.now(), [{ productId: 'kit-12-02', quantity: 1 }]);
   assert.equal(one.status, 201);
-  assert.equal((await one.json()).indicativeSubtotal, 6799);
+  assert.equal((await one.json()).indicativeSubtotal, 1449);
+
+  // A wall frame (above ₹2,999) can no longer be requested
+  const wall = await order('slab-wall-' + Date.now(), [{ productId: 'kit-07-01', quantity: 1 }]);
+  assert.equal(wall.status, 404);
 });
 
 await test('44. Order requests with oversized fields are refused', async () => {
@@ -1202,6 +1220,79 @@ await test('46. Banner buttons can only link to pages on this site', async () =>
     }
   }), env));
   assert.equal(res.status, 400);
+});
+
+await test('47. Every page gets its own title, canonical address and status before it reaches the browser', async () => {
+  const plan = href => planSeo(new URL(href), kitEnv);
+  const home = await plan('https://swayari.com/');
+  assert.equal(home.status, 200);
+  assert.equal(home.canonical, 'https://swayari.com/');
+  assert.ok(home.isHome);
+
+  // A single collection filter is a page of its own; tracking codes and combinations are not
+  const cards = await plan('https://swayari.com/shop?category=stotram-cards&utm_source=wa');
+  assert.equal(cards.canonical, 'https://swayari.com/shop?category=stotram-cards');
+  assert.match(cards.robots, /^index/);
+  assert.match(cards.title, /Stotram Cards/i);
+  const combo = await plan('https://swayari.com/shop?category=stotram-cards&budget=under-299');
+  assert.match(combo.robots, /^noindex/);
+
+  // Retired collections, old aliases and trailing slashes redirect
+  assert.equal((await plan('https://swayari.com/shop?category=wall-frames')).redirect, '/shop');
+  assert.equal((await plan('https://swayari.com/privacy')).redirect, '/privacy-policy');
+  assert.equal((await plan('https://swayari.com/about/')).redirect, '/about');
+
+  // A product above the price limit sends visitors to the shop; one for sale carries Product data
+  const wallSlug = kitEnv.DB.prepare
+    ? (await kitEnv.DB.prepare("SELECT slug FROM products WHERE id = 'kit-07-01'").first())?.slug
+    : null;
+  assert.ok(wallSlug, 'Wall frame row must still exist (archived, not deleted)');
+  assert.equal((await plan(`https://swayari.com/product/${wallSlug}`)).redirect, '/shop');
+  const forSaleSlug = (await kitEnv.DB.prepare("SELECT slug FROM products WHERE id = 'kit-12-02'").first()).slug;
+  const product = await plan(`https://swayari.com/product/${forSaleSlug}`);
+  assert.equal(product.status, 200);
+  assert.equal(product.type, 'product');
+  assert.ok(product.jsonLd.some(d => d['@type'] === 'Product' && d.offers), 'Product structured data with offers');
+  assert.equal((await plan('https://swayari.com/product/no-such-frame')).status, 404);
+
+  // Gift guides: the index, each article and unknown articles
+  assert.ok(BLOG_POSTS.length >= 6, 'At least six gift guides');
+  const post = BLOG_POSTS[0];
+  const article = await plan(`https://swayari.com/blog/${post.slug}`);
+  assert.equal(article.status, 200);
+  assert.equal(article.type, 'article');
+  assert.equal(article.canonical, `https://swayari.com/blog/${post.slug}`);
+  assert.ok(article.jsonLd.some(d => d['@type'] === 'BlogPosting'));
+  assert.equal((await plan('https://swayari.com/blog/not-a-guide')).status, 404);
+  assert.equal((await plan('https://swayari.com/no-such-page')).status, 404);
+  assert.match((await plan('https://swayari.com/checkout')).robots, /^noindex/);
+});
+
+await test('48. Gift guides follow the wording rules and fit search results', async () => {
+  const slugs = new Set();
+  for (const post of BLOG_POSTS) {
+    assert.ok(!slugs.has(post.slug), `Duplicate slug ${post.slug}`);
+    slugs.add(post.slug);
+    assert.match(post.slug, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    const title = post.metaTitle || post.title;
+    assert.ok(`${title} | SWAYARI`.length <= 70, `Title too long: ${title}`);
+    assert.ok(post.description.length >= 110 && post.description.length <= 165, `Description length ${post.description.length}: ${post.slug}`);
+    assert.ok(fs.existsSync(path.join(process.cwd(), 'public', post.image)), `Missing image ${post.image}`);
+    const text = [post.title, post.description, post.excerpt, post.html, ...(post.faq || []).flatMap(f => [f.q, f.a])].join(' ');
+    assert.doesNotMatch(text, /999\s*(?:fine|silver)|silver\s*999|fine silver|pure silver|german silver|sterling|wall frame/i, `Wording rule broken in ${post.slug}`);
+    for (const m of text.matchAll(/silver(?![ -]foil)/gi)) {
+      assert.fail(`"silver" without "foil" in ${post.slug}: …${text.slice(Math.max(0, m.index - 30), m.index + 30)}…`);
+    }
+    assert.doesNotMatch(post.html, /<(script|style|iframe|img)\b/i, `Unexpected tag in ${post.slug}`);
+    for (const [, href] of post.html.matchAll(/href="([^"]+)"/g)) {
+      assert.ok(href.startsWith('/') || href.startsWith('#'), `External link in ${post.slug}: ${href}`);
+    }
+  }
+  const res = await sfSitemap.onRequestGet({ env: kitEnv });
+  const xml = await res.text();
+  assert.ok(xml.includes(`<loc>https://swayari.com/blog/${BLOG_POSTS[0].slug}</loc>`), 'Sitemap lists the articles');
+  assert.ok(xml.includes('<loc>https://swayari.com/shop?category=stotram-cards</loc>'), 'Sitemap lists collection pages');
+  assert.ok(!xml.includes('wall-frame'), 'Sitemap leaves out the hidden wall frames');
 });
 
 console.log('====================================================');

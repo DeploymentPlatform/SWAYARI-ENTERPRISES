@@ -3,18 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SWAYARI — Devotional Gifting Under ₹2,999 | Silver Foil God Frames &amp; Return Gifts</title>
-    <meta name="description" content="Silver foil god frames, Telugu stotram frames, god stands and stotram cards. Return gifts from ₹39, order from 1 piece, bulk prices as you add more. Weddings, griha pravesh, vratams and festivals." />
-    <meta name="robots" content="index, follow" />
+    <title>SWAYARI — Devotional Return Gifts &amp; God Frames Under ₹2,999</title>
+    <meta name="description" content="Silver foil god frames, Telugu stotram frames, god stands and stotram cards, all under ₹2,999. Return gifts from ₹39 — order from 1 piece, bulk prices as you add more." />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="theme-color" content="#4A1428" />
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/favicon-48.png" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="SWAYARI" />
-    <meta property="og:title" content="SWAYARI — Devotional Gifting Under ₹2,999" />
-    <meta property="og:description" content="Silver foil god frames, stotram frames and return gifts from ₹39. Order from 1 piece — bulk prices as you add more." />
-    <meta property="og:image" content="https://swayari.com/assets/editorial/hero-god-frames-og.jpg" />
+    <meta property="og:title" content="SWAYARI — Devotional Return Gifts &amp; God Frames Under ₹2,999" />
+    <meta property="og:description" content="Silver foil god frames, Telugu stotram frames, god stands and stotram cards, all under ₹2,999. Return gifts from ₹39 — order from 1 piece, bulk prices as you add more." />
+    <meta property="og:image" content="https://swayari.com/assets/editorial/og-swayari.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:url" content="https://swayari.com/" />
     <meta property="og:locale" content="en_IN" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -23,9 +25,10 @@
 
     <link rel="preload" as="image" type="image/svg+xml" href="/assets/brand/swayari-logo-light-compact.svg" />
 
-    <!-- First hero slide (matches the first campaign banner): start downloading before the app boots -->
-    <link rel="preload" as="image" type="image/webp" media="(min-width: 768px)" href="/assets/editorial/hero-god-frames-desktop.webp" fetchpriority="high" />
-    <link rel="preload" as="image" type="image/webp" media="(max-width: 767px)" href="/assets/editorial/hero-god-frames-mobile.webp" fetchpriority="high" />
+    <!-- First hero slide (matches the first campaign banner): start downloading before the app boots.
+         The server removes these two on every page except the home page. -->
+    <link rel="preload" as="image" type="image/webp" media="(min-width: 768px)" href="/assets/editorial/hero-signature-desktop.webp" fetchpriority="high" data-hero-preload />
+    <link rel="preload" as="image" type="image/webp" media="(max-width: 767px)" href="/assets/editorial/hero-signature-mobile.webp" fetchpriority="high" data-hero-preload />
 
     <!-- Self-hosted fonts (see packages/ui/src/fonts.css): preload the faces used above the fold -->
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/cinzel-normal-latin.woff2" crossorigin />
@@ -39,7 +42,7 @@
   <body>
     <div id="root"></div>
     <noscript>
-      <p style="padding:24px;font-family:system-ui">SWAYARI — devotional gifting under ₹2,999: silver foil god frames, stotram frames and return gifts from ₹39. Please enable JavaScript to browse the collection, or email swayarienterprises@gmail.com.</p>
+      <p style="padding:24px;font-family:system-ui">SWAYARI — devotional gifting under ₹2,999: silver foil god frames, stotram frames, god stands and stotram cards, with return gifts from ₹39. Please enable JavaScript to browse the collection, or email swayarienterprises@gmail.com.</p>
     </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>

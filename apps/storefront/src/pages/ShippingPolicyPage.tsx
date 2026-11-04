@@ -58,7 +58,7 @@ const SECTIONS: PolicySection[] = [
       <>
         <p>
           <strong>Delivery is not included in the product price.</strong> It is charged at actual cost, based on your location and the size and weight of the
-          parcel. Large wall frames and big bulk orders cost more to send safely.
+          parcel. Large frames and big bulk orders cost more to send safely.
         </p>
         <p>Our team tells you the exact delivery charge before dispatch, along with the final amount. You pay it only after you have agreed to it.</p>
       </>
@@ -69,7 +69,7 @@ const SECTIONS: PolicySection[] = [
     title: 'Packing',
     content: (
       <p>
-        Every order is packed with protective material for safe travel. Frames, and large wall frames in particular, get extra padding and corner
+        Every order is packed with protective material for safe travel. Frames, and large frames in particular, get extra padding and corner
         protection. Big orders may be sent in more than one box, which can arrive on different days.
       </p>
     )

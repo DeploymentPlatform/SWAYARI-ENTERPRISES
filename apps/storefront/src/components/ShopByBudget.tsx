@@ -3,6 +3,17 @@ import { BRAND_TAGLINES, FRAME_PRICE_BANDS, FramePriceBandDefinition } from '@sw
 import { Link } from '../lib/router';
 import { Sparkles, ArrowRight, Tag } from 'lucide-react';
 
+/** The three price bands, then the whole collection (the API also accepts budget=under-2999). */
+const WHOLE_COLLECTION: FramePriceBandDefinition = {
+  id: 'under-2999',
+  label: 'Everything under ₹2,999',
+  shortLabel: 'All gifts',
+  minPrice: 0,
+  maxPrice: 2999,
+  description: 'The full SWAYARI collection, from ₹89 god stands to grand pooja-room frames'
+};
+const BUDGET_CARDS = [...FRAME_PRICE_BANDS, WHOLE_COLLECTION];
+
 interface ShopByBudgetProps {
   selectedBudget?: string;
   onSelectBudget?: (budgetId: string) => void;
@@ -32,8 +43,8 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
                 Gifting under ₹2,999
               </h2>
               <p className="text-[13px] sm:text-[14px] text-ink-soft mt-1 max-w-2xl">
-                Return gifts from ₹39, god frames for every home and grand pieces for the pooja room. For a statement gift,
-                our long 5, 10 and 12 god wall frames start at ₹3,299. {BRAND_TAGLINES.priceNote}
+                Every design on SWAYARI is under ₹2,999: return gifts from ₹39, god frames for every home and grand
+                pieces for the pooja room. {BRAND_TAGLINES.priceNote}
               </p>
             </div>
             
@@ -49,11 +60,11 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
 
         {/* 4 Prominent Budget Cards (4 across on desktop, 2 across on mobile) */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          {FRAME_PRICE_BANDS.map((band: FramePriceBandDefinition, idx: number) => {
+          {BUDGET_CARDS.map((band: FramePriceBandDefinition, idx: number) => {
             const isSelected = selectedBudget === band.id;
             const isEntryLevel = band.id === 'under-299';
-            const isPremium = band.id === '3000-plus';
-            const tag = isEntryLevel ? 'Return gifts' : isPremium ? 'Premium pick' : null;
+            const isWhole = band.id === WHOLE_COLLECTION.id;
+            const tag = isEntryLevel ? 'Return gifts' : isWhole ? 'Full collection' : null;
 
             return (
               <div
@@ -88,7 +99,7 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
                         isSelected ? 'bg-white/10 text-white/90' : 'bg-[#FAF7F2] text-ink-soft'
                       }`}
                     >
-                      {isPremium ? 'Above ₹2,999' : `Band ${idx + 1}`}
+                      {isWhole ? 'All designs' : `Band ${idx + 1}`}
                     </span>
                   </div>
 
@@ -132,7 +143,7 @@ export const ShopByBudget: React.FC<ShopByBudgetProps> = ({
                           : 'bg-[#FAF7F2] text-[#292421] group-hover:bg-[#571C2A] group-hover:text-white'
                       }`}
                     >
-                      <span>{isPremium ? 'See wall frames' : 'Explore'}</span>
+                      <span>{isWhole ? 'Shop all' : 'Explore'}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   )}

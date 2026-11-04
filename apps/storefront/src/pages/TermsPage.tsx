@@ -309,8 +309,7 @@ const SECTIONS: PolicySection[] = [
             'Silver foil stotram cards with red gift covers',
             'Silver foil god photo stands (acrylic)',
             'Silver foil god frames, including embossed designs',
-            'Colour god frames',
-            'Large wall frames'
+            'Colour god frames'
           ]}
         />
       </>
@@ -350,7 +349,7 @@ const SECTIONS: PolicySection[] = [
             </>,
             <>
               Each product has four quantity slabs. The slab is decided by the <strong>total quantity of that product in that size</strong> in your order, and
-              you can mix designs to reach a slab. Gift items: 1–9, 10–49, 50–99 and 100+ pieces. God frames and wall frames: 1–2, 3–9, 10–24 and 25+ pieces.
+              you can mix designs to reach a slab. Gift items (including colour god frames): 1–9, 10–49, 50–99 and 100+ pieces. Silver foil god frames: 1–2, 3–9, 10–24 and 25+ pieces.
             </>,
             'Where an MRP is shown struck through, it is the maximum retail price printed by the supplier or set for the product; the price you pay is the slab price.',
             'For quantities larger than the last slab, ask us for a special quote.',

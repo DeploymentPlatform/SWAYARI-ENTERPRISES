@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from '../lib/router';
 import { ArrowRight } from 'lucide-react';
 
-/** The five catalogue categories, each with a real product photo (480px thumbnails for the small tiles). */
+/** The four catalogue categories plus return gifts under ₹299, each with a real product photo (480px thumbnails). */
 const SHORTCUTS = [
   {
     slug: 'god-frames',
@@ -33,13 +33,14 @@ const SHORTCUTS = [
     alt: 'Silver foil stotram card in a red gift cover'
   },
   {
-    slug: 'wall-frames',
-    name: 'Wall Frames',
-    line: '5, 10 & 12 gods · from ₹3,299',
-    image: '/assets/products/thumbs/kit-07-01.webp',
-    alt: 'Long silver foil wall frame with many gods'
+    slug: 'return-gifts',
+    name: 'Under ₹299',
+    line: 'Return gifts for every guest',
+    image: '/assets/products/thumbs/kit-04-13.webp',
+    alt: 'Colour silver foil Lakshmi image in a clear acrylic stand',
+    href: '/shop?budget=under-299'
   }
-].map(item => ({ ...item, href: `/shop?category=${item.slug}` }));
+].map(item => ({ ...item, href: item.href ?? `/shop?category=${item.slug}` }));
 
 export const CategoryShortcuts: React.FC = () => {
   return (

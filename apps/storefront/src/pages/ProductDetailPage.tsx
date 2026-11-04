@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronLeft, ChevronRight, MessageCircle, ShoppingBag, Sparkles, Truck } from 'lucide-react';
 import { Product, formatPrice } from '@swayari/shared';
 import { Link } from '../lib/router';
-import { usePageMeta, useStructuredData } from '../lib/meta';
+import { usePageMeta } from '../lib/meta';
 import { useAddToBag, useProducts } from '../lib/products';
 import { withPreview } from '../lib/preview';
 import { EmptyState, LoadError, Ornament } from '../components/States';
@@ -87,58 +87,8 @@ export const ProductDetailPage: React.FC<{ slug: string }> = ({ slug }) => {
       noindex: status === 'notfound' || Boolean(product?.isDemo)
     }
   );
-  useStructuredData(
-    'product-jsonld',
-    product && !product.isDemo
-      ? {
-          '@context': 'https://schema.org',
-          '@type': 'Product',
-          name: product.name,
-          sku: product.sku,
-          description: product.description,
-          image: product.images?.map(src => new URL(src, window.location.origin).href),
-          brand: { '@type': 'Brand', name: 'SWAYARI' },
-          ...(product.indicativePrice !== null
-            ? {
-                // All sizes and quantity slabs: the 1-piece price is the highest, the best slab the lowest
-                offers: (() => {
-                  const prices = [product.indicativePrice!, ...(product.bulkTiers || []).map(t => t.unit_price)];
-                  for (const v of product.variants || []) {
-                    if (v.indicativePrice != null) prices.push(v.indicativePrice);
-                    for (const t of v.tiers || []) prices.push(t.unit_price);
-                  }
-                  return {
-                    '@type': 'AggregateOffer',
-                    priceCurrency: 'INR',
-                    lowPrice: Math.min(...prices),
-                    highPrice: Math.max(...prices),
-                    offerCount: Math.max(1, product.variants?.length || 1),
-                    availability: 'https://schema.org/InStock',
-                    url: `https://swayari.com/product/${product.slug}`,
-                    seller: { '@type': 'Organization', name: 'SWAYARI Enterprises' }
-                  };
-                })()
-              }
-            : {})
-        }
-      : null
-  );
-  useStructuredData(
-    'breadcrumb-jsonld',
-    product
-      ? {
-          '@context': 'https://schema.org',
-          '@type': 'BreadcrumbList',
-          itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Shop', item: 'https://swayari.com/shop' },
-            ...(product.categorySlug
-              ? [{ '@type': 'ListItem', position: 2, name: product.categoryName, item: `https://swayari.com/shop?category=${product.categorySlug}` }]
-              : []),
-            { '@type': 'ListItem', position: product.categorySlug ? 3 : 2, name: product.name, item: `https://swayari.com/product/${product.slug}` }
-          ]
-        }
-      : null
-  );
+  // Product and breadcrumb structured data are written into the page HTML by the server
+  // (functions/_middleware.js), so every crawler sees them without running the app.
 
   if (status === 'loading') {
     return (

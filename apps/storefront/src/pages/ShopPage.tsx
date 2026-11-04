@@ -9,6 +9,7 @@ import { EASE_LUXURY, Reveal, StaggerGroup, StaggerItem } from '../components/mo
 import { useDialogBehaviour } from '../components/ui';
 import { useRouter } from '../lib/router';
 import { usePageMeta } from '../lib/meta';
+import { PAGES, shopLanding } from '../content/seo.js';
 import { useProducts } from '../lib/products';
 
 /** The five catalogue categories (slug matches `categories.slug`, sent to the API as `category`). */
@@ -16,8 +17,7 @@ const CATEGORIES: { slug: string; name: string }[] = [
   { slug: 'god-frames', name: 'God Frames' },
   { slug: 'stotram-frames', name: 'Stotram Frames' },
   { slug: 'god-stands', name: 'God Stands' },
-  { slug: 'stotram-cards', name: 'Stotram Cards' },
-  { slug: 'wall-frames', name: 'Wall Frames' }
+  { slug: 'stotram-cards', name: 'Stotram Cards' }
 ];
 
 /** Extra budget the API accepts on top of FRAME_PRICE_BANDS: the whole gifting collection. */
@@ -106,9 +106,11 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
   }
   const isFiltered = isSearch || isBulk || Boolean(category || deity || occasion || budget);
 
+  // A single category, occasion, budget or deity filter is a landing page with its own title (content/seo.js).
+  const landing = shopLanding(search);
   usePageMeta(
-    isFiltered ? title : 'Shop Devotional Gifts',
-    'Silver foil god frames, stotram frames, god stands, stotram cards and wall frames. Gifting under ₹2,999, with return gifts from ₹39. Order from 1 piece and mix designs to unlock bulk prices. Delivery extra.',
+    landing ? landing.meta.title : isFiltered ? title : PAGES['/shop'].title,
+    landing ? landing.meta.description : PAGES['/shop'].description,
     { noindex: isSearch }
   );
 
@@ -182,8 +184,8 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
                 )}
               </h1>
               <p className="lede mt-4 max-w-xl">
-                Silver foil god frames, stotram frames, god stands, stotram cards and wall frames — for weddings, griha pravesh,
-                festivals and the pooja room. Order from 1 piece, and mix designs to unlock bulk prices.
+                Silver foil god frames, stotram frames, god stands and stotram cards, every one under ₹2,999 — for weddings,
+                griha pravesh, festivals and the pooja room. Order from 1 piece, and mix designs to unlock bulk prices.
               </p>
               <p className="mt-3 text-[0.8125rem] text-ink-soft">{BRAND_TAGLINES.priceNote}</p>
             </div>
@@ -346,7 +348,7 @@ export const ShopPage: React.FC<{ searchQuery?: string }> = ({ searchQuery }) =>
             <EmptyState
               eyebrow="Nothing here just yet"
               title="No designs matched your filters"
-              body={<p>Try clearing a filter, or browse the full collection — god frames, stotram frames, god stands, stotram cards and wall frames.</p>}
+              body={<p>Try clearing a filter, or browse the full collection — god frames, stotram frames, god stands and stotram cards.</p>}
               action={{ to: '/shop', label: 'View all designs' }}
             />
           )}

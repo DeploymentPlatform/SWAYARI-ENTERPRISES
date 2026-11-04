@@ -21,14 +21,14 @@ export const BRAND = {
   }
 } as const;
 
-/** Sanity cap for any single price on SWAYARI (the largest wall frame is well below it). */
+/** Sanity cap for any single price entered in the admin portal (the store itself lists only items up to GIFTING_PRICE_CAP). */
 export const MAX_FRAME_PRICE = 20000;
 export const MAX_FRAME_PRICE_PAISE = 2000000;
 
 /** No order-wide minimum: buyers start at 1 piece and slabs reward larger quantities. */
 export const MIN_ORDER_FRAMES = 1;
 
-/** The gifting promise shown across the site. */
+/** The store promise: every item's 1-piece price is ₹2,999 or less; anything above it is hidden from the store. */
 export const GIFTING_PRICE_CAP = 2999;
 
 export const ORDER_DISCLAIMER_TEXT =
@@ -67,7 +67,7 @@ export interface FramePriceBandDefinition {
   description?: string;
 }
 
-/** Shop-by-budget bands, matched against the 1-piece price. */
+/** Shop-by-budget bands, matched against the 1-piece price. Everything on SWAYARI is under ₹2,999. */
 export const FRAME_PRICE_BANDS: FramePriceBandDefinition[] = [
   {
     id: 'under-299',
@@ -75,7 +75,7 @@ export const FRAME_PRICE_BANDS: FramePriceBandDefinition[] = [
     shortLabel: '< ₹299',
     minPrice: 0,
     maxPrice: 299,
-    description: 'Stotram cards, god stands and colour frames for every guest'
+    description: 'Stotram cards and god stands: return gifts for every guest'
   },
   {
     id: '300-999',
@@ -83,7 +83,7 @@ export const FRAME_PRICE_BANDS: FramePriceBandDefinition[] = [
     shortLabel: '₹300–999',
     minPrice: 300,
     maxPrice: 999,
-    description: 'Stotram flip frames, god frames and gifts for close family'
+    description: 'Colour god frames, stotram flip frames and 8×10 god frames for close family'
   },
   {
     id: '1000-2999',
@@ -91,15 +91,7 @@ export const FRAME_PRICE_BANDS: FramePriceBandDefinition[] = [
     shortLabel: '₹1k–2,999',
     minPrice: 1000,
     maxPrice: 2999,
-    description: 'Grand god frames for the pooja room and special occasions'
-  },
-  {
-    id: '3000-plus',
-    label: 'Wall frames ₹3,000+',
-    shortLabel: '₹3,000+',
-    minPrice: 3000,
-    maxPrice: 20000,
-    description: '5, 10 and 12 god wall frames for the pooja room entrance'
+    description: 'Grand 14×17 god frames for the pooja room and special occasions'
   }
 ];
 
@@ -145,19 +137,19 @@ export const OCCASIONS = [
     id: 'griha-pravesh',
     name: 'Griha Pravesh',
     badge: 'New beginnings',
-    description: 'Balaji, Lakshmi and Ganesh frames to bless a new home'
+    description: 'Balaji, Lakshmi and Ganesh god stands, frames and stotram cards to bless a new home'
   },
   {
     id: 'festivals-vratams',
     name: 'Festivals & Vratams',
     badge: 'Sacred days',
-    description: 'Varalakshmi Vratam, Vinayaka Chavithi, Diwali and Navratri gifts'
+    description: 'Varalakshmi Vratham thamboolam, Vinayaka Chavithi, Diwali and Navratri gifts'
   },
   {
     id: 'pooja-room',
     name: 'Pooja Room',
     badge: 'For the home',
-    description: 'Grand silver foil god frames and wall frames for your pooja room'
+    description: 'Grand silver foil god frames and stotram frames for your pooja room'
   },
   {
     id: 'corporate-gifting',

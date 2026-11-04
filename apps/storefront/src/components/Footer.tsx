@@ -8,11 +8,12 @@ const COLLECTIONS = [
   { label: 'Stotram Frames', to: '/shop?category=stotram-frames' },
   { label: 'God Stands', to: '/shop?category=god-stands' },
   { label: 'Stotram Cards', to: '/shop?category=stotram-cards' },
-  { label: 'Wall Frames', to: '/shop?category=wall-frames' },
+  { label: 'Return gifts under ₹299', to: '/shop?budget=under-299' },
   { label: 'Wedding return gifts', to: '/shop?occasion=wedding-return-gifts' }
 ];
 
 const SUPPORT = [
+  { label: 'Gift guides', to: '/blog' },
   { label: 'My order requests', to: '/account/orders' },
   { label: 'Our story', to: '/about' },
   { label: 'Contact & assistance', to: '/contact' }

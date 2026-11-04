@@ -51,7 +51,7 @@ export const AboutPage: React.FC = () => {
             </h1>
             <p className="mt-7 max-w-lg text-[1.0625rem] leading-relaxed text-ivory/90">
               SWAYARI brings you devotional gifting under ₹2,999 — silver foil god frames, stotram frames, god stands and stotram cards, with
-              return gifts from ₹39. For the pooja room, our long wall frames are the grand pick. Chosen for weddings, griha pravesh,
+              return gifts from ₹39. For the pooja room, our grand 14×17 god frames are the special pick. Chosen for weddings, griha pravesh,
               festivals and vratams.
             </p>
           </motion.div>

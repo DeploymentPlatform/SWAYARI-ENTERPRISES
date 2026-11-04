@@ -11,5 +11,8 @@ Disallow: /checkout
 Disallow: /order-confirmation/
 Disallow: /dev-login
 Disallow: /api/
+Disallow: /search
+Disallow: /*?search=
 
 Sitemap: https://swayari.com/sitemap.xml
+# Gift-guide articles feed: https://swayari.com/blog/rss.xml

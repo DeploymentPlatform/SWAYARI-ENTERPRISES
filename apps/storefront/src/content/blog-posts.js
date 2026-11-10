@@ -10,7 +10,7 @@ export const BLOG_POSTS = [
     description: "Wedding return gifts under ₹299 that guests keep: silver foil stotram cards and god stands, with real slab prices and plans for 100 to 500 guests.",
     excerpt: "Silver foil stotram cards and god stands that guests take home and actually use, with a simple plan and real slab prices for 100 to 500 guests.",
     date: '2026-11-04',
-    updated: '2026-11-04',
+    updated: '2026-11-10',
     readMinutes: 6,
     category: 'Return gift ideas',
     keywords: ['wedding return gifts under 299', 'wedding return gifts under 300', 'return gifts under 300', 'devotional return gifts', 'telugu wedding return gifts', 'bulk wedding return gifts'],
@@ -26,7 +26,7 @@ export const BLOG_POSTS = [
 <h3>Silver foil stotram cards</h3>
 <p>Each card is a silver foil card printed with a stotram in Telugu and a colour image of the deity, sealed in a clear sleeve and presented in a red gift cover. There are 18 designs in the <a href="/shop?category=stotram-cards">stotram card collection</a>. They are light and flat, and they slip easily into a thamboolam bag, which makes them ideal for a long guest list.</p>
 <h3>Silver foil god stands</h3>
-<p>A god stand is a colour-enamelled silver foil image of a deity set in a clear acrylic table stand. There are 13 designs in the <a href="/shop?category=god-stands">god stand collection</a>, in three sizes. The No. 1 (small) and No. 2 (medium) sizes are under ₹299 at every quantity. The No. 3 (large) size costs ₹219 to ₹349 depending on quantity, so it is usually kept for the closest relatives.</p>
+<p>A god stand is a colour-enamelled silver foil image of a deity set in a clear acrylic table stand. There are 13 classic designs in the <a href="/shop?category=god-stands">god stand collection</a>, in three sizes. The No. 1 (small) and No. 2 (medium) sizes are under ₹299 at every quantity. The No. 3 (large) size costs ₹219 to ₹349 depending on quantity, so it is usually kept for the closest relatives.</p>
 
 <h2>Designs that suit a wedding</h2>
 <ul>
@@ -378,13 +378,13 @@ export const BLOG_POSTS = [
     description: "God idol stand return gifts made simple: compare No. 1, No. 2 and No. 3 silver foil god stands, choose a deity for each guest and plan mixed-faith lists.",
     excerpt: "Small, medium or large? Ganesh, Lakshmi or Venkateswara? A practical guide to choosing silver foil god stands, including Jesus and Makkah Madina designs for mixed guest lists.",
     date: '2026-11-04',
-    updated: '2026-11-04',
+    updated: '2026-11-10',
     readMinutes: 5,
     category: 'Buying guide',
     keywords: ['god idol stand return gift', 'god stand return gifts', 'silver foil god stand', 'god stand for car dashboard', 'interfaith return gifts', 'god photo stand for pooja shelf'],
     image: '/assets/products/kit-04-02.webp',
     imageAlt: "Ganesh silver foil god stand: a colour-enamelled image of Lord Ganesha seated, in a clear acrylic table stand",
-    html: `<p>A god stand return gift is a framed deity image that guests can keep on a desk, a car dashboard or a pooja shelf. At SWAYARI each stand is a colour-enamelled silver foil image set in a clear acrylic table stand, in 13 designs and three sizes, starting at ₹49 a piece. The two choices that matter are which deity to give and which size, and this guide covers both.</p>
+    html: `<p>A god stand return gift is a framed deity image that guests can keep on a desk, a car dashboard or a pooja shelf. At SWAYARI each stand is a colour-enamelled silver foil image set in a clear acrylic table stand, in 13 classic designs and three sizes, starting at ₹49 a piece, plus seven new 3D colour designs. The two choices that matter are which deity to give and which size, and this guide covers both.</p>
 
 <h2>What you get in a god stand</h2>
 <p>The deity's image is embossed on a silver foil sheet and coloured with enamel, so the figure stands out against the patterned background. The image sits inside a clear acrylic frame with a built-in stand, so it stays upright without any extra holder. Stands come in three sizes, and each size is priced separately.</p>
@@ -422,6 +422,9 @@ export const BLOG_POSTS = [
 <p>If you are unsure, use a simple rule: No. 1 for everyone on a long list, No. 2 for the people you want to honour a little more, and No. 3 for the handful closest to you. The No. 3 size costs more than ₹299 at every quantity, so it usually makes sense to keep it for a short list. If you want something larger still for a pooja room, see the <a href="/shop?category=god-frames">god frames collection</a>.</p>
 <p>Each size has its own slab, and designs of the same size count together. So 30 No. 1 Ganesh stands and 20 No. 1 Lakshmi stands make 50 small stands at ₹59 each. But 25 small and 25 medium stands are two separate groups of 25, priced at ₹69 and ₹139.</p>
 
+<h2>New: 3D colour god stands</h2>
+<p>For guests you want to honour with something special, the <a href="/product/venkateswara-balaji-3d-colour-god-stand">3D colour god stands</a> have a full-colour 3D printed deity raised in relief on a patterned silver foil background, in a white mount inside a clear acrylic table stand. There are seven unique designs: Venkateswara Balaji, Lakshmi Ganesh Shubh Labh, Ganesh, Radha Krishna, Ram Darbar, Shiva Parivar and Bal Krishna, all in one size. They cost ₹349 for 1–9 pieces, ₹299 for 10–49, ₹269 for 50–99 and ₹249 for 100 or more, and all seven designs count together for the slab.</p>
+
 <h2>Choosing the deity</h2>
 <h3>For weddings and couples</h3>
 <p>The Venkateswara Padmavathi, Radha Krishna and Ram Darbar stands all show a divine couple or family. Ram Darbar shows Lord Rama with Sita, Lakshmana and Hanuman, a picture many families see as the ideal household.</p>
@@ -456,7 +459,7 @@ export const BLOG_POSTS = [
 <li>On a desk, keep it away from water bottles and tea cups.</li>
 <li>In a shop or office cabin, place it on a shelf at eye level rather than on a low table, where it is easy to knock over.</li>
 </ul>
-<p>For cleaning and care, read our guide on <a href="/blog/what-is-silver-foil-care-and-cleaning-tips">silver foil care and display</a>. Browse all 13 designs in the <a href="/shop?category=god-stands">god stand collection</a>, or see ideas for offices in <a href="/shop?occasion=corporate-gifting">corporate gifting</a>.</p>`,
+<p>For cleaning and care, read our guide on <a href="/blog/what-is-silver-foil-care-and-cleaning-tips">silver foil care and display</a>. Browse every design in the <a href="/shop?category=god-stands">god stand collection</a>, or see ideas for offices in <a href="/shop?occasion=corporate-gifting">corporate gifting</a>.</p>`,
     faq: [
       { q: "What is the difference between the No. 1, No. 2 and No. 3 god stands?", a: "No. 1 is small, No. 2 is medium and No. 3 is large. No. 1 suits dashboards, desks and long guest lists, No. 2 suits office tables and special guests, and No. 3 suits pooja shelves and close family." },
       { q: "Do different sizes count together for bulk pricing?", a: "No. Each size has its own slab. Designs of the same size count together." },
@@ -467,7 +470,8 @@ export const BLOG_POSTS = [
       '/product/shiva-parivar-silver-foil-god-stand',
       '/product/multi-god-silver-foil-god-stand',
       '/product/jesus-silver-foil-god-stand',
-      '/product/makkah-madina-silver-foil-god-stand'
+      '/product/makkah-madina-silver-foil-god-stand',
+      '/product/venkateswara-balaji-3d-colour-god-stand'
     ]
   },
   {
@@ -477,7 +481,7 @@ export const BLOG_POSTS = [
     description: "How bulk return gift pricing works at SWAYARI: quantity slabs, mixing designs, worked examples, corporate Diwali gifts under ₹300 and delivery at cost.",
     excerpt: "Price slabs, mixing designs, when to round up, and how the cart-to-confirmation process works, with real worked examples.",
     date: '2026-11-04',
-    updated: '2026-11-04',
+    updated: '2026-11-10',
     readMinutes: 5,
     category: 'Buying guide',
     keywords: ['bulk return gifts hyderabad', 'bulk return gifts price', 'return gifts under 300', 'corporate diwali gifts under 300', 'return gifts bulk order online', 'stotram cards bulk price'],
@@ -496,7 +500,7 @@ export const BLOG_POSTS = [
 <tr><td>100+</td><td>₹39</td></tr>
 </tbody>
 </table>
-<h3>Silver foil god stands (13 designs, three sizes)</h3>
+<h3>Silver foil god stands (13 classic designs, three sizes)</h3>
 <table>
 <thead><tr><th>Stands of one size</th><th>No. 1 (small)</th><th>No. 2 (medium)</th><th>No. 3 (large)</th></tr></thead>
 <tbody>
@@ -506,7 +510,17 @@ export const BLOG_POSTS = [
 <tr><td>100+</td><td>₹49</td><td>₹99</td><td>₹219</td></tr>
 </tbody>
 </table>
-<p>For reference, the MRP is ₹199 for a stotram card, and ₹149, ₹299 and ₹599 for No. 1, No. 2 and No. 3 stands. The slab price is what you pay.</p>
+<h3>3D colour god stands (7 designs, one size)</h3>
+<table>
+<thead><tr><th>Total stands</th><th>Price per stand</th></tr></thead>
+<tbody>
+<tr><td>1–9</td><td>₹349</td></tr>
+<tr><td>10–49</td><td>₹299</td></tr>
+<tr><td>50–99</td><td>₹269</td></tr>
+<tr><td>100+</td><td>₹249</td></tr>
+</tbody>
+</table>
+<p>For reference, the MRP is ₹199 for a stotram card, ₹149, ₹299 and ₹599 for No. 1, No. 2 and No. 3 stands, and ₹599 for a 3D colour god stand. The slab price is what you pay.</p>
 
 <h2>Rule 1: mix designs freely</h2>
 <p>All 18 card designs count together. Order 20 Lakshmi Ashtottaram, 20 Ganesha Ashtottara and 20 Lingashtakam cards and you have 60 cards, so every card is priced at the 50–99 slab:</p>

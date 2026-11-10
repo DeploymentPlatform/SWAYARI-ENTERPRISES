@@ -1077,13 +1077,13 @@ await test('39. Sample data is strictly isolated when ENVIRONMENT is missing, em
 const liveDb = createMockD1();
 const liveRows = sql => liveDb._rawDb.prepare(sql).all();
 
-await test('40. Live catalogue is the 91 kit designs under ₹2,999 in four categories at the exact kit prices', async () => {
+await test('40. Live catalogue is the 98 designs under ₹2,999 in four categories at the exact kit prices', async () => {
   const products = liveRows("SELECT * FROM products WHERE status = 'published' AND is_demo = 0");
-  assert.equal(products.length, 91, '91 designs are for sale');
+  assert.equal(products.length, 98, '91 kit designs + 7 3D colour god stands are for sale');
   assert.ok(products.every(p => p.indicative_price <= 2999), 'Nothing above ₹2,999 is for sale');
   // The wall frames are archived (kept for earlier requests), with their kit prices intact
   const kit = liveRows("SELECT * FROM products WHERE id LIKE 'kit-%'");
-  assert.equal(kit.length, 94);
+  assert.equal(kit.length, 101);
   const byId = Object.fromEntries(kit.map(p => [p.id, p]));
   assert.deepEqual(['kit-05-01', 'kit-06-01', 'kit-07-01'].map(id => byId[id].status), ['archived', 'archived', 'archived']);
   const tiers = id => JSON.parse(byId[id].bulk_tiers_json).map(t => t.unit_price);
@@ -1103,6 +1103,17 @@ await test('40. Live catalogue is the 91 kit designs under ₹2,999 in four cate
     ['No. 3 (large)', 599, [349, 289, 249, 219]]
   ]);
   assert.deepEqual(JSON.parse(byId['kit-09-01'].variants_json).map(v => v.tiers.map(t => t.min_qty)), [[1, 3, 10, 25], [1, 3, 10, 25]]);
+  // 3D colour god stands (cost ₹150): one size, seven designs share one slab group
+  const stands3d = kit.filter(p => p.price_group === '13');
+  assert.equal(stands3d.length, 7);
+  for (const p of stands3d) {
+    assert.equal(p.category_id, 'cat-god-stands');
+    assert.equal(p.status, 'published');
+    assert.equal(p.mrp, 599);
+    assert.equal(p.has_variants, 0);
+    assert.deepEqual(tiers(p.id), [349, 299, 269, 249]);
+    assert.equal(JSON.parse(p.images).length, 2, `${p.name}: stand photo and close-up`);
+  }
   for (const p of products) {
     const prices = JSON.parse(p.bulk_tiers_json).map(t => t.unit_price);
     assert.ok(prices.every(x => x % 10 === 9), `${p.name}: every price ends in 9`);

@@ -100,7 +100,7 @@ export const LANDINGS = {
     'god-stands': {
       title: 'Silver Foil God Stands — Return Gifts from ₹49',
       description:
-        'Colour silver foil god images in clear acrylic stands, in three sizes from ₹89. Mix designs for bulk prices from ₹49 — wedding and housewarming return gifts.'
+        'Colour silver foil god images and new 3D colour designs in clear acrylic stands, from ₹89. Mix designs for bulk prices from ₹49 — wedding return gifts.'
     },
     'stotram-cards': {
       title: 'Silver Foil Stotram Cards — Return Gifts from ₹39',
